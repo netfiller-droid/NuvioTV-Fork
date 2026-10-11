@@ -428,7 +428,7 @@ private fun heroClock(fixture: SportsFixture, item: IptvFixtureItem, hidden: Boo
         }
         is SportsDetail.Card -> {
             val bout = detail.live
-            Clock(bout?.weightClass, bout?.let { b -> b.round?.let { stringResource(R.string.iptv_sport5_section_fight_round, it) } } ?: live,
+            Clock(bout?.weightClass, bout?.let { b -> b.round?.let { stringResource(R.string.iptv_sport5_section_fight_round, it) } } ?: fixture.detail ?: live,
                 bout?.let { "${fighterName(it.first)} v ${fighterName(it.second)}" })
         }
         is SportsDetail.Cricket -> {

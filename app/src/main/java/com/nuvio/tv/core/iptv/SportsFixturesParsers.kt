@@ -471,7 +471,8 @@ object EspnScoreboard {
             else -> null
         }
         val last = json.optJSONObject("lastPlay")
-        val lastPlay = last?.text("text")?.replace(SPACES, " ")?.replaceFirst(SNAP, "")?.take(MAX_PLAY)
+        val lastPlay = last?.text("text")?.replace(SPACES, " ")?.replaceFirst(SNAP, "")?.let { text ->
+            last.optJSONObject("type")?.text("text")?.takeIf { text.startsWith("(") && text.endsWith(")") }?.let { "$it $text" } ?: text }?.take(MAX_PLAY)
         val probability = last?.optJSONObject("probability") ?: json.optJSONObject("probability")
         val homeWin = probability?.let { if (it.isNull("homeWinPercentage")) null else it.optDouble("homeWinPercentage", Double.NaN) }
             ?.takeIf { !it.isNaN() && it >= 0 }?.let { if (it <= 1.0) it * 100 else it }?.takeIf { it <= 100.0 }?.let { Math.round(it).toInt() }

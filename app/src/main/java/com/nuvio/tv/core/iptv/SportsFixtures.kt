@@ -350,6 +350,7 @@ object SportsFavourites {
 
 object SportsFixtureText {
     private val US_SPORTS = setOf("american-football", "basketball", "baseball", "ice-hockey")
+    private val ZERO_CLOCK = Regex("0+(?:[:.]0+)?'?")
 
     fun awayFirst(fixture: SportsFixture): Boolean = fixture.sport in US_SPORTS
 
@@ -364,7 +365,7 @@ object SportsFixtureText {
     fun periodClock(fixture: SportsFixture): String? {
         if (fixture.status != FixtureStatus.LIVE) return null
         val label = fixture.period?.takeIf { it > 0 }?.let { periodLabel(fixture.sport, it) }
-        val clock = fixture.clock?.trim()?.takeIf { it.isNotEmpty() && it != "0:00" && it != "0'" && it != "0" }
+        val clock = fixture.clock?.trim()?.takeIf { it.isNotEmpty() && !ZERO_CLOCK.matches(it) }
         return if (label != null && clock != null) "$label · $clock" else fixture.detail ?: label ?: clock
     }
 
@@ -466,7 +467,8 @@ object SportsFixtureText {
         val bout = detail.live ?: detail.mainEvent ?: return SportsBugText(fixture.title, fixture.detail)
         val primary = "${fighter(bout.first)} v ${fighter(bout.second)}"
         return when {
-            bout.state == FixtureStatus.LIVE -> SportsBugText(primary, "Round ${bout.round ?: 1}" + (bout.rounds?.let { " of $it" } ?: ""), bout.weightClass)
+            bout.state == FixtureStatus.LIVE -> SportsBugText(primary, (if (bout.round == null) fixture.detail else null)
+                ?: ("Round ${bout.round ?: 1}" + (bout.rounds?.let { " of $it" } ?: "")), bout.weightClass)
             fixture.status == FixtureStatus.FINAL -> SportsBugText(primary, fixture.detail ?: "Final", bout.weightClass)
             else -> SportsBugText(primary, bout.weightClass, bout.rounds?.let { "$it rounds" })
         }

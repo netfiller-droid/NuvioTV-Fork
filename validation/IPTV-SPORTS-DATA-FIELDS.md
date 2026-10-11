@@ -638,3 +638,45 @@ between innings); NFL live `situation`; tennis serve in a match tiebreak; F1/NAS
 order and gaps; UFC round in progress; cricket live innings; AFL/NRL live clock; golf after
 a cut; football own goals, penalties, second yellows and the half-time and second-half
 status names on the scoreboard.
+
+## Ninth pass (11 October, 11:03)
+
+ESPN responses captured at 11:03 Brisbane time on 11 October (01:03Z), 28 minutes after the
+eighth pass; no TheSportsDB calls. In play: the same MLB game (Cleveland v Chicago White Sox,
+bottom of the 4th, 0–0, no outs, a runner on first), six NBA preseason games (one in the 4th,
+one at the end of the 3rd, one in the 3rd, two in the 2nd, one in the 1st), four college
+football games (one at half-time, three in the 2nd quarter), eight NHL games (five at the
+second intermission, two at 20:00 of the 3rd, one in the 2nd), the PGA final round and the
+UFC card at the walkouts of the next main-card bout. The Premier League, NBL and URC live
+files are byte-for-byte the earlier ones. No pitching change, NBA overtime, red zone,
+overtime, empty net or shootout was on. Trimmed copies are in
+`app/src/test/resources/sports/espn-*-real-20261011c.json` (`SportsRealDataLateMorningTest`).
+
+| Shape | What the real response showed | Parser change |
+|---|---|---|
+| MLB scoreboard (live, at-bat) | `shortDetail` `Bot 4th`, `displayClock` `0:00`. `situation` `balls`/`strikes`/`outs` 0, `onFirst` true, `pitcher` and `batter` with full athlete, `period` and a `summary` line (`3.0 IP, 0 ER, H, 2 K, 0 BB`, `0-1`); `lastPlay` the new at-bat (`summaryType` `A`, `Sean Burke pitches to Jose Ramirez`). | none |
+| MLB summary (live, at-bat) | Fetched just before the scoreboard (last update 01:02:09Z): the plays end on Kwan's single (`N`) and the untexted `end-batterpitcher` row, but the root `situation` still holds that finished at-bat: `strikes` 1, `batter.playerId` Kwan while `onFirst.playerId` is also Kwan. Runners on play rows are `onFirst: {athlete: {id}}` plus an `onFirst` participant. New pitch types: `bunted-foul` (alternative text `Out`), `single` as the in-play pitch. `situationNotes` now `BVP_STATS` (batter v pitcher). Half-innings 8–14 real minutes; bottom of the 4th began 61 min after the listed start (shape 58). | Once the at-bat's end row is the last play and the situation still names that batter, the count reads 0–0 with no batter (runners and outs kept); a situation already on the next batter is used as given |
+| NBA scoreboard (live) | `STATUS_END_PERIOD` with `displayClock` `0.0` (the sub-minute format), `shortDetail` `End of 3rd`, `lastPlay` `End of the 3rd Quarter`. Two more free-throw `lastPlay`s with no player or team. | A zero clock in any form (`0.0`, `00:00`) gives the status text: `End of 3rd`, was `Q3 · 0.0` |
+| NBA summary (live, 4th) | Same shape as the eighth pass with four quarters on the line. Quarters 28, 37 and 33 real minutes, half-time 16; 5:55 of the 4th at 152 min after the listed start (shape 135). | none (play markers use the wallclock) |
+| College football scoreboard (half-time) | `STATUS_HALFTIME`, `displayClock` `0:00`; `situation` `down` and `distance` -1, `yardLine` 65, no texts or possession; `lastPlay` the conversion, text `(A. Zouagui KICK)` with type `Extra Point Good`. Elsewhere `isRedZone` false (one drive at its own 18). | A last play wholly in brackets is led by its type: `Extra Point Good (A. Zouagui KICK)` |
+| College football summary (half-time) | `drives.current` repeats the last `previous` drive. The touchdown's play text runs past 240 characters (the score, an automatic review, an LSU timeout and the kick with holder and snapper); `scoringPlays` has the short form (`K. Minchey run for 1 yd, for a TD (A. Zouagui KICK)`). The 2nd quarter took 53 real minutes; half-time began 104 min after the listed start (shape 94). | Last plays use the scoring summary's text for a scoring play |
+| NHL scoreboard | Second intermission `STATUS_END_PERIOD` `End of 2nd`, `0:00`. Start of the 3rd is `STATUS_IN_PROGRESS` `20:00 - 3rd` while `lastPlay` is still `End of 2nd Period`. | none |
+| NHL summary (intermission) | Fighting majors (5 min each side) at 19:27 of the 2nd, one tagged `Even Strength`, the other `Power Play`; a goalie's 10-minute misconduct served by a skater; a delay-of-game minor followed by `Shorthanded`/`Power Play` rows and a power-play goal. Play clocks count up (`End of 2nd Period` at 20:00). The 2nd period took 45 real minutes (shape 88 min to its end, real 105). | none: the per-side count from the eighth pass reads the fighting majors as even strength |
+| UFC (walkouts) | New bout status `STATUS_FIGHTERS_WALKING`: state `in`, `period` 0, `displayClock` `-`, `shortDetail` `Walkouts`, `details` `Fight Open`. The bout before it finished in round 2 at 0:22. | Until a round starts the bug shows the bout's status (`Walkouts`, `Pre-fight`) instead of `Round 1 of 3` |
+| Golf | Leaders tee off at 01:21Z; a player who teed off four minutes before the capture had no `thru` yet. | none |
+
+Checked again on this data: the between-innings rule (`Mid` rows and the `periodPrefix`),
+pitch rows left out of the last plays, a situation player given by `playerId`, NBA clocks
+under a minute and win probability, college football spots and snap-clock prefixes, NHL
+penalties counted per side.
+
+Confirmed now: MLB count, runners, outs and pitcher during an inning; NBA end of quarter and
+the 4th quarter; college football half-time on the scoreboard and summary; NHL fighting
+majors, misconduct and the start of a period at 20:00; UFC walkouts status.
+
+Still unconfirmed: MLB pitching change, runners on second or third and a full count; NBA
+overtime; college football red zone and overtime; NHL empty net and shootout; men's college
+basketball (not in the capture); NFL live `situation`; tennis serve in a match tiebreak;
+F1/NASCAR live order and gaps; UFC round in progress; cricket live innings; AFL/NRL live
+clock; golf after a cut; football own goals, penalties, second yellows and the half-time
+and second-half status names on the scoreboard.

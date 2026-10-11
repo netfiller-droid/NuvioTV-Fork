@@ -776,6 +776,14 @@ Sport data (second capture of 11 October, first real live baseball):
   Coppa Italia, Coupe de France, Belgian Pro League, Brasileirão, Argentine Primera División
   and J1 League.
 
+Sport data (third capture of 11 October, 11:03):
+- Baseball: after a hit or walk the count resets to 0–0 and the runner no longer shows as
+  the batter.
+- Basketball: the score shows "End of 3rd" at the end of a quarter instead of "Q3 · 0.0".
+- UFC: before a bout starts the score and the Sport hero show "Walkouts" or "Pre-fight"
+  instead of "Round 1".
+- College football: conversions and touchdowns read cleanly in the last plays.
+
 ## Ready below the UI (screens pending)
 
 - Provider account groups shared by several sources (each source has its own

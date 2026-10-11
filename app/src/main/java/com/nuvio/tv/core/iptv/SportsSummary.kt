@@ -383,13 +383,17 @@ object EspnSummary {
         fun on(json: JSONObject?, key: String): Boolean? = json?.takeIf { it.has(key) }?.let { j ->
             when (val v = j.opt(key)) { is JSONObject -> true; is Boolean -> v; is Number -> v.toInt() != 0; else -> false }
         }
+        fun lastId(role: String) = last?.optJSONArray("participants")?.let(::objs)?.firstOrNull { it.str("type") == role }?.optJSONObject("athlete")?.str("id")
+        val atBatOver = last?.optJSONObject("type")?.str("type") == "end-batterpitcher" &&
+            situation?.optJSONObject("batter")?.let { it.str("playerId") ?: it.optJSONObject("athlete")?.str("id") }.let { it == null || it == lastId("batter") }
         fun person(role: String): String? {
+            if (role == "batter" && atBatOver) return null
             situation?.optJSONObject(role)?.let { p -> (p.optJSONObject("athlete") ?: p).let { it.str("displayName") ?: it.str("shortName") ?: (it.str("id") ?: p.str("playerId"))?.let(names::get) } }
                 ?.let { return it }
             val participant = last?.optJSONArray("participants")?.let(::objs)?.firstOrNull { it.str("type") == role }?.optJSONObject("athlete") ?: return null
             return participant.str("displayName") ?: participant.str("id")?.let(names::get)
         }
-        return SummaryCount(situation?.int("balls") ?: tally?.int("balls"), situation?.int("strikes") ?: tally?.int("strikes"),
+        return SummaryCount(if (atBatOver) 0 else situation?.int("balls") ?: tally?.int("balls"), if (atBatOver) 0 else situation?.int("strikes") ?: tally?.int("strikes"),
             situation?.int("outs") ?: last?.int("outs"), on(situation, "onFirst") ?: on(last, "onFirst") ?: false,
             on(situation, "onSecond") ?: on(last, "onSecond") ?: false, on(situation, "onThird") ?: on(last, "onThird") ?: false,
             period?.int("number"), period?.str("type")?.let(::bottom), person("pitcher"), person("batter"))
@@ -428,8 +432,9 @@ object EspnSummary {
     }
 
     private fun lastPlays(root: JSONObject, plays: List<JSONObject>): List<SummaryPlay> {
+        val scored = root.optJSONArray("scoringPlays")?.let(::objs).orEmpty().mapNotNull { s -> s.str("id")?.let { id -> s.str("text")?.let { id to it } } }.toMap()
         val fromPlays = plays.filter { it.str("text") != null }.takeLast(3).map {
-            SummaryPlay(plain(it.str("text")!!).replaceFirst(SNAP, "").take(MAX_TEXT), it.optJSONObject("period")?.int("number"), clock(it))
+            SummaryPlay(plain(it.str("id")?.let(scored::get) ?: it.str("text")!!).replaceFirst(SNAP, "").take(MAX_TEXT), it.optJSONObject("period")?.int("number"), clock(it))
         }
         if (fromPlays.isNotEmpty()) return fromPlays.reversed()
         return root.optJSONArray("commentary")?.let(::objs).orEmpty().filter { it.str("text") != null }.takeLast(3).map {
