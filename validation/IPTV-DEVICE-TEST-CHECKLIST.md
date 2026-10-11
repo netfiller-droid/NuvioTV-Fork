@@ -1,4 +1,4 @@
-# Nuvio IPTV — device test checklist (build `7741e4029`, run 38101462318)
+# Nuvio IPTV — device test checklist (build `428ec7c99`, run 38109063375)
 
 For this build start with section 7k, then 7j, 7i, 7h, 7g, 7f, 7e, 7d, 7c (fixes from the second 9 October pass), then 7b, 7 (Sport) and the rest.
 
@@ -84,7 +84,7 @@ logcat (`adb logcat -s NuvioIptv:V *:E`). Do not share logs that contain address
    stop (`sports fetch` lines cease).
 12. Useful logs: `sports fetch service=`, `sports links`, `sports fixtures`.
 
-## 7k. Sport page, multiview and schedule look (build `7bf9f8b5a`; try on the 4K TV and a 1080p one if you can)
+## 7k. Sport page, multiview and schedule look (build `428ec7c99`; try on the 4K TV and a 1080p one if you can)
 Sport page:
 1. On a quiet day the row fills with "Earlier today" results, tomorrow's games and "Your
    teams next", each with a small label; no single card left on its own; the D-pad moves

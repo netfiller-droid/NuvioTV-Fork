@@ -1015,6 +1015,10 @@ Phone setup (security review)
 
 ## Validation
 
+- Sport page, multiview strips, All scores day strip and league picker screen: CI debug
+  green at `428ec7c99` (run 38109063375; run 38108029708 at `7bf9f8b5a` failed on one
+  compile error, a hidden ICU number formatter, fixed). 924 core and 298 data-layer JVM
+  tests on the host. Not device-tested.
 - Third 11 October capture (11:03; baseball count after an at-bat, end of quarter, UFC
   walkouts, college football last plays): CI debug green at `7741e4029` (run
   38101462318); 895 core and 293 data-layer JVM tests on the host. Not device-tested.

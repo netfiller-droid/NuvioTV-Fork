@@ -9,6 +9,17 @@ Older sections further down are history; read "Start here" first.
 
 ## Start here — next session (from 10 October 2026)
 
+Update 11 October (afternoon): the Sport visual decisions (items 1–9 in "Decisions — 11
+October 2026 (Sport visuals)") are done in code (`3397061c8`, `7bf9f8b5a`, `428ec7c99`).
+Build: CI debug green at `428ec7c99` (run 38109063375); checklist starts at 7k; a printable
+test sheet was generated from the checklist (7k–7e). Follow-ups: move the multiview
+"Channel and programme" key (`multiview-labels`) into IptvLivePreferences and the setup
+backup; unused strings `iptv_sport5_section_other_feeds`, `iptv_sport7_source_both`,
+`iptv_sport7_source_needs_key`; past tennis results on earlier days are dropped by the
+parser's 12 h rule; ordinal table positions are English-only (other languages show the
+number). Channel-matching ideas (event/team channel names, confidence labels, remembered
+feed, HD/4K grouping, "My countries", more cricket) still await the user's choice.
+
 Update 11 October (midday): second capture of the day checked (first real live baseball;
 `1cafb6dab`): baseball between innings and at-bat last plays, NHL offsetting penalties,
 college football at midfield, worldwide TV channels, 14 more football competitions. Build:
@@ -75,7 +86,7 @@ session winners shown. CI green at `3de7568` (run 38012700521) and at `3065341` 
 focused game's summary (one extra request).
 
 Next, in order:
-1. Device pass on `7741e4029` (run 38101462318; checklist 7j, 7i, 7h, 7g, 7f, then 7e); take the findings,
+1. Device pass on `428ec7c99` (run 38109063375; checklist 7k, 7j, 7i, 7h, 7g, 7f, then 7e); take the findings,
    record and fix them the same way. Playback options, menu order, external player and
    source expiry (7e) have not been tried on a device yet.
 2. Waiting on the user (do not do these without them):
