@@ -10,6 +10,8 @@ data class RecordingTimeline(val marks: List<RecordingMark>, val endOffset: Long
         require(marks.zipWithNext().all { (a, b) -> b.offset > a.offset && b.millis >= a.millis })
     }
 
+    fun covers(total: Long): Boolean = if (probed) endOffset == total else total - endOffset < UNCOVERED_BYTES
+
     fun encode(): String = buildString {
         append(VERSION).append(' ').append(endOffset).append(' ').append(endMillis)
         if (probed) append(" p")
@@ -27,6 +29,7 @@ data class RecordingTimeline(val marks: List<RecordingMark>, val endOffset: Long
 
     companion object {
         const val MAX_MARKS = 20_000
+        const val UNCOVERED_BYTES = 8L * 1024 * 1024
         private const val VERSION = "v1"
 
         fun decode(text: String): RecordingTimeline? = try {
@@ -104,6 +107,10 @@ class RecordingClock(private var markMillis: Long = 4_000, private val maxMarks:
     private var synced = true
     private var pid = -1
     private var stale = 0
+    private var foreignPid = -1
+    private var foreignOffset = 0L
+    private var foreignPcr = 0L
+    private var foreignTicks = 0L
     private var lastPcr = -1L
     private var lastOffset = -1L
     private var ticks = 0L
@@ -117,6 +124,7 @@ class RecordingClock(private var markMillis: Long = 4_000, private val maxMarks:
         require(offset >= 0)
         pendingCut = offset
         lastPcr = -1
+        stale = 0
         carried = 0
         synced = true
     }
@@ -172,12 +180,19 @@ class RecordingClock(private var markMillis: Long = 4_000, private val maxMarks:
 
     private fun packet(data: ByteArray, at: Int, offset: Long) {
         val pcr = TsClock.pcr(data, at, offset) ?: return
-        if (pid < 0) pid = pcr.pid
+        if (pid < 0 || lastPcr < 0) pid = pcr.pid
         if (pcr.pid != pid) {
+            if (stale == 0) foreignOffset = offset
+            if (stale == 0 || pcr.pid != foreignPid) { foreignPid = pcr.pid; foreignTicks = 0 }
+            else TsClock.delta(foreignPcr, pcr.value).takeIf { !pcr.reset && TsClock.continuous(it) }?.let { foreignTicks += it }
+            foreignPcr = pcr.value
             if (++stale < RELOCK_AFTER) return
             pid = pcr.pid
             stale = 0
-            if (lastPcr >= 0) { mark(offset, true); remember(pcr); return }
+            mark(foreignOffset, true)
+            ticks += foreignTicks
+            remember(pcr)
+            return
         }
         stale = 0
         if (lastPcr < 0) {

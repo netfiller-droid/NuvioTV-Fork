@@ -862,6 +862,25 @@ Sport screens and multiview:
   and carried in the setup backup; "Hide score on this picture" stays set while Live TV is
   open, including after closing and reopening multiview.
 
+Recordings, guide and catch-up:
+- Guide: Left on the first programme of a channel with only now/next listings, or after
+  loading earlier listings failed, opens the menu; a failed load is tried again on the
+  next Left. Choosing a programme older than the provider's archive no longer stops the
+  channel that is playing.
+- A stream that changes its clock track after a reconnect no longer loses about 8 seconds
+  per change, so length and seeking stay right; older recordings whose clock track changed
+  part-way are split correctly when prepared for playback; a recording cut short by the app
+  closing is scanned before playback instead of guessing its last part.
+- Backing out while "Preparing the recording…" shows, or leaving playback, no longer leaves
+  the share connection or file open; pressing OK twice opens a recording once; "Preparing…"
+  only appears when the recording needs scanning.
+- Deleting a recording while it records no longer leaves its time index behind, and while it
+  uploads to a WebDAV share no longer leaves a "(2).ts.part" file on the share.
+- Opening Recordings retries waiting uploads, and uploading resumes once there is room for
+  the next part rather than the whole backlog. With a WebDAV share without partial upload, a
+  full share now shows "upload paused" while recording and stops the recording at about 2 GB
+  waiting, as for other shares.
+
 ## Reliability
 
 - A stream is replaced only after the previous decoder and HTTP connections have

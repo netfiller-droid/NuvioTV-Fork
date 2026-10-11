@@ -4,6 +4,8 @@ import com.nuvio.tv.core.iptv.RecordingUpload
 import java.io.File
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicLong
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
@@ -25,6 +27,7 @@ class FakeShare : IptvShareConnector {
     @Volatile var append = true
     @Volatile var overwrites = false
     @Volatile var beforeRename: (() -> Unit)? = null
+    @Volatile var onWrite: (() -> Unit)? = null
     val totals = ArrayList<Long>()
     var connects = 0
     var flushes = 0
@@ -94,6 +97,8 @@ class FakeShare : IptvShareConnector {
             val next = current.copyOf(maxOf(current.size, (offset + count).toInt()))
             System.arraycopy(buffer, start, next, offset.toInt(), count)
             files[path] = next
+            onWrite?.invoke()
+            Unit
         }
         override fun read(offset: Long, buffer: ByteArray, start: Int, count: Int): Int = synchronized(this@FakeShare) {
             check()
@@ -336,6 +341,53 @@ class IptvRecordingUploaderTest {
         val down = IptvRecordingUploader(share, pause = { }, now = { 0L }, onIssue = { issues += it }).upload(spool(bytes(10, 1)), "g.ts", { Long.MAX_VALUE }, { true }, 0)
         assertEquals(IptvShareError.UNREACHABLE, down.error)
         assertEquals(IptvShareError.UNREACHABLE, issues.last())
+    }
+
+    @Test fun uploadStartsWhenTheNextPieceFitsRatherThanTheWholeBacklog() = runBlocking {
+        val share = FakeShare().apply { free = 160 }
+        val pieces = arrayOf(bytes(100, 33), bytes(100, 34), bytes(100, 35))
+        val issues = ArrayList<IptvShareError?>()
+        val result = IptvRecordingUploader(share, pause = { }, now = { 0L }, chunkBytes = 64, minimumFreeBytes = 50, onIssue = { issues += it })
+            .upload(spool(*pieces), "n.ts", { Long.MAX_VALUE }, { true }, 0)
+        assertEquals(IptvUploadOutcome(IptvUploadResult.DONE, 300, remote = "n.ts"), result)
+        assertEquals(listOf<IptvShareError?>(null), issues)
+        share.free = 140
+        val full = IptvRecordingUploader(share, pause = { }, now = { 0L }, chunkBytes = 64, minimumFreeBytes = 50).upload(spool(*pieces), "m.ts", { Long.MAX_VALUE }, { true }, 0)
+        assertEquals(IptvShareError.FULL, full.error)
+    }
+
+    @Test fun wholeFileTargetReportsAFullShareWhileStillRecording() = runBlocking {
+        val share = FakeShare().apply { append = false; free = 10 }
+        val issues = ArrayList<IptvShareError?>()
+        var pauses = 0
+        val uploader = IptvRecordingUploader(share, pause = { if (++pauses == 4) share.free = Long.MAX_VALUE }, now = { 0L }, chunkBytes = 64,
+            minimumFreeBytes = 50, onIssue = { issues += it })
+        val data = bytes(100, 36)
+        val result = uploader.upload(spool(data), "v.ts", { Long.MAX_VALUE }, { pauses >= 8 }, 60_000)
+        assertEquals(IptvUploadOutcome(IptvUploadResult.DONE, 100, remote = "v.ts"), result)
+        assertEquals(listOf(IptvShareError.FULL, null), issues)
+        assertArrayEquals(data, share.text("v.ts"))
+        val quiet = FakeShare().apply { append = false; free = 10 }
+        var waits = 0
+        val unchecked = IptvRecordingUploader(quiet, pause = { if (++waits == 4) quiet.free = Long.MAX_VALUE }, now = { 0L }, minimumFreeBytes = 50,
+            checkWhileWaiting = false).upload(spool(data), "q.ts", { Long.MAX_VALUE }, { waits >= 8 }, 60_000)
+        assertEquals(IptvUploadResult.DONE, unchecked.result)
+        assertEquals(2, quiet.connects)
+    }
+
+    @Test fun cancelledWholeFileUploadRemovesTheCopyItWasWriting() = runBlocking {
+        val share = FakeShare().apply { append = false }
+        val other = bytes(70, 37)
+        share.files["c.ts"] = other
+        val uploader = IptvRecordingUploader(share, pause = { }, now = { 0L }, chunkBytes = 64, minimumFreeBytes = 0)
+        val dir = spool(bytes(400, 38))
+        val job = async(Dispatchers.IO, start = CoroutineStart.LAZY) { uploader.upload(dir, "c.ts", { Long.MAX_VALUE }, { true }, 60_000) }
+        share.onWrite = { share.onWrite = null; job.cancel() }
+        job.start()
+        try { withTimeout(10_000) { job.await() }; fail() } catch (_: CancellationException) { }
+        assertEquals(setOf("c.ts"), share.files.keys)
+        assertArrayEquals(other, share.text("c.ts"))
+        assertTrue(File(dir, RecordingUpload.spoolName(0)).exists())
     }
 
     @Test fun fullShareWaitsWithoutWriting() = runBlocking {

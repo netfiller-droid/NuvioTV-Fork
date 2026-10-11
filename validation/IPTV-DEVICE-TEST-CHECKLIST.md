@@ -110,6 +110,13 @@ logcat (`adb logcat -s NuvioIptv:V *:E`). Do not share logs that contain address
     it on another box (or after clearing data): the choice comes back.
 12. 1080p box, a game with a short Sport hero: the two teams' facts sit side by side and
     "Last met" still shows.
+13. Recordings: press OK twice quickly on a recording: it opens once. Press Back while
+    "Preparing the recording…" shows on a NAS recording, then open it again: it opens
+    normally (no stuck connection).
+14. Delete a recording while it is still recording (and, with a WebDAV share, while it
+    uploads): no leftover files on the box or the share.
+15. Guide catch-up: OK on a programme right at the edge of the archive does not stop the
+    channel that is playing.
 
 ## 7m. Live NFL and NASCAR from the 12 October capture (build `85fe99dce`)
 1. Live NFL game, score over the video: three small bars beside each team logo show the
@@ -215,9 +222,11 @@ Recordings (use last night's NAS recording and a new one):
    the time shown. On the old recording a seek may be a few seconds out; note how far.
 3. Watch a few minutes, back out, open it again: it resumes there. The recording's options
    show "Resume from …" and "Play from start"; the row shows a progress line.
-4. Watch to within a minute of the end, back out: next time it starts from the beginning.
+4. Watch to near the end (within a minute, or 1/50 of the length for long recordings: about
+   3½ minutes for 3 h), back out: next time it starts from the beginning.
 5. Make a new short recording (to the NAS and to device storage) with a network drop if
-   you can: length correct, seeks exact, no "Preparing" step.
+   you can: length correct, seeks exact, no "Preparing" step (a recording cut short by the
+   app closing may show "Preparing" once).
 6. No watch party button when playing a recording; IPTV movies and series still have it.
 7. NAS asleep when opening a recording: note whether the first seconds stall or retry.
 Guide catch-up (on a channel with the history mark):
@@ -227,7 +236,8 @@ Guide catch-up (on a channel with the history mark):
    from the start. Past programmes on other channels are dimmed (is the dimming right?).
 10. Rewind / Fast-forward jump 3 hours; the time bar shows the day when not today.
 11. Back returns to now; the next Back opens the menu. Left at the earliest reachable
-    programme opens the menu.
+    programme opens the menu, also on a channel with only now/next listings and after a
+    failed earlier-guide load (Left again retries).
 12. A programme older than the provider's archive: OK says "No catch-up for this
     programme" and does not stop what is playing.
 13. With a corner picture playing, Rewind/Fast-forward still work in the guide.
@@ -248,10 +258,13 @@ Guide catch-up (on a channel with the history mark):
 7. Live rugby: the clock is not stuck on 1'; half scores do not show "0 0".
 8. Football Game Centre: substitutions read "X replaces Y".
 9. Recording to a network share that is full (or nearly full): the recording row shows
-   "Share full – upload paused until there's space" in red; after freeing space it clears
-   within the next retry (up to 15 minutes, or open Recordings).
+   "Share full – upload paused until there's space" in red; after freeing space (enough for
+   the next 256 MB part plus 100 MB; for a WebDAV share without partial upload, the whole
+   recording plus 100 MB) it clears within about a minute while recording, or for a finished
+   recording at the next retry (up to 15 minutes) or when you open Recordings.
 10. Keep the share full: the recording stops once about 2 GB is waiting on the box, marked
-    "The network share is full"; it uploads after space is freed.
+    "The network share is full"; it uploads after space is freed. Also with a WebDAV share
+    that has no partial upload.
 11. Box storage low while recording to a share: the reason says the TV box's storage.
 
 ## 7g. Fixes from the night review of 10 October (build `c1685393a`)

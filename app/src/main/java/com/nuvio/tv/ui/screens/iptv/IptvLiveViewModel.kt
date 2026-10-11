@@ -39,7 +39,8 @@ data class IptvLiveState(val sources: List<IptvSource> = emptyList(), val source
     val extraGuide: Map<String, GuideGridRow> = emptyMap(), val scrubProgrammes: List<GuideProgramme> = emptyList(),
     val catchupUntil: Long? = null, val scrubTarget: Long? = null, val inset: IptvTile? = null, val picker: IptvPicker? = null,
     val localTimeshift: Boolean = false, val localBehind: Boolean = false,
-    val pastWindow: GuideGridWindow? = null, val pastGuide: Map<String, GuideGridRow> = emptyMap(), val pastDays: Int = 1) {
+    val pastWindow: GuideGridWindow? = null, val pastGuide: Map<String, GuideGridRow> = emptyMap(), val pastDays: Int = 1,
+    val pastLoading: Boolean = false, val pastRound: Int = 0) {
     val mergedFavourites: Boolean get() = allSources && favourites && search.isBlank()
     val canReorder: Boolean get() = source != null && search.isBlank() && !sports && !mergedFavourites
 }
@@ -121,6 +122,8 @@ class IptvLiveViewModel @Inject constructor(@ApplicationContext private val cont
     private var extraGuideJob: Job? = null
     private var pastJob: Job? = null
     private var pastWanted: GuideGridWindow? = null
+    private var pastSerial = 0
+    private var pastFailed = false
     private var pastBand: Set<String> = emptySet()
     private val timeshiftPreferences = IptvTimeshiftPreferences(context)
     private var fullscreen = false
@@ -823,6 +826,11 @@ class IptvLiveViewModel @Inject constructor(@ApplicationContext private val cont
             fullscreenRequested.value = true
             return
         }
+        val kind = live.sources.firstOrNull { it.ref.sourceId == row.item.channel.sourceId }?.kind
+        if (catchup != null && kind != null && !IptvCatchup.reaches(kind, row.item.attributes, from ?: catchup.start.epochMillis, System.currentTimeMillis())) {
+            if (!auto) mutable.update { it.copy(message = R.string.iptv_live_catchup_unavailable) }
+            return
+        }
         tuneJob?.cancel(); scrubJob?.cancel(); catchupWatch?.cancel(); warmJob?.cancel()
         runtime.interrupt(owner)
         val insetClosing = if (live.inset?.row?.item?.channel?.id == row.item.channel.id) { closeInset(); insetJob } else null
@@ -1056,42 +1064,49 @@ class IptvLiveViewModel @Inject constructor(@ApplicationContext private val cont
             else -> watch(row)
         }
     }
-    fun browseGuide(from: Long, until: Long) {
+    fun browseGuide(from: Long, until: Long): Boolean {
         val state = mutable.value
-        val home = state.window ?: return
+        val home = state.window ?: return false
         val earliest = if (session == null || (state.sports && state.search.isBlank())) null else GuidePast.earliest(System.currentTimeMillis(), state.pastDays)
         val target = GuidePast.follow(home, pastWanted, from, until, earliest)
-        if (target == pastWanted) return
+        if (target == pastWanted) return target != null && (pastJob?.isActive == true || (pastFailed && loadPast(target, fresh = true)))
         pastWanted = target
         pastJob?.cancel()
-        if (target == null) mutable.update { it.copy(pastWindow = null, pastGuide = emptyMap()) } else loadPast(target, fresh = true)
+        if (target == null) { mutable.update { it.copy(pastWindow = null, pastGuide = emptyMap(), pastLoading = false) }; return false }
+        return loadPast(target, fresh = true)
     }
     fun guideNow() {
         pastWanted = null; pastJob?.cancel()
-        mutable.update { it.copy(pastWindow = null, pastGuide = emptyMap()) }
+        mutable.update { it.copy(pastWindow = null, pastGuide = emptyMap(), pastLoading = false) }
     }
     fun catchupOutOfReach() { mutable.update { it.copy(message = R.string.iptv_live_catchup_unavailable) } }
-    private fun loadPast(window: GuideGridWindow, fresh: Boolean) {
-        val current = session ?: return
+    private fun loadPast(window: GuideGridWindow, fresh: Boolean): Boolean {
+        val current = session ?: return false
         val state = mutable.value
         val focus = state.channels.indexOfFirst { it.item.channel.id == state.focused?.item?.channel?.id }.coerceAtLeast(0)
         val held = if (fresh || state.pastWindow != window) emptySet() else state.pastGuide.keys
         val wanted = (maxOf(0, focus - PAST_BEFORE)..minOf(state.channels.lastIndex, focus + PAST_AFTER))
             .sortedBy { kotlin.math.abs(it - focus - 3) }.map { state.channels[it] }.filter { it.item.channel.id !in held }
-        if (wanted.isEmpty()) return
+        if (wanted.isEmpty()) return false
         pastBand = wanted.mapTo(HashSet()) { it.item.channel.id }
         val keep = state.channels.subList(maxOf(0, focus - 2 * PAST_BEFORE), minOf(state.channels.size, focus + 2 * PAST_AFTER + 1)).mapTo(HashSet()) { it.item.channel.id }
         pastJob?.cancel()
+        val round = ++pastSerial
+        pastFailed = false
+        mutable.update { it.copy(pastLoading = true) }
         pastJob = viewModelScope.launch {
-            if (!fresh) delay(PAST_SETTLE)
-            for (part in wanted.chunked(PAST_CHUNK)) {
-                val rows = runCatching { browse.guideRows(current.profileId, part, window) }
-                    .getOrElse { if (it is CancellationException) throw it; IptvLog.failure("guide earlier", it); return@launch }
-                if (session !== current || pastWanted != window) return@launch
-                mutable.update { it.copy(pastWindow = window,
-                    pastGuide = (if (it.pastWindow == window) it.pastGuide.filterKeys { id -> id in keep } else emptyMap()) + rows) }
-            }
+            try {
+                if (!fresh) delay(PAST_SETTLE)
+                for (part in wanted.chunked(PAST_CHUNK)) {
+                    val rows = runCatching { browse.guideRows(current.profileId, part, window) }
+                        .getOrElse { if (it is CancellationException) throw it; IptvLog.failure("guide earlier", it); if (round == pastSerial) pastFailed = true; return@launch }
+                    if (session !== current || pastWanted != window) return@launch
+                    mutable.update { it.copy(pastWindow = window,
+                        pastGuide = (if (it.pastWindow == window) it.pastGuide.filterKeys { id -> id in keep } else emptyMap()) + rows) }
+                }
+            } finally { if (round == pastSerial) mutable.update { it.copy(pastLoading = false, pastRound = it.pastRound + 1) } }
         }
+        return true
     }
     private fun ensureGuide(rows: List<IptvListedChannel>) {
         val current = session ?: return

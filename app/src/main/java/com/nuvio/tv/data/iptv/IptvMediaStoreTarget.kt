@@ -172,6 +172,7 @@ internal fun mediaError(error: IOException): IptvShareError =
 
 class IptvMediaStoreReader(private val files: IptvMediaFiles, private val id: Long) : IptvRecordingReader {
     private var channel: FileChannel? = null
+    private var closed = false
     override val network: Boolean get() = false
 
     @Synchronized override fun length(): Long = opened().size()
@@ -183,13 +184,18 @@ class IptvMediaStoreReader(private val files: IptvMediaFiles, private val id: Lo
     }
 
     @Synchronized override fun close() {
+        closed = true
         try { channel?.close() } catch (_: IOException) { }
         channel = null
     }
 
-    private fun opened(): FileChannel = channel?.takeIf { it.isOpen } ?: try { files.openRead(id) } catch (error: SecurityException) {
-        throw IOException("Media recording not accessible", error)
-    }.also { channel = it }
+    private fun opened(): FileChannel {
+        channel?.takeIf { it.isOpen }?.let { return it }
+        if (closed) throw IOException("Reader closed")
+        return try { files.openRead(id) } catch (error: SecurityException) {
+            throw IOException("Media recording not accessible", error)
+        }.also { channel = it }
+    }
 
     override fun toString(): String = "IptvMediaStoreReader(withheld)"
 }

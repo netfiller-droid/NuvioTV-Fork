@@ -146,6 +146,7 @@ class IptvRecordingPartsTest {
         assertEquals(50L, IptvRecordingDataSource(reader).start(10, 50))
         try { IptvRecordingDataSource(reader).start(600, C.LENGTH_UNSET.toLong()); fail() } catch (_: java.io.IOException) { }
         reader.close()
+        try { reader.read(0, buffer, 0, 10); fail() } catch (_: java.io.IOException) { }
     }
 
     @Test fun shareReaderReadsAheadAndReconnectsOnce() {
@@ -167,5 +168,8 @@ class IptvRecordingPartsTest {
         assertEquals(-1, reader.read(5_000, buffer, 0, 10))
         reader.close()
         assertFalse(reader.toString().contains("TV"))
+        val connects = share.connects
+        try { reader.read(0, buffer, 0, 10); fail() } catch (_: java.io.IOException) { }
+        assertEquals(connects, share.connects)
     }
 }

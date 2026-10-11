@@ -29,6 +29,8 @@ import javax.inject.Inject
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -76,6 +78,7 @@ class IptvRecordingsViewModel @Inject constructor(
     private val stream = MutableStateFlow<IptvRecordingStream?>(null)
     private val preparing = MutableStateFlow(false)
     private var server: IptvRecordingStreamServer? = null
+    private var opening: Job? = null
 
     private val shown = combine(playing, stream, preparing) { playing, stream, preparing -> Triple(playing, stream, preparing) }
     private val upload = combine(recorder.uploading, recorder.uploadIssues) { uploading, issues -> uploading to issues }
@@ -96,36 +99,51 @@ class IptvRecordingsViewModel @Inject constructor(
             stream = stream?.takeIf { current -> list.any { it.id == current.id } }, message = message, preparing = preparing)
     }.flowOn(Dispatchers.IO).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), IptvRecordingsState())
 
-    init { refreshFree() }
+    init {
+        refreshFree()
+        recorder.retryUploads()
+    }
 
     fun play(recording: IptvRecording, fullPlayer: Boolean = false, fromStart: Boolean = false) {
-        if (preparing.value) return
-        viewModelScope.launch {
-            val reader = withContext(Dispatchers.IO) { recorder.reader(recording) }
-            if (reader == null) { message.value = R.string.iptv_recording_file_missing; return@launch }
-            message.value = null
-            val previous = server.also { server = null }
-            if (fullPlayer) preparing.value = true
-            val started = try {
-                if (fullPlayer || previous != null) withContext(Dispatchers.IO) {
-                    previous?.let { runCatching { it.stop() } }
-                    if (fullPlayer) {
-                        val playlist = try { recorder.playlist(recording, reader, IptvRecordingStreamServer.MEDIA) } catch (cancel: CancellationException) { throw cancel }
-                            catch (error: Exception) { IptvLog.failure("recording playlist", error); null }
-                        IptvRecordingStreamServer.start(reader, playlist)
-                    } else null
-                } else null
-            } finally { preparing.value = false }
-            if (started != null) {
-                server = started
-                val position = if (fromStart) null else (recorder.all.value.firstOrNull { it.id == recording.id } ?: recording).resumeMillis
-                IptvRecordingResume.open(started.url, recording.id, position)
-                stream.value = IptvRecordingStream(recording.id, started.url, recording.title ?: recording.channelName, recording.channelName, position != null)
-            } else {
-                playing.value = IptvRecordingPlayback(recording, reader)
-                screensaver.setPlaybackActive(true)
+        if (opening?.isActive == true) return
+        opening = viewModelScope.launch {
+            var reader: IptvRecordingReader? = null
+            var started: IptvRecordingStreamServer? = null
+            var kept = false
+            try {
+                withContext(Dispatchers.IO) { reader = recorder.reader(recording) }
+                val opened = reader ?: run { message.value = R.string.iptv_recording_file_missing; return@launch }
+                message.value = null
+                stopStream()
+                if (fullPlayer) withContext(Dispatchers.IO) {
+                    val playlist = try { recorder.playlist(recording, opened, IptvRecordingStreamServer.MEDIA) { preparing.value = true } }
+                        catch (cancel: CancellationException) { throw cancel } catch (error: Exception) { IptvLog.failure("recording playlist", error); null }
+                    ensureActive()
+                    started = IptvRecordingStreamServer.start(opened, playlist)
+                }
+                preparing.value = false
+                val running = started
+                kept = true
+                if (running != null) {
+                    server = running
+                    val position = if (fromStart) null else (recorder.all.value.firstOrNull { it.id == recording.id } ?: recording).resumeMillis
+                    IptvRecordingResume.open(running.url, recording.id, position)
+                    stream.value = IptvRecordingStream(recording.id, running.url, recording.title ?: recording.channelName, recording.channelName, position != null)
+                } else {
+                    playing.value = IptvRecordingPlayback(recording, opened)
+                    screensaver.setPlaybackActive(true)
+                }
+                if (recording.playedAtMillis == null) recorder.markPlayed(recording.id)
+            } finally {
+                preparing.value = false
+                if (!kept) {
+                    val unused = started
+                    val left = reader
+                    if (unused != null || left != null) kotlin.concurrent.thread(name = "recording-stream-stop", isDaemon = true) {
+                        if (unused != null) runCatching { unused.stop() } else runCatching { left?.close() }
+                    }
+                }
             }
-            if (recording.playedAtMillis == null) recorder.markPlayed(recording.id)
         }
     }
 

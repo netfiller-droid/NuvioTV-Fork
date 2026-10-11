@@ -209,10 +209,11 @@ class IptvRecorder @Inject constructor(
         }
     }
 
-    fun playlist(recording: IptvRecording, reader: IptvRecordingReader, uri: String): String? {
+    fun playlist(recording: IptvRecording, reader: IptvRecordingReader, uri: String, probing: () -> Unit = {}): String? {
         val total = reader.length()
         if (total <= 0) return null
-        val timeline = index.load(recording.id)?.takeIf { !it.probed || it.endOffset == total } ?: run {
+        val timeline = index.load(recording.id)?.takeIf { it.covers(total) } ?: run {
+            probing()
             val wall = (recording.finishedAtMillis ?: recording.stopMillis) - (recording.startedAtMillis ?: recording.startMillis)
             RecordingProbe.timeline(total, wall.coerceAtLeast(0)) { offset, size -> reader.window(offset, size) }.also {
                 IptvLog.info("recording probed marks=${it.marks.size} cuts=${it.marks.count { mark -> mark.cut }}")
@@ -582,8 +583,8 @@ class IptvRecorder @Inject constructor(
                 if (++ticks % PERSIST_TICKS == 0) {
                     mutex.withLock {
                         update(id) { it.copy(bytes = holder.bytes, gaps = holder.gaps, parts = if (upload == null) holder.parts.coerceIn(1, RecordingParts.MAX_PARTS) else 1) }
+                        if (store.get(id) != null) holder.clock.timeline(holder.committed)?.let { index.save(id, it) }
                     }
-                    holder.clock.timeline(holder.committed)?.let { index.save(id, it) }
                 }
                 if ((store.get(id)?.stopMillis ?: Long.MAX_VALUE) <= System.currentTimeMillis()) stop(id, RecordingStop.ENDED)
                 publish()
@@ -624,7 +625,7 @@ class IptvRecorder @Inject constructor(
                 lease?.let { admission.release(it)?.let(admission::completeClose) }
                 output.close()
                 copied.set(true)
-                holder.clock.timeline(if (upload == null) holder.bytes else holder.committed)?.let { if (store.get(id) != null) index.save(id, it) }
+                mutex.withLock { if (store.get(id) != null) holder.clock.timeline(if (upload == null) holder.bytes else holder.committed)?.let { index.save(id, it) } }
                 val stop = synchronized(this@IptvRecorder) { stops[id] }
                 if (upload == null) finishLocal(entry, output, holder.bytes, failure, holder.gaps, stop)
                 else finishShare(entry, spool, upload, holder, failure, stop, link)
@@ -745,7 +746,8 @@ class IptvRecorder @Inject constructor(
     }
 
     private fun uploader(place: IptvRecordingPlace, connector: IptvShareConnector, id: String) =
-        IptvRecordingUploader(connector, onFree = { if (place is IptvRecordingPlace.Share) livePreferences.shareFreeBytes = it }, onIssue = { issue(id, it) })
+        IptvRecordingUploader(connector, onFree = { if (place is IptvRecordingPlace.Share) livePreferences.shareFreeBytes = it }, onIssue = { issue(id, it) },
+            checkWhileWaiting = place is IptvRecordingPlace.Share)
 
     private fun issue(id: String, error: IptvShareError?) = issues.update { if (error == null) it - id else it + (id to error) }
 

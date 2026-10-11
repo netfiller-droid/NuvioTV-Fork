@@ -89,7 +89,7 @@ internal fun GuideGrid(state: IptvLiveState, listState: LazyListState, now: Long
     moving: String? = null, onMove: (IptvListedChannel, ListMove) -> Unit = { _, _ -> }, onMoveDone: () -> Unit = {},
     sport: IptvSportsGuide = NoSportsGuide, sportOnly: Boolean? = null, onSportOnly: () -> Unit = {}, onSpan: (Long) -> Unit = {},
     sportOnlyFocus: FocusRequester? = null, onSportOnlyUp: () -> Boolean = { false }, updating: Boolean = false, blocked: Boolean = false,
-    earliest: Long? = null, onEarlier: (Long) -> Unit = {}, onJump: (Int) -> Unit = {}) {
+    earliest: Long? = null, onEarlier: (Long) -> Boolean = { false }, onJump: (Int) -> Unit = {}) {
     val spec = guideSpec(state.density)
     BoxWithConstraints(modifier.iptvPanel().padding(horizontal = 6.dp, vertical = 8.dp)) {
         val stripWidth = maxWidth - spec.column
@@ -170,7 +170,7 @@ internal fun GuideGrid(state: IptvLiveState, listState: LazyListState, now: Long
                                 onCursor, onRail, onFocus, onSelect, onMenu, onPage = { delta -> page(index, delta * spec.pageRows) },
                                 onStep = { delta, repeat -> step(index, delta, repeat) },
                                 moving = row.item.channel.id == moving, onMove = { move -> onMove(row, move) }, onMoveDone = onMoveDone, sport = sport, blocked = blocked,
-                                earliest = earliest, onEarlier = onEarlier, onJump = onJump)
+                                earliest = earliest, onEarlier = onEarlier, onJump = onJump, pastLoading = state.pastLoading, pastRound = state.pastRound)
                         }
                     }
                 }
@@ -256,7 +256,7 @@ private fun GuideRow(spec: GuideSpec, row: IptvListedChannel, grid: GuideGridRow
     playing: Boolean, recording: Boolean, scheduled: Set<Long>, focusRequester: FocusRequester, onCursor: (Long, Long) -> Unit, onRail: () -> Unit,
     onFocus: (IptvListedChannel) -> Unit, onSelect: (IptvListedChannel) -> Unit, onMenu: (IptvListedChannel) -> Unit, onPage: (Int) -> Unit,
     onStep: (Int, Boolean) -> Boolean, moving: Boolean, onMove: (ListMove) -> Unit, onMoveDone: () -> Unit, sport: IptvSportsGuide, blocked: Boolean,
-    earliest: Long?, onEarlier: (Long) -> Unit, onJump: (Int) -> Unit) {
+    earliest: Long?, onEarlier: (Long) -> Boolean, onJump: (Int) -> Unit, pastLoading: Boolean, pastRound: Int) {
     var focused by remember { mutableStateOf(false) }
     var waitingBack by remember { mutableStateOf(false) }
     val archive = remember(row) { hasArchive(row) }
@@ -285,12 +285,12 @@ private fun GuideRow(spec: GuideSpec, row: IptvListedChannel, grid: GuideGridRow
     fun back() {
         if (move(-1)) return
         val first = earlier()
-        if (first != null) { waitingBack = true; onEarlier(first) } else onRail()
+        if (first != null && onEarlier(first)) waitingBack = true else onRail()
     }
-    LaunchedEffect(grid) {
+    LaunchedEffect(grid, pastRound) {
         if (!waitingBack) return@LaunchedEffect
         if (!focused || move(-1)) { waitingBack = false; return@LaunchedEffect }
-        if (earlier() == null) { waitingBack = false; onRail() }
+        if (!pastLoading) { waitingBack = false; onRail() }
     }
     val rowShape = RoundedCornerShape(12.dp)
     Row(Modifier.fillMaxWidth().height(spec.row).clip(rowShape)

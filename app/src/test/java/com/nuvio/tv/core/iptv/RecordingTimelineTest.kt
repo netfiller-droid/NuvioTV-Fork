@@ -5,16 +5,16 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class RecordingTimelineTest {
-    private class Run(val packets: Int, val pcrStart: Long)
+    private class Run(val packets: Int, val pcrStart: Long, val pid: Int = 0x100)
 
-    private fun stream(vararg runs: Run, ticksPerPacket: Long = 900, pcrEvery: Int = 4, pid: Int = 0x100): ByteArray {
+    private fun stream(vararg runs: Run, ticksPerPacket: Long = 900, pcrEvery: Int = 4): ByteArray {
         val out = ByteArrayOutputStream()
         runs.forEach { run ->
             repeat(run.packets) { index ->
                 val packet = ByteArray(TsClock.PACKET) { 0x11 }
                 packet[0] = 0x47
-                packet[1] = (pid shr 8).toByte()
-                packet[2] = pid.toByte()
+                packet[1] = (run.pid shr 8).toByte()
+                packet[2] = run.pid.toByte()
                 if (index % pcrEvery == 0) {
                     val pcr = (run.pcrStart + index * ticksPerPacket) and TsClock.MASK
                     packet[3] = 0x30
@@ -72,6 +72,46 @@ class RecordingTimelineTest {
         assertEquals(29_880L, timeline.endMillis)
     }
 
+    @Test fun reconnectWithANewClockPidKeepsEveryPcr() {
+        val first = stream(Run(6_000, 5_000))
+        val second = stream(Run(6_000, 3_000_000_000, pid = 0x200))
+        val clock = RecordingClock()
+        clock.cut(0)
+        feed(clock, first)
+        clock.cut(first.size.toLong())
+        feed(clock, second, first.size.toLong())
+        val timeline = requireNotNull(clock.timeline((first.size + second.size).toLong()))
+        assertEquals(listOf(first.size.toLong()), timeline.marks.filter { it.cut }.map { it.offset })
+        assertEquals(59_960L, timeline.marks.first { it.cut }.millis)
+        assertEquals(119_920L, timeline.endMillis)
+    }
+
+    @Test fun clockPidSwitchWithoutReconnectCutsAtTheFirstNewPcr() {
+        val first = stream(Run(6_000, 5_000))
+        val second = stream(Run(6_000, 3_000_000_000, pid = 0x200))
+        val data = first + second
+        val clock = RecordingClock()
+        clock.cut(0)
+        feed(clock, data, chunk = 1_316)
+        val timeline = requireNotNull(clock.timeline(data.size.toLong()))
+        assertEquals(listOf(first.size.toLong()), timeline.marks.filter { it.cut }.map { it.offset })
+        assertEquals(59_960L, timeline.marks.first { it.cut }.millis)
+        assertEquals(119_920L, timeline.endMillis)
+        assertTrue(timeline.marks.zipWithNext().all { (a, b) -> b.millis - a.millis <= 8_100L })
+    }
+
+    @Test fun strayPcrsFromAnotherPidAreIgnored() {
+        val main = stream(Run(6_000, 5_000))
+        val stray = stream(Run(40, 9_000_000, pid = 0x300))
+        val data = main.copyOf(188 * 3_000) + stray + main.copyOfRange(188 * 3_000, main.size)
+        val clock = RecordingClock()
+        clock.cut(0)
+        feed(clock, data)
+        val timeline = requireNotNull(clock.timeline(data.size.toLong()))
+        assertTrue(timeline.marks.none { it.cut })
+        assertEquals(59_960L, timeline.endMillis)
+    }
+
     @Test fun clockFollowsTheTimestampWrap() {
         val data = stream(Run(3_000, TsClock.MASK - 900L * 1_000))
         val clock = RecordingClock()
@@ -113,6 +153,17 @@ class RecordingTimelineTest {
         assertNull(RecordingTimeline.decode(""))
     }
 
+    @Test fun savedIndexIsTrustedOnlyWhenItCoversTheFile() {
+        val clock = RecordingTimeline(listOf(RecordingMark(0, 0)), 100L shl 20, 600_000)
+        assertTrue(clock.covers(100L shl 20))
+        assertTrue(clock.covers((100L shl 20) + RecordingTimeline.UNCOVERED_BYTES - 1))
+        assertFalse(clock.covers((100L shl 20) + RecordingTimeline.UNCOVERED_BYTES))
+        assertFalse(clock.covers(160L shl 20))
+        assertTrue(clock.covers(90L shl 20))
+        assertTrue(clock.copy(probed = true).covers(100L shl 20))
+        assertFalse(clock.copy(probed = true).covers((100L shl 20) + 1))
+    }
+
     @Test fun probeFindsRunsAndCutsInAnOldRecording() {
         val runs = arrayOf(Run(40_000, 3_000_000), Run(30_000, 900_000_000), Run(50_000, TsClock.MASK - 90_000L * 60))
         val data = stream(*runs)
@@ -128,6 +179,30 @@ class RecordingTimelineTest {
         assertTrue(kotlin.math.abs(cuts[0].millis - 400_000) < 500)
         assertTrue(kotlin.math.abs(cuts[1].millis - 700_000) < 500)
         assertTrue(reads < 120)
+    }
+
+    @Test fun probeFollowsAClockPidChange() {
+        val data = stream(Run(40_000, 3_000_000), Run(40_000, 900_000_000, pid = 0x200), Run(40_000, 4_000_000_000, pid = 0x300))
+        val timeline = RecordingProbe.timeline(data.size.toLong(), 20 * 60_000L) { offset, size ->
+            data.copyOfRange(offset.toInt(), (offset + size).toInt().coerceAtMost(data.size))
+        }
+        val cuts = timeline.marks.filter { it.cut }
+        assertEquals(listOf(188L * 40_000, 188L * 80_000), cuts.map { it.offset })
+        assertTrue(kotlin.math.abs(cuts[0].millis - 400_000) < 500)
+        assertTrue(kotlin.math.abs(cuts[1].millis - 800_000) < 500)
+        assertTrue(kotlin.math.abs(timeline.endMillis - 1_200_000) < 1_000)
+        val segments = RecordingVodPlaylist.segments(timeline, data.size.toLong())
+        assertEquals(2, RecordingVodPlaylist.text(segments, "r.ts").lines().count { it == "#EXT-X-DISCONTINUITY" })
+        assertEquals(listOf(188L * 40_000, 188L * 80_000), segments.filter { it.cut }.map { it.offset })
+    }
+
+    @Test fun probeKeepsTheSameClockAcrossAContinuousPidChange() {
+        val data = stream(Run(40_000, 3_000_000), Run(40_000, 3_000_000 + 900L * 40_000, pid = 0x200))
+        val timeline = RecordingProbe.timeline(data.size.toLong(), 0) { offset, size ->
+            data.copyOfRange(offset.toInt(), (offset + size).toInt().coerceAtMost(data.size))
+        }
+        assertEquals(listOf(188L * 40_000), timeline.marks.filter { it.cut }.map { it.offset })
+        assertTrue(kotlin.math.abs(timeline.endMillis - 800_000) < 1_000)
     }
 
     @Test fun probeFallsBackToTheWallClockWithoutTimestamps() {

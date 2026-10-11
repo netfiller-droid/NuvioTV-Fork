@@ -23,6 +23,7 @@ class IptvPartsReader(private val files: List<File>) : IptvRecordingReader {
     private var opened: List<RandomAccessFile>? = null
     private var starts = LongArray(0)
     private var total = 0L
+    private var closed = false
     override val network: Boolean get() = false
 
     @Synchronized override fun length(): Long { open(); return total }
@@ -40,12 +41,14 @@ class IptvPartsReader(private val files: List<File>) : IptvRecordingReader {
     }
 
     @Synchronized override fun close() {
+        closed = true
         opened?.forEach { try { it.close() } catch (_: IOException) { } }
         opened = null
     }
 
     private fun open(): List<RandomAccessFile> {
         opened?.let { return it }
+        if (closed) throw IOException("Reader closed")
         val result = ArrayList<RandomAccessFile>(files.size)
         try { files.forEach { result += RandomAccessFile(it, "r") } } catch (error: IOException) {
             result.forEach { try { it.close() } catch (_: IOException) { } }
@@ -68,6 +71,7 @@ class IptvShareReader(private val connector: IptvShareConnector, private val pat
     private val window = ByteArray(windowBytes)
     private var windowStart = 0L
     private var windowLength = 0
+    private var closed = false
     override val network: Boolean get() = true
 
     @Synchronized override fun length(): Long = attempt { if (size < 0) size = opened().length; size }
@@ -95,10 +99,11 @@ class IptvShareReader(private val connector: IptvShareConnector, private val pat
         return count
     }
 
-    @Synchronized override fun close() = drop()
+    @Synchronized override fun close() { closed = true; drop() }
 
     private fun opened(): IptvShareFile {
         file?.let { return it }
+        if (closed) throw IOException("Reader closed")
         val current = session ?: connector.connect().also { session = it }
         return current.openRead(path).also { file = it }
     }

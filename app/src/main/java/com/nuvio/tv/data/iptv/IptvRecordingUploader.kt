@@ -12,6 +12,7 @@ import java.io.IOException
 import java.io.RandomAccessFile
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
@@ -30,8 +31,10 @@ class IptvRecordingUploader(
     private val minimumFreeBytes: Long = RecordingStorage.START_MARGIN_BYTES,
     private val onFree: (Long) -> Unit = { },
     private val onIssue: (IptvShareError?) -> Unit = { },
+    private val freeCheckMillis: Long = 60_000,
+    private val checkWhileWaiting: Boolean = true,
 ) {
-    init { require(chunkBytes > 0 && pollMillis > 0 && minimumFreeBytes >= 0) }
+    init { require(chunkBytes > 0 && pollMillis > 0 && minimumFreeBytes >= 0 && freeCheckMillis > 0) }
 
     @Volatile var uploaded: Long = 0
         private set
@@ -49,6 +52,7 @@ class IptvRecordingUploader(
         var failingSince: Long? = null
         var chosen: String? = null
         var lastError: IptvShareError? = null
+        var abandon: String? = null
         while (true) {
             val done = finished()
             if (committed() > 0L) break
@@ -78,17 +82,19 @@ class IptvRecordingUploader(
                 }
                 if (!session.append) {
                     if (!finished()) {
+                        if (checkWhileWaiting) { checkFree(session, backlog(initial)); failures = 0 }
                         quietly(session)
                         session = null
-                        while (!finished()) pause(pollMillis)
+                        var waited = 0L
+                        while (!finished() && (!checkWhileWaiting || waited < freeCheckMillis)) { pause(pollMillis); waited += pollMillis }
                         continue
                     }
                     val local = pieces(spool)
                     val total = RecordingUpload.whole(local.map { it.piece }, committed())
                         ?: return@withContext IptvUploadOutcome(IptvUploadResult.LOST, 0, IptvShareError.LOST)
-                    checkFree(session, local, 0)
+                    checkFree(session, total)
                     val target = free(session, chosen ?: remote, chosen?.let(RecordingFiles::partial) ?: partial).also { chosen = it }
-                    val whole = RecordingFiles.partial(target)
+                    val whole = RecordingFiles.partial(target).also { abandon = it }
                     val output = session.openWrite(whole, total).also { file = it }
                     var size = 0L
                     uploaded = 0
@@ -110,13 +116,14 @@ class IptvRecordingUploader(
                     output.close()
                     file = null
                     val name = publish(session, whole, target, total)
+                    abandon = null
                     uploaded = total
                     return@withContext IptvUploadOutcome(IptvUploadResult.DONE, total, remote = name)
                 }
                 val output = session.openWrite(partial).also { file = it }
                 var size = output.length
                 uploaded = size
-                checkFree(session, initial, size)
+                checkFree(session, next(initial, size))
                 failingSince = null
                 while (true) {
                     currentCoroutineContext().ensureActive()
@@ -151,13 +158,17 @@ class IptvRecordingUploader(
                                 if (confirmed < size) throw IOException("Remote size behind")
                                 val removable = RecordingUpload.removable(local.map { it.piece }, confirmed, false)
                                 removable.forEach { local[it].file.delete() }
-                                checkFree(session, pieces(spool), size)
+                                checkFree(session, next(pieces(spool), size))
                             }
                         }
                     }
                 }
-            } catch (cancel: CancellationException) { throw cancel }
-            catch (error: Exception) {
+            } catch (cancel: CancellationException) {
+                quietly(file)
+                file = null
+                discard(abandon)
+                throw cancel
+            } catch (error: Exception) {
                 lastError = (error as? IptvShareException)?.error ?: IptvShareError.OTHER
                 if (lastError == IptvShareError.LOST) return@withContext IptvUploadOutcome(IptvUploadResult.LOST, uploaded, lastError)
                 report(lastError)
@@ -166,7 +177,7 @@ class IptvRecordingUploader(
                     val since = failingSince ?: now().also { failingSince = it }
                     if (now() - since >= patienceMillis) return@withContext IptvUploadOutcome(IptvUploadResult.PENDING, uploaded, lastError)
                 }
-                pause(RecordingUpload.retryMillis(failures))
+                try { pause(RecordingUpload.retryMillis(failures)) } catch (cancel: CancellationException) { discard(abandon); throw cancel }
                 failures += 1
             } finally {
                 quietly(file)
@@ -216,8 +227,15 @@ class IptvRecordingUploader(
         return null
     }
 
-    private fun checkFree(session: IptvShareSession, local: List<Local>, size: Long) {
-        val pending = (local.maxOfOrNull { it.piece.end } ?: size) - size
+    private suspend fun discard(name: String?) {
+        if (name != null) withContext(NonCancellable) { try { connector.connect().use { it.delete(name) } } catch (_: Exception) { } }
+    }
+
+    private fun backlog(local: List<Local>): Long = local.maxOfOrNull { it.piece.end } ?: 0
+
+    private fun next(local: List<Local>, size: Long): Long = (local.firstOrNull { it.piece.end > size }?.piece?.end ?: size) - size
+
+    private fun checkFree(session: IptvShareSession, pending: Long) {
         val free = session.freeBytes()
         onFree(free)
         if (free < minimumFreeBytes + pending.coerceAtLeast(0)) throw IptvShareException(IptvShareError.FULL)

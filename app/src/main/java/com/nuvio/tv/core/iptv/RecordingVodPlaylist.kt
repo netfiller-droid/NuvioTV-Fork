@@ -14,24 +14,20 @@ object RecordingProbe {
         val fallback = RecordingTimeline(listOf(RecordingMark(0, 0)), total.coerceAtLeast(0), wallMillis.coerceAtLeast(0), probed = true)
         if (total < 4L * TsClock.PACKET) return fallback
         var reads = 0
-        var pid = -1
         fun sample(offset: Long, size: Int): List<TsClock.Pcr> {
             reads += 1
             val at = offset.coerceIn(0, total - 1)
             val data = read(at, minOf(size.toLong(), total - at).toInt())
             return TsClock.scan(data, data.size, at)
         }
-        fun first(offset: Long): TsClock.Pcr? {
-            val found = sample(offset, WINDOW)
-            if (pid < 0) found.firstOrNull()?.let { pid = it.pid }
-            return found.firstOrNull { it.pid == pid }
-        }
+        fun first(offset: Long, pid: Int): TsClock.Pcr? = sample(offset, WINDOW).let { found -> found.firstOrNull { it.pid == pid } ?: found.firstOrNull() }
         val count = ((if (wallMillis > 0) wallMillis / SPACING_MILLIS else total / (128L shl 20)) + 1).coerceIn(8, 160).toInt()
         val points = ((0 until count).map { total * it / count } + (total - WINDOW).coerceAtLeast(0)).distinct().sorted()
-        val coarse = points.mapNotNull { first(it) }.distinctBy { it.offset }.sortedBy { it.offset }
+        var pid = -1
+        val coarse = points.mapNotNull { point -> first(point, pid)?.also { pid = it.pid } }.distinctBy { it.offset }.sortedBy { it.offset }
         if (coarse.size < 2) return fallback
         val rates = coarse.zipWithNext().mapNotNull { (a, b) ->
-            TsClock.delta(a.value, b.value).takeIf { it in 1 until TsClock.HALF }?.let { it.toDouble() / (b.offset - a.offset) }
+            TsClock.delta(a.value, b.value).takeIf { a.pid == b.pid && it in 1 until TsClock.HALF }?.let { it.toDouble() / (b.offset - a.offset) }
         }.sorted()
         if (rates.isEmpty()) return fallback
         val rate = rates[rates.size / 2]
@@ -44,13 +40,15 @@ object RecordingProbe {
         val steps = ArrayList<Step>()
         fun locate(a: TsClock.Pcr, b: TsClock.Pcr) {
             val bytes = b.offset - a.offset
-            val inside = if (bytes <= 4L * WINDOW && reads < MAX_READS) sample(a.offset, (bytes + TsClock.PACKET).toInt())
-                .filter { it.pid == pid && it.offset > a.offset && it.offset < b.offset } else emptyList()
+            val found = if (bytes <= 4L * WINDOW && reads < MAX_READS) sample(a.offset, (bytes + TsClock.PACKET).toInt())
+                .filter { (it.pid == a.pid || it.pid == b.pid) && it.offset > a.offset && it.offset < b.offset } else emptyList()
+            val switch = if (a.pid == b.pid) found.size else found.indexOfFirst { it.pid == b.pid }.takeIf { it >= 0 } ?: found.size
+            val inside = found.filterIndexed { index, pcr -> pcr.pid == (if (index < switch) a.pid else b.pid) }
             var previous = a
             var ticks = 0L
             for (pcr in inside + b) {
                 val step = TsClock.delta(previous.value, pcr.value)
-                if (TsClock.continuous(step) && !pcr.reset) ticks += step
+                if (pcr.pid == previous.pid && TsClock.continuous(step) && !pcr.reset) ticks += step
                 else {
                     if (previous !== a) steps += Step(previous, ticks, false)
                     steps += Step(pcr, estimate(pcr.offset - previous.offset), true)
@@ -63,9 +61,9 @@ object RecordingProbe {
         fun refine(a: TsClock.Pcr, b: TsClock.Pcr) {
             val bytes = b.offset - a.offset
             val ticks = TsClock.delta(a.value, b.value)
-            if (plausible(ticks, bytes)) { steps += Step(b, ticks, false); return }
+            if (a.pid == b.pid && plausible(ticks, bytes)) { steps += Step(b, ticks, false); return }
             if (bytes <= 2L * WINDOW || reads >= MAX_READS) { locate(a, b); return }
-            val middle = first(a.offset + bytes / 2)
+            val middle = first(a.offset + bytes / 2, a.pid)
             if (middle == null || middle.offset <= a.offset || middle.offset >= b.offset) { locate(a, b); return }
             refine(a, middle)
             refine(middle, b)
