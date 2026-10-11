@@ -1,4 +1,4 @@
-# Nuvio IPTV — device test checklist (build `91e1e7f1b`, run 38178089678)
+# Nuvio IPTV — device test checklist (build `2d693cada`, run 38180390637)
 
 For this build start with section 7o, then 7n, 7m, 7l, 7k, 7j, 7i, 7h, 7g and 7f (not yet tried on a device). 7e and earlier passed on earlier builds; repeat them only as a regression check. After the 1.1.0-nt.5 merge, also repeat sections 1 and 2.
 
@@ -84,7 +84,7 @@ logcat (`adb logcat -s NuvioIptv:V *:E`). Do not share logs that contain address
    stop (`sports fetch` lines cease).
 12. Useful logs: `sports fetch service=`, `sports links`, `sports fixtures`.
 
-## 7o. 8:01 12 October capture: NFL half-time and overtime finals (build pending)
+## 7o. 8:01 12 October capture: NFL half-time and overtime finals (build `2d693cada`)
 1. NFL at half-time: the score bug reads Halftime with no timeout marks; they come back in
    the 3rd quarter.
 2. With TheSportsDB as the source, an NFL or hockey game that ended in overtime or a

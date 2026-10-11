@@ -1125,6 +1125,10 @@ Phone setup (security review)
 
 ## Validation
 
+- Fourteenth sport capture (12 October 08:01; NFL half-time, overtime tie, NHL end of
+  period; TheSportsDB Final/OT): CI debug green at `2d693cada` (run 38180390637); 973 core
+  and 305 data-layer JVM tests on the host. Not device-tested.
+
 - Merge of the fork release 1.1.0-nt.5, the thirteenth sport capture (12 October 06:42) and
   the second pass over the untested work (25 fixes): CI debug green at `91e1e7f1b` (run
   38178089678); the merge itself at `0d1d90ab3` (run 38175520520; run 38174703576 at

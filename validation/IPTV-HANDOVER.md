@@ -32,28 +32,30 @@ under "Earlier session notes" and the dated sections is history kept for referen
   three read-only reviews (recordings and catch-up; sport data; Sport and multiview
   screens) found 25 defects, all fixed in `74ab681fc` (screens), `7b7c32e02` (recordings)
   and `91e1e7f1b` (sport data, sport recordings through overtime, unused strings removed).
-  The thirteenth sports capture (06:42) is in `011204b82`. Checklist section 7n lists what
-  to try.
+  The thirteenth sports capture (06:42) is in `011204b82` and the fourteenth (08:01) in
+  `2d693cada`. Checklist sections 7o and 7n list what to try.
 - All work is committed and pushed to `iptv/player-binding`. Build for the next device pass:
-  CI debug green at `91e1e7f1b` (run 38178089678), app "Nuvio IPTV Prototype", file
+  CI debug green at `2d693cada` (run 38180390637; `91e1e7f1b`, run 38178089678, was the
+  build before the fourteenth capture), app "Nuvio IPTV Prototype", file
   `app-iptvPrototype-arm64-v8a-debug.apk`; the merge alone was green at `0d1d90ab3` (run
   38175520520). Minified release (R8) was last built at `c1685393a` (run 38058607115),
   before the merge; build it again before shipping.
-- Host tests at that commit: core 968, data 305, androidTest compiles.
+- Host tests at that commit: core 973, data 305, androidTest compiles.
   Translations: all 40 locales, `check_translations.py` prints `problems 0`.
 - Device testing: the user's last checklist pass was on 10 October, evening (`e7e1d17b5`;
   7e and 7d passed apart from the findings fixed in 7f); on 11 October they recorded ~3 h to
   an SMB NAS on `f79646c53` (findings fixed in 7i). Everything in checklist sections 7f to
-  7n is built and host-tested but not yet tried on a device; the user was about to test
+  7o is built and host-tested but not yet tried on a device; the user was about to test
   `85fe99dce` (7m to 7f) when the merge was asked for, so findings may refer to that build.
 - A printable test sheet for the current build is made from the checklist (see "How to
   build and check" below); the user prints it for each device pass.
 
 ### Next, in order
 
-1. Device pass on `91e1e7f1b` (checklist 7n, then 7m, 7l, 7k, 7j, 7i, 7h, 7g, 7f, plus
-   sections 1 and 2 as a regression check after the merge). Findings on `85fe99dce` are
-   still valid unless 7n or the second-pass fixes changed that area. Record the
+1. Device pass on `2d693cada` (checklist 7o, 7n, then 7m, 7l, 7k, 7j, 7i, 7h, 7g, 7f, plus
+   sections 1 and 2 as a regression check after the merge; `91e1e7f1b` differs only in 7o).
+   Findings on `85fe99dce` are still valid unless 7n, 7o or the second-pass fixes changed
+   that area. Record the
    findings in a new "Device findings" section below, fix them, update the release notes in
    the same commits, translate new strings, build, send the run link and a new test sheet.
 2. Keep processing the user's ESPN/TheSportsDB captures (process below). The thirteenth
