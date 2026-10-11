@@ -813,6 +813,13 @@ Sport data (fourth capture of 11 October, 18:36; first live tennis and many fini
 - Half-time scores the source got wrong are hidden instead of showing 0–0.
 - Lower-league hockey games stuck on the third period no longer show as live.
 
+Sport data (fifth capture of 11 October, 22:46; first live Formula 1 race):
+- Formula 1: a race in progress shows the current lap and the top three (score, Sport
+  hero, cards and the video score bug) instead of "live" and the qualifying podium.
+- The football score bug shows HT during the half-time break, not the stoppage minute.
+- Games from TheSportsDB that have no status no longer stay live after they should have
+  finished; overtime reads "OT" with the minute.
+
 ## Ready below the UI (screens pending)
 
 - Provider account groups shared by several sources (each source has its own

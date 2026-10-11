@@ -1,0 +1,14 @@
+{"livescore":[
+ {"idEvent":"2612962","strSport":"Basketball","strLeague":"Ukrainian Basketball SuperLeague","strStatus":null,"strProgress":null,"intHomeScore":"37","intAwayScore":"45","strTimestamp":"2026-10-11T10:00:00","updated":"2026-10-11 13:46:31"},
+ {"idEvent":"2523160","strSport":"Ice Hockey","strLeague":"Swedish Hockey Allsvenskan","strStatus":"BT","strProgress":null,"intHomeScore":"2","intAwayScore":"0","strTimestamp":"2026-10-11T12:00:00","updated":"2026-10-11 13:46:30"},
+ {"idEvent":"2526140","strSport":"Ice Hockey","strLeague":"American AHL","strStatus":"OT","strProgress":"4","intHomeScore":"3","intAwayScore":"3","strTimestamp":"2026-10-10T01:05:00","updated":"2026-10-10 05:04:35"},
+ {"idEvent":"2517720","strSport":"Ice Hockey","strLeague":"American USHL","strStatus":"P3","strProgress":"19","intHomeScore":"8","intAwayScore":"5","strTimestamp":"2026-10-10T22:00:00","updated":"2026-10-11 13:46:30"},
+ {"idEvent":"2524548","strSport":"Ice Hockey","strLeague":"Swedish Womens Hockey League","strStatus":"P3","strProgress":"9","intHomeScore":"0","intAwayScore":"2","strTimestamp":"2026-10-11T11:00:00","updated":"2026-10-11 13:46:30"},
+ {"idEvent":"2584726","strSport":"Basketball","strLeague":"Czech NBL","strStatus":"POST","strProgress":null,"intHomeScore":"0","intAwayScore":"0","strTimestamp":"2026-10-11T15:00:00","updated":"2026-10-11 13:31:33"},
+ {"idEvent":"2564058","strSport":"Basketball","strLeague":"Polish Basketball League","strStatus":"Q4","strProgress":"10","intHomeScore":"96","intAwayScore":"82","strTimestamp":"2026-10-11T10:30:00","updated":"2026-10-11 13:46:31"},
+ {"idEvent":"2598068","strSport":"Soccer","strLeague":"Greek Super League 2","strStatus":"HT","strProgress":"45+1","intHomeScore":"0","intAwayScore":"0","strTimestamp":"2026-10-11T11:45:00","updated":"2026-10-11 13:46:34"},
+ {"idEvent":"2481848","strSport":"Soccer","strLeague":"Danish Superliga","strStatus":"1H","strProgress":"45+1","intHomeScore":"0","intAwayScore":"1","strTimestamp":"2026-10-11T12:00:00","updated":"2026-10-11 13:46:32"},
+ {"idEvent":"2571746","strSport":"Basketball","strLeague":"Spanish Liga ACB","strStatus":"FT","strProgress":null,"intHomeScore":"91","intAwayScore":"89","strTimestamp":"2026-10-11T10:00:00","updated":"2026-10-11 13:12:33"},
+ {"idEvent":"2548859","strSport":"Basketball","strLeague":"NBA","strStatus":"FT","strProgress":"12","intHomeScore":"115","intAwayScore":"132","strTimestamp":"2026-10-11T10:00:00","updated":"2026-10-11 13:46:31"},
+ {"idEvent":"2594989","strSport":"Soccer","strLeague":"Vietnam V.League 2","strStatus":"2H","strProgress":"87","intHomeScore":"1","intAwayScore":"1","strTimestamp":"2026-10-11T11:00:00","updated":"2026-10-11 13:46:34"}
+]}

@@ -279,7 +279,8 @@ internal fun CardState(fixture: SportsFixture, detail: SportsDetail?, hidden: Bo
             is SportsDetail.Tennis -> fixture.period?.let { stringResource(R.string.iptv_sport5_section_set, it) }
             is SportsDetail.Golf -> detail.round?.let { stringResource(R.string.iptv_sport5_section_golf_round, it) }
             is SportsDetail.Baseball -> sportInning(detail)
-            is SportsDetail.Sessions, is SportsDetail.Card -> null
+            is SportsDetail.Sessions -> detail.current?.takeIf { it.state == FixtureStatus.LIVE }?.lap?.let { stringResource(R.string.iptv_ui22_sport_lap, it) }
+            is SportsDetail.Card -> null
             else -> SportsFixtureText.periodClock(fixture)
         } ?: live
         FixtureStatus.FINAL -> stringResource(R.string.iptv_sport2_final)
@@ -433,7 +434,7 @@ private fun SessionsMiddle(fixture: SportsFixture, detail: SportsDetail.Sessions
                     color = if (session.state == FixtureStatus.FINAL) NuvioTheme.colors.TextSecondary else itemContent(focused))
                 Text(when (session.state) {
                     FixtureStatus.FINAL -> session.top.firstOrNull()?.takeIf { !hidden } ?: stringResource(R.string.iptv_sport5_section_done)
-                    FixtureStatus.LIVE -> stringResource(R.string.iptv_sport_live)
+                    FixtureStatus.LIVE -> session.lap?.let { stringResource(R.string.iptv_ui22_sport_lap, it) } ?: stringResource(R.string.iptv_sport_live)
                     FixtureStatus.SCHEDULED -> sportWhen(session.startMillis)
                 }, style = MaterialTheme.typography.labelSmall, maxLines = 1,
                     color = if (session.state == FixtureStatus.LIVE) NuvioTheme.colors.Error else NuvioTheme.colors.TextTertiary)

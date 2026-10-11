@@ -265,10 +265,12 @@ private fun LedgerBody(item: IptvFixtureItem, state: IptvFixturesState, summary:
             TennisLedgerLine(away, detail.awayPlayer.seed, FixtureSide.AWAY, detail, fixture.status == FixtureStatus.LIVE, hidden, compact)
         }
         detail is SportsDetail.Sessions -> Column(modifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            val podium = detail.sessions.lastOrNull { it.state == FixtureStatus.FINAL && it.top.isNotEmpty() }?.takeIf { !hidden }
+            val podium = (detail.current?.takeIf { it.state == FixtureStatus.LIVE && it.top.isNotEmpty() }
+                ?: detail.sessions.lastOrNull { it.state == FixtureStatus.FINAL && it.top.isNotEmpty() })?.takeIf { !hidden }
             if (podium != null) {
                 LedgerTitle(fixture.title, compact)
-                Text(podium.name, style = SportCaps, color = NuvioTheme.colors.TextTertiary, maxLines = 1)
+                Text(listOfNotNull(podium.name, podium.lap?.let { stringResource(R.string.iptv_ui22_sport_lap, it) }).joinToString(" · "), style = SportCaps,
+                    color = NuvioTheme.colors.TextTertiary, maxLines = 1)
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(18.dp)) {
                     podium.top.take(3).forEachIndexed { index, name ->
                         Row(Modifier.weight(1f), verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -550,7 +552,8 @@ private fun heroClock(fixture: SportsFixture, item: IptvFixtureItem, hidden: Boo
         }
         is SportsDetail.Sessions -> {
             val session = detail.current
-            Clock(session?.name, session?.takeIf { it.state == FixtureStatus.SCHEDULED }?.let { sportWhen(it.startMillis) } ?: live, null)
+            Clock(session?.name, session?.takeIf { it.state == FixtureStatus.SCHEDULED }?.let { sportWhen(it.startMillis) }
+                ?: session?.takeIf { it.state == FixtureStatus.LIVE }?.lap?.let { stringResource(R.string.iptv_ui22_sport_lap, it) } ?: live, null)
         }
         is SportsDetail.Card -> {
             val bout = detail.live

@@ -390,7 +390,7 @@ internal fun IptvSportsBug(fixture: SportsFixture, hidden: Boolean, modifier: Mo
             is SportsDetail.Sessions -> {
                 BugText(bug.primary)
                 BugState(bug.state, fixture)
-                val next = SportsOverlayText.nextSession(detail)
+                val next = SportsOverlayText.nextSession(detail)?.takeIf { detail.current?.state != FixtureStatus.LIVE }
                 BugExtra(next?.let { stringResource(R.string.iptv_sport5_overlay_next, it.name, "${sportDayLabel(it.startMillis)} ${clock(it.startMillis)}") } ?: bug.extra)
             }
             is SportsDetail.Card -> {

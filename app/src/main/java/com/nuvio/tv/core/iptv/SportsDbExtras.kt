@@ -18,6 +18,7 @@ object SportsDbLive {
     private val PATHS = mapOf("soccer" to "Soccer", "basketball" to "Basketball", "ice-hockey" to "Ice_Hockey", "baseball" to "Baseball",
         "american-football" to "American_Football")
     private val SKIPPED = SportsDbEvents.SKIPPED + "post"
+    private val OVERTIME = mapOf("ice-hockey" to 4, "basketball" to 5, "american-football" to 5)
     private val MINUTE = Regex("[0-9]{1,3}(\\+[0-9]{1,2})?")
     private val UPDATED = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
     private val UPDATED_ZONE = ZoneId.of("Europe/London")
@@ -53,13 +54,14 @@ object SportsDbLive {
         val status = if (code in SportsDbEvents.FINISHED) FixtureStatus.FINAL else FixtureStatus.LIVE
         if (status == FixtureStatus.LIVE && score.updatedMillis?.let { nowMillis - it > STALE_MILLIS } == true) return fixture
         if (status == FixtureStatus.LIVE && nowMillis - fixture.startMillis > maxOf(STALE_MILLIS, 3 * SportsRefresh.durationMillis(fixture))) return fixture
+        if (code.isEmpty() && nowMillis - fixture.startMillis > SportsRefresh.durationMillis(fixture)) return fixture
         val live = status == FixtureStatus.LIVE
         val home = score.homeScore?.trim()?.takeIf { it.isNotEmpty() && it.length <= 8 }
         val away = score.awayScore?.trim()?.takeIf { it.isNotEmpty() && it.length <= 8 }
         val both = fixture.teams && home != null && away != null
         val progress = score.progress?.trim()?.takeIf { live && it.isNotEmpty() && it.length <= 8 }?.let { if (it.matches(MINUTE)) "$it'" else it }
         return fixture.copy(status = status, score = if (both) "$home–$away" else fixture.score, detail = raw.takeIf { live && it.isNotEmpty() && it.length <= 24 },
-            period = if (live) SportsDbEvents.PERIODS[code] ?: fixture.period else null, clock = if (live) progress ?: fixture.clock else null,
+            period = if (live) SportsDbEvents.PERIODS[code] ?: OVERTIME[fixture.sport]?.takeIf { code == "ot" } ?: fixture.period else null, clock = if (live) progress ?: fixture.clock else null,
             homeLine = if (both) FixtureLine(home) else fixture.homeLine, awayLine = if (both) FixtureLine(away) else fixture.awayLine)
     }
 }

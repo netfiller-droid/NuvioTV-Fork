@@ -306,9 +306,11 @@ object EspnScoreboard {
             if (skipped(type)) return@mapNotNull null
             val abbreviation = competition.optJSONObject("type")?.text("abbreviation")?.take(12)
             val state = status(type)
-            val top = if (state != FixtureStatus.FINAL) emptyList() else competitors(competition).filter { it.optIntOrNull("order") != null }.sortedBy { it.optIntOrNull("order") }
+            val top = if (state == FixtureStatus.SCHEDULED) emptyList() else competitors(competition).filter { (it.optIntOrNull("order") ?: 0) > 0 }.sortedBy { it.optIntOrNull("order") }
                 .take(3).mapNotNull { it.optJSONObject("athlete")?.let { athlete -> athlete.text("shortName") ?: athlete.text("displayName") }?.take(MAX_NAME) }
-            Triple(competition, type, RaceSession(abbreviation, sessionName(abbreviation, competition.optJSONObject("type")?.text("text")), start, state, top))
+            val name = sessionName(abbreviation, competition.optJSONObject("type")?.text("text"))
+            val lap = (competition.optJSONObject("status") ?: eventStatus)?.optIntOrNull("period")?.takeIf { state == FixtureStatus.LIVE && name in RACES && it in 1..MAX_LAPS }
+            Triple(competition, type, RaceSession(abbreviation, name, start, state, top, lap))
         }.sortedBy { it.third.startMillis }.take(MAX_SESSIONS)
         val circuit = event.optJSONObject("circuit")
         val venue = (circuit?.text("fullName") ?: list.firstNotNullOfOrNull { it.first.optJSONObject("venue")?.text("fullName") }
@@ -530,6 +532,7 @@ object EspnScoreboard {
     private val SPACES = Regex("\\s+")
     private val SNAP = Regex("^\\(\\d{1,2}:\\d{2}\\)\\s+")
     private val RECORD = Regex("\\d{1,3}(-\\d{1,3}){1,3}")
+    private val RACES = setOf("Race", "Sprint")
     private val FIGHT_CLOCK = Regex("\\d{1,2}:\\d{2}")
     private val LEADING = Regex("^\\d{1,3}")
     private val INITIAL = Regex("""[\p{L}.\-]{1,6}\.\s+(.+)""")
@@ -541,6 +544,7 @@ object EspnScoreboard {
     private const val MAX_PERIODS = 12
     private const val MAX_SETS = 5
     private const val MAX_SESSIONS = 12
+    private const val MAX_LAPS = 400
     private const val MAX_BOUTS = 24
     const val MAX_MATCHES = 60
     private const val RECENT_MILLIS = 12L * 60 * 60 * 1000

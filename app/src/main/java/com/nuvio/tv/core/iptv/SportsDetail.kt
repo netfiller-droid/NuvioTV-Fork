@@ -10,7 +10,8 @@ data class TennisPlayer(val seed: Int? = null, val flag: String? = null, val cou
 data class TennisSet(val home: Int? = null, val away: Int? = null, val homeTiebreak: Int? = null, val awayTiebreak: Int? = null, val winner: FixtureSide? = null)
 data class GolfPlayer(val position: String, val name: String, val shortName: String? = null, val country: String? = null, val flag: String? = null,
     val toPar: String? = null, val thru: String? = null, val today: String? = null, val teeMillis: Long? = null)
-data class RaceSession(val abbreviation: String?, val name: String, val startMillis: Long, val state: FixtureStatus, val top: List<String> = emptyList())
+data class RaceSession(val abbreviation: String?, val name: String, val startMillis: Long, val state: FixtureStatus, val top: List<String> = emptyList(),
+    val lap: Int? = null)
 data class Fighter(val name: String, val shortName: String? = null, val record: String? = null, val flag: String? = null)
 data class FightBout(val weightClass: String?, val rounds: Int?, val first: Fighter, val second: Fighter, val winner: Int? = null, val startMillis: Long,
     val state: FixtureStatus = FixtureStatus.SCHEDULED, val round: Int? = null, val mainCard: Boolean = false, val method: FightMethod? = null,
@@ -100,7 +101,7 @@ object SportsDetails {
                 put("type", "sessions"); detail.venue?.let { put("venue", it) }
                 put("sessions", JSONArray().apply { detail.sessions.forEach { session -> put(JSONObject().apply {
                     session.abbreviation?.let { put("abbreviation", it) }; put("name", session.name); put("start", session.startMillis); put("state", session.state.name)
-                    if (session.top.isNotEmpty()) put("top", JSONArray(session.top))
+                    if (session.top.isNotEmpty()) put("top", JSONArray(session.top)); session.lap?.let { put("lap", it) }
                 }) } })
             }
             is SportsDetail.Card -> {
@@ -141,7 +142,8 @@ object SportsDetails {
                 }.take(MAX_LEADERS), json.long("end"))
             "sessions" -> SportsDetail.Sessions(json.text("venue"), json.objects("sessions").mapNotNull { session ->
                 RaceSession(session.text("abbreviation"), session.text("name") ?: return@mapNotNull null, session.long("start") ?: return@mapNotNull null,
-                    status(session.text("state")), session.optJSONArray("top")?.let { top -> (0 until minOf(top.length(), 3)).mapNotNull { top.optString(it).takeIf(String::isNotEmpty) } }.orEmpty())
+                    status(session.text("state")), session.optJSONArray("top")?.let { top -> (0 until minOf(top.length(), 3)).mapNotNull { top.optString(it).takeIf(String::isNotEmpty) } }.orEmpty(),
+                    session.int("lap"))
             })
             "card" -> SportsDetail.Card(json.objects("bouts").mapNotNull { bout ->
                 FightBout(bout.text("weightClass"), bout.int("rounds"), bout.optJSONObject("first")?.let(::fighter) ?: return@mapNotNull null,

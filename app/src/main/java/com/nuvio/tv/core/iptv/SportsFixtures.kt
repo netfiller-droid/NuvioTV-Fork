@@ -351,6 +351,7 @@ object SportsFavourites {
 object SportsFixtureText {
     private val US_SPORTS = setOf("american-football", "basketball", "baseball", "ice-hockey")
     private val ZERO_CLOCK = Regex("0+(?:[:.]0+)?'?")
+    private val BREAKS = setOf("ht", "half time", "halftime", "bt", "break time")
 
     fun awayFirst(fixture: SportsFixture): Boolean = fixture.sport in US_SPORTS
 
@@ -401,7 +402,8 @@ object SportsFixtureText {
         val home = fixture.home
         val away = fixture.away
         val state = when (fixture.status) {
-            FixtureStatus.LIVE -> if (fixture.sport == "soccer") fixture.clock?.trim()?.takeIf { it.isNotEmpty() && it != "0'" } ?: fixture.detail else periodClock(fixture)
+            FixtureStatus.LIVE -> if (fixture.sport == "soccer") fixture.detail?.takeIf { SportsGuide.normalise(it) in BREAKS }
+                ?: fixture.clock?.trim()?.takeIf { it.isNotEmpty() && it != "0'" } ?: fixture.detail else periodClock(fixture)
             FixtureStatus.FINAL -> fixture.detail
             FixtureStatus.SCHEDULED -> null
         }
@@ -465,12 +467,15 @@ object SportsFixtureText {
     private fun sessions(fixture: SportsFixture, detail: SportsDetail.Sessions): SportsBugText {
         val session = detail.current ?: return SportsBugText(fixture.title, fixture.detail, detail.venue)
         val word = when (session.state) {
-            FixtureStatus.LIVE -> "live"
+            FixtureStatus.LIVE -> session.lap?.let { "Lap $it" } ?: "live"
             FixtureStatus.SCHEDULED -> "next"
             FixtureStatus.FINAL -> "finished"
         }
-        return SportsBugText(fixture.title, "${session.name} · $word", detail.venue)
+        val order = session.top.takeIf { session.state == FixtureStatus.LIVE && it.isNotEmpty() }?.let(::runningOrder)
+        return SportsBugText(fixture.title, "${session.name} · $word", order ?: detail.venue)
     }
+
+    fun runningOrder(names: List<String>): String = names.mapIndexed { index, name -> "${index + 1} $name" }.joinToString(" · ")
 
     private fun card(fixture: SportsFixture, detail: SportsDetail.Card): SportsBugText {
         val bout = detail.live ?: detail.mainEvent ?: return SportsBugText(fixture.title, fixture.detail)

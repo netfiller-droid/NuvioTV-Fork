@@ -744,3 +744,60 @@ college football red zone; NHL empty net; NFL live `situation`; F1/NASCAR live o
 gaps; UFC round in progress; cricket live innings; AFL/NRL live clock; golf after a cut or a
 playoff; football own goals, penalties, second yellows and the half-time and second-half
 status names on the scoreboard.
+
+## Eleventh pass (11 October, 22:46)
+
+ESPN and TheSportsDB responses captured at 22:46 Brisbane time on 11 October (12:46Z). In
+play: the Singapore Grand Prix, the first live motor race seen (lap 26, 46 minutes after the
+listed 12:00Z start), and eight WTA matches (one in the 3rd set, five in the 2nd, two in the
+1st). Nothing else on ESPN was live: the `*-LIVE.json` summaries are the ninth-pass files, and
+the AFL, A-League, cricket, MLB, NASCAR, NRL, PGA, URC and UFC scoreboards are byte-for-byte
+the tenth pass. The ATP, Premier League, NBA, NBL, college football, NFL, NHL and Champions
+League scoreboards changed only by status (the NBA preseason game finished, Rockets 115–132
+Mavericks); parsed, every other fixture is identical to the tenth pass. The AFL, A-League,
+NBL, college football, NFL, NHL, NRL, URC, MLB and Champions League summaries parse exactly
+as before. Trimmed copies are in `app/src/test/resources/sports/*-real-20261011e.json`
+(`SportsRealDataRaceNightTest`).
+
+| Shape | What the real response showed | Parser change |
+|---|---|---|
+| F1 race (live) | Race competition `STATUS_IN_PROGRESS`, `detail` and `shortDetail` `In Progress`, `displayClock` `0:00`, `period` 26 (the lap). The event status still says `STATUS_FINAL` (`period` 28) for the whole weekend. All 22 competitors carry `order` 1–22, updated live (Piastri 7th on the grid, now 3rd; Russell 6th, now 11th); `winner` false for all and `statistics` empty. No gaps, intervals, pit stops, retirements, fastest lap or race distance anywhere in the scoreboard; the multi-sport header has no racing. Finished sessions also carry a `period` (28, 15, 20, 15), not used. | A live race or sprint keeps the lap and the top three of the running order (`RaceSession.lap`, `top`, also in the cache); the bug reads `Race · Lap 26` with `1 M. Verstappen · 2 L. Norris · 3 O. Piastri` in place of the circuit |
+| Tennis (live) | Same shapes as the tenth pass, now with a match in the 3rd set (`period` 3, `shortDetail` `3rd`). Where `possession` is set the competition also has a `situation` with baseball fields only (`onFirst`, `onSecond`, `onThird`, all false). A China Open women's match is in the ATP scoreboard too, under `womens-singles`. Still no point score; `notes` still written from the first-listed side. | none (the stray situation is ignored; the ATP list keeps the men's groupings) |
+| Football summary (before kick-off) | Crystal Palace v Nottingham Forest 14 minutes before kick-off: `rosters` with `formation` `3-4-2-1`, 11 starters with `formationPlace` 1–11 and 9 substitutes (`formationPlace` 0, position `SUB`) per side. | none (the Line-ups tab fills before kick-off) |
+| NBA summary (final) | Four quarters, 400 win-probability rows ending at 0 for the home side, `End of Game` as the last play; no `featuredAthletes`. | none |
+
+TheSportsDB at 12:46Z: livescore returned Soccer (212), Basketball (94) and Ice Hockey (75);
+every other sport answered `{"Message":"No data found"}`. Football minutes track the real
+clock (`16` at 16 minutes, `45+1` at 46, `2H` `87` at 106), stoppage time up to `90+10` on
+finished rows, half-time rows keep the stoppage minute (`HT` `45+1`); no extra time or
+penalties were live. Basketball `Q2`/`Q4` progress is the minute of the quarter; finished
+rows have `10`, `12` or no progress; a Czech game due at 15:00Z was `POST` at 0–0 (skipped).
+A Ukrainian SuperLeague row had `strStatus` null with 37–45 at 166 minutes after the start (a
+game from the same league sat at 41–46 the day before); earlier in the day it was `NS`. Six
+hockey rows were `BT` (break, no progress) 46 minutes after a 12:00Z start, after the 1st
+period. The AHL and USHL rows that started at 22:00Z on 10 October were still `P3` `20` and
+`P3` `19`, refreshed every minute, and the WHL `P3` `20` and AHL `OT` `4` rows from 10 October
+were still there; all skipped by the rules of the earlier passes. `lookuptv` returned channels for
+9 of 46 events (the NFL game 46, Liverpool v Manchester City 43 including one for Australia,
+Monaco v Toulouse 9, single channels marked `World`); the new countries are plain English
+names. ESPN and TheSportsDB league lists are unchanged from the tenth pass.
+
+Parser changes: a TheSportsDB row with no status no longer keeps a game live once the
+game length has passed; `OT` sets the period (4th in hockey, 5th in basketball and American
+football), so the clock reads `OT · 4'`; the football bug shows `HT` during the break
+instead of the frozen stoppage minute.
+
+Checked again on this data: stale and stuck TheSportsDB rows, count-up minutes, the race
+window (live until the end of the race, at least 150 minutes after its start), tennis
+server and sets, worldwide channels.
+
+Confirmed now: F1 live race status, lap and running order; live tennis in a deciding set;
+football line-ups before kick-off; TheSportsDB hockey breaks and rows without a status.
+
+Still unconfirmed: F1 gaps, pit stops, retirements and fastest lap (not in ESPN's scoreboard
+at all so far), the race's finished state and NASCAR live; tennis point score and a live
+tiebreak; MLB pitching change, runners on second or third and a full count; NBA overtime;
+college football red zone; NHL empty net; NFL live `situation`; UFC round in progress;
+cricket live innings; AFL/NRL live clock; golf after a cut or a playoff; football own goals,
+penalties, second yellows, extra time and the half-time and second-half status names on
+ESPN's scoreboard.
