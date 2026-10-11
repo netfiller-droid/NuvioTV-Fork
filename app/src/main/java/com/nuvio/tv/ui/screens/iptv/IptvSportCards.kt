@@ -58,7 +58,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.tv.material3.Icon
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
@@ -154,7 +153,7 @@ internal fun ColumnScope.SportCardContent(item: IptvFixtureItem, hidden: Boolean
     Row(Modifier.fillMaxWidth().height(size.header).padding(start = 12.dp, end = 12.dp, top = 4.dp), verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(6.dp)) {
         fixture.leagueLogo?.let { LeagueLogo(it, 14.dp) }
-        Text(listOfNotNull(sportLeagueName(fixture), (detail as? SportsDetail.Golf)?.tournament).joinToString(" · ").uppercase(), style = SportCaps,
+        Text(listOfNotNull(sportLeagueName(fixture), (detail as? SportsDetail.Golf)?.tournament).joinToString(" · "), style = SportCaps,
             color = NuvioTheme.colors.TextSecondary, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
         if (item.favourite) Icon(Icons.Filled.Star, null, Modifier.size(13.dp), tint = NuvioTheme.colors.Secondary)
         if (reminded) Icon(Icons.Filled.NotificationsActive, null, Modifier.size(13.dp), tint = NuvioTheme.colors.Secondary)
@@ -183,7 +182,7 @@ internal fun ColumnScope.SportCardContent(item: IptvFixtureItem, hidden: Boolean
 }
 
 internal val SportCaps: TextStyle
-    @Composable get() = MaterialTheme.typography.labelSmall.copy(letterSpacing = .6.sp, fontWeight = FontWeight.SemiBold)
+    @Composable get() = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.SemiBold)
 
 internal val SportNumerals: TextStyle
     @Composable get() = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold, fontFeatureSettings = "tnum")
@@ -272,7 +271,7 @@ internal fun SportDetailBody(fixture: SportsFixture, hidden: Boolean, favourites
 }
 
 @Composable
-internal fun CardState(fixture: SportsFixture, detail: SportsDetail?, hidden: Boolean) {
+internal fun CardState(fixture: SportsFixture, detail: SportsDetail?, hidden: Boolean, timeOnly: Boolean = false) {
     val live = stringResource(R.string.iptv_sport_live)
     val text = when (fixture.status) {
         FixtureStatus.LIVE -> if (hidden) live else when (detail) {
@@ -284,7 +283,7 @@ internal fun CardState(fixture: SportsFixture, detail: SportsDetail?, hidden: Bo
             else -> SportsFixtureText.periodClock(fixture)
         } ?: live
         FixtureStatus.FINAL -> stringResource(R.string.iptv_sport2_final)
-        FixtureStatus.SCHEDULED -> if (sportToday(fixture.startMillis)) clock(fixture.startMillis) else "${sportDayLabel(fixture.startMillis)} ${clock(fixture.startMillis)}"
+        FixtureStatus.SCHEDULED -> if (timeOnly || sportToday(fixture.startMillis)) clock(fixture.startMillis) else "${sportDayLabel(fixture.startMillis)} ${clock(fixture.startMillis)}"
     }
     Text(text, style = SportCaps.copy(fontFeatureSettings = "tnum"), fontWeight = if (fixture.status == FixtureStatus.LIVE) FontWeight.Bold else FontWeight.SemiBold,
         color = when (fixture.status) {
@@ -448,9 +447,9 @@ private fun FightMiddle(fixture: SportsFixture, detail: SportsDetail.Card, hidde
     val main = detail.mainEvent
     val live = detail.live?.takeIf { !hidden }
     Column(modifier.padding(horizontal = 12.dp), verticalArrangement = Arrangement.spacedBy(3.dp, Alignment.CenterVertically)) {
-        Text(main?.let { "${fighterName(it.first)} v ${fighterName(it.second)}" } ?: fixture.title, style = MaterialTheme.typography.titleSmall,
+        Text(main?.let { stringResource(R.string.iptv_sport2_versus, fighterName(it.first), fighterName(it.second)) } ?: fixture.title, style = MaterialTheme.typography.titleSmall,
             fontWeight = FontWeight.Bold, color = itemContent(focused), maxLines = 1, overflow = TextOverflow.Ellipsis)
-        if (live != null) Text(stringResource(R.string.iptv_sport5_section_now_bout, "${fighterName(live.first)} v ${fighterName(live.second)}") +
+        if (live != null) Text(stringResource(R.string.iptv_sport5_section_now_bout, stringResource(R.string.iptv_sport2_versus, fighterName(live.first), fighterName(live.second))) +
             (live.round?.let { " · " + stringResource(R.string.iptv_sport5_section_fight_round, it) } ?: ""),
             style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.SemiBold, color = NuvioTheme.colors.Error, maxLines = 1, overflow = TextOverflow.Ellipsis)
         else main?.let { bout ->
@@ -714,7 +713,7 @@ internal fun GolfBoard(fixture: SportsFixture, detail: SportsDetail.Golf, favour
 
 @Composable
 private fun GolfHeading(text: String, width: Dp) {
-    Text(text.uppercase(), style = SportCaps, color = NuvioTheme.colors.TextTertiary, maxLines = 1, overflow = TextOverflow.Ellipsis,
+    Text(text, style = SportCaps, color = NuvioTheme.colors.TextTertiary, maxLines = 1, overflow = TextOverflow.Ellipsis,
         textAlign = TextAlign.End, modifier = Modifier.width(width))
 }
 

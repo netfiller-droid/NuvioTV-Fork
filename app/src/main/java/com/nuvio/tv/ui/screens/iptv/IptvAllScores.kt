@@ -109,7 +109,7 @@ private val LineShape = RoundedCornerShape(10.dp)
 private val DayShape = RoundedCornerShape(10.dp)
 private val TEAM_LINE = 66.dp
 private val PLAIN_LINE = 40.dp
-private val DAY_MIN = 84.dp
+private val DAY_MIN = 100.dp
 private val DAY_MAX = 150.dp
 private val DAY_GAP = 6.dp
 private const val DAY_SETTLE = 350L
@@ -296,9 +296,9 @@ internal fun IptvAllScores(state: IptvFixturesState, playingId: String?, onWatch
 private fun ScoreHeader(entry: ScoreEntry.Header) {
     Row(Modifier.fillMaxWidth().padding(start = 12.dp, end = 12.dp, top = 14.dp, bottom = 4.dp), verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text((SportsLeagues.byId(entry.league)?.name ?: entry.league).uppercase(), style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold,
-            color = NuvioTheme.colors.TextSecondary, maxLines = 1)
-        if (entry.live > 0) Text("${entry.live} ${stringResource(R.string.iptv_sport_live)}", style = SportCaps.copy(fontFeatureSettings = "tnum"),
+        Text(SportsLeagues.byId(entry.league)?.name ?: entry.league, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold,
+            color = NuvioTheme.colors.TextSecondary, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f, fill = false))
+        if (entry.live > 0) Text(pluralStringResource(R.plurals.iptv_ui20_sched_live, entry.live, entry.live), style = SportCaps.copy(fontFeatureSettings = "tnum"),
             fontWeight = FontWeight.Bold, color = NuvioTheme.colors.Error, maxLines = 1)
     }
 }
@@ -327,7 +327,7 @@ private fun ScoreLine(item: IptvFixtureItem, hidden: Boolean, spoiler: Boolean, 
         }
         .focusable().padding(end = 12.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
         Box(Modifier.width(3.dp).height(if (teams) 44.dp else 22.dp).clip(RoundedCornerShape(2.dp)).background(if (close) NuvioTheme.colors.Warning else Color.Transparent))
-        Box(Modifier.width(96.dp), contentAlignment = Alignment.CenterStart) { CardState(fixture, fixture.sportDetail.takeIf { !item.scheduleOnly }, hidden || item.scheduleOnly) }
+        Box(Modifier.width(96.dp), contentAlignment = Alignment.CenterStart) { CardState(fixture, fixture.sportDetail.takeIf { !item.scheduleOnly }, hidden || item.scheduleOnly, timeOnly = true) }
         val content = itemContent(focused)
         if (home != null && away != null) {
             CardBands(fixture, home, away, focused, Modifier.weight(1f).fillMaxHeight().padding(vertical = 3.dp), 22.dp, extra = null) { team, side ->
@@ -369,18 +369,20 @@ private fun ScoreDays(strip: List<LocalDate>, summaries: List<ScoreDaySummary>, 
             strip.forEachIndexed { index, date ->
                 val summary = summaries.getOrNull(index) ?: ScoreDaySummary(ScoreDayKind.UNKNOWN)
                 DayChip(dayName(date, today), dayCount(summary, date.isBefore(today)), summary.kind == ScoreDayKind.LIVE, date == day, width,
-                    if (date == day) Modifier.focusRequester(chosen) else Modifier, onFocus = { focusedDay = date }, onClick = { onSelect(date) })
+                    if (date == day) Modifier.focusRequester(chosen) else Modifier, onFocus = { focusedDay = date }, onBlur = { if (focusedDay == date) focusedDay = null },
+                    onClick = { onSelect(date) })
             }
         }
     }
 }
 
 @Composable
-private fun DayChip(label: String, count: String, live: Boolean, selected: Boolean, width: Dp, modifier: Modifier, onFocus: () -> Unit, onClick: () -> Unit) {
+private fun DayChip(label: String, count: String, live: Boolean, selected: Boolean, width: Dp, modifier: Modifier, onFocus: () -> Unit, onBlur: () -> Unit,
+    onClick: () -> Unit) {
     var focused by remember { mutableStateOf(false) }
     var pressed by remember { mutableStateOf(false) }
-    Column(modifier.width(width).height(58.dp)
-        .onFocusChanged { focused = it.isFocused; if (it.isFocused) onFocus() }
+    Box(modifier.width(width).height(58.dp)
+        .onFocusChanged { focused = it.isFocused; if (it.isFocused) onFocus() else onBlur() }
         .iptvItem(focused, selected, DayShape)
         .onPreviewKeyEvent { event ->
             val native = event.nativeKeyEvent
@@ -389,15 +391,16 @@ private fun DayChip(label: String, count: String, live: Boolean, selected: Boole
             if (native.action == AndroidKeyEvent.ACTION_UP) { if (pressed) onClick(); pressed = false }
             true
         }
-        .focusable().padding(horizontal = 10.dp, vertical = 6.dp), verticalArrangement = Arrangement.spacedBy(2.dp, Alignment.CenterVertically)) {
-        Text(label, style = MaterialTheme.typography.labelLarge, fontWeight = if (selected || focused) FontWeight.SemiBold else FontWeight.Medium,
-            color = if (focused) itemContent(true) else if (selected) NuvioTheme.colors.TextPrimary else NuvioTheme.colors.TextSecondary,
-            maxLines = 1, overflow = TextOverflow.Ellipsis)
-        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(5.dp)) {
-            Box(Modifier.width(10.dp).height(3.dp).clip(RoundedCornerShape(2.dp)).background(if (selected) NuvioTheme.colors.Secondary else Color.Transparent))
+        .focusable()) {
+        Column(Modifier.fillMaxSize().padding(horizontal = 10.dp, vertical = 6.dp), verticalArrangement = Arrangement.spacedBy(2.dp, Alignment.CenterVertically)) {
+            Text(label, style = MaterialTheme.typography.labelLarge, fontWeight = if (selected || focused) FontWeight.SemiBold else FontWeight.Medium,
+                color = if (focused) itemContent(true) else if (selected) NuvioTheme.colors.TextPrimary else NuvioTheme.colors.TextSecondary,
+                maxLines = 1, overflow = TextOverflow.Ellipsis)
             Text(count, style = MaterialTheme.typography.labelSmall.copy(fontFeatureSettings = "tnum"), maxLines = 1, overflow = TextOverflow.Ellipsis,
                 color = if (live) NuvioTheme.colors.Error else NuvioTheme.colors.TextTertiary)
         }
+        if (selected) Box(Modifier.align(Alignment.BottomStart).padding(start = 10.dp, bottom = 4.dp).width(18.dp).height(3.dp).clip(RoundedCornerShape(2.dp))
+            .background(NuvioTheme.colors.Secondary))
     }
 }
 

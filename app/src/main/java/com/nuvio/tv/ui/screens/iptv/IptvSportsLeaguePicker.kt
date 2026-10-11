@@ -81,15 +81,15 @@ private val CREST = 40.dp
 
 @Composable
 internal fun IptvSportsLeaguePicker(offered: List<SportsLeague>, chosen: Set<String>, hasKey: Boolean, crests: Map<String, String>,
-    onSave: (List<String>) -> Unit, onAdd: () -> Unit, onDismiss: () -> Unit, overlay: @Composable () -> Unit = {}) {
+    onSave: (List<String>, Boolean) -> Unit, onAdd: () -> Unit, onDismiss: () -> Unit, overlay: @Composable () -> Unit = {}) {
     var selected by remember(chosen) { mutableStateOf(chosen) }
     val sports = remember(offered, selected) { SportsLeaguePicker.sports(offered, selected) }
     var sport by rememberSaveable { mutableStateOf(sports.firstOrNull { it.chosen > 0 }?.sport ?: sports.firstOrNull()?.sport.orEmpty()) }
     val current = sports.firstOrNull { it.sport == sport } ?: sports.firstOrNull()
     val sportFocus = remember { FocusRequester() }
     val firstTile = remember(current?.sport) { FocusRequester() }
-    fun save() { if (selected != chosen) onSave(SportsLeaguePicker.saved(offered, selected)) }
-    Dialog(onDismissRequest = { save(); onDismiss() }, properties = DialogProperties(usePlatformDefaultWidth = false)) {
+    fun save(leaving: Boolean) { if (leaving || selected != chosen) onSave(SportsLeaguePicker.saved(offered, selected), leaving) }
+    Dialog(onDismissRequest = { save(true); onDismiss() }, properties = DialogProperties(usePlatformDefaultWidth = false)) {
         LaunchedEffect(Unit) { withFrameNanos { }; runCatching { sportFocus.requestFocus() } }
         Box(Modifier.fillMaxSize().background(NuvioTheme.colors.Background)) {
             if (!LocalIptvAppearance.current.plainBackground) LocalV2Appearance.current?.let { V2Atmosphere(rich = false, background = it.settingsBackground) }
@@ -108,7 +108,7 @@ internal fun IptvSportsLeaguePicker(offered: List<SportsLeague>, chosen: Set<Str
                         }
                     }
                     PickerRailRow(stringResource(R.string.iptv_sport7_add_league), null, false, Modifier, icon = Icons.Filled.Add,
-                        onClick = { save(); onAdd() })
+                        onClick = { save(false); onAdd() })
                 }
                 Column(Modifier.weight(1f).fillMaxHeight(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     BoxWithConstraints(Modifier.weight(1f).fillMaxWidth()) {

@@ -97,6 +97,19 @@ logcat (`adb logcat -s NuvioIptv:V *:E`). Do not share logs that contain address
    live with "OT · m:ss".
 6. ESPN NFL: straight after a touchdown, the score bug does not show "Red zone" while the
    conversion is pending; inside the 20 the down line is accented.
+7. All scores: on the day strip press Left, then Down straight away: the day does not change
+   and focus stays on the list. Future days show only the kick-off time on each line; in
+   German or Russian, counts such as "4 Ergebnisse" are not cut off.
+8. Sport page on a quiet day: Up from a card to "All scores", then Down lands on the cards.
+9. League picker: untick a league added from TheSportsDB, then "Add a league" and Back to the
+   picker: its tile is still there, unticked. Leave the picker with it unticked: it is gone.
+10. Headings in Game Centre, All scores, game cards, Home widgets and the Live TV rail are in
+    sentence case, not spaced capitals.
+11. Multiview: hide the score on one picture, close and reopen multiview: still hidden until
+    you leave Live TV. Change "Channel and programme", export the setup backup and import
+    it on another box (or after clearing data): the choice comes back.
+12. 1080p box, a game with a short Sport hero: the two teams' facts sit side by side and
+    "Last met" still shows.
 
 ## 7m. Live NFL and NASCAR from the 12 October capture (build `85fe99dce`)
 1. Live NFL game, score over the video: three small bars beside each team logo show the

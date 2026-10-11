@@ -843,6 +843,25 @@ Sport data (capture of 12 October, 06:42; first live NFL overtime):
   being fetched for up to an hour past the game length while they have not finished.
 - The red-zone marker no longer appears after a touchdown while the conversion is pending.
 
+## Second pass over the untested work (12 October 2026, not device-tested)
+
+Sport screens and multiview:
+- All scores: moving off the day strip quickly no longer changes the day or throws focus
+  back to the filter list; scheduled games show only the kick-off time (the strip names the
+  day); league live counts use proper plurals; day counts no longer cut off in longer
+  languages.
+- Sport page: on a quiet day, Down from "All scores" goes to the game cards. "Your teams
+  next", the pre-game fact lines and "Last met" no longer cut off on smaller screens.
+- League picker: unticking a league added from TheSportsDB keeps its tile while the picker
+  is open (it is removed when you leave the picker unticked, as before); adding a league
+  when the list is full no longer drops it.
+- Section headings in Live TV, Game Centre, All scores, on game cards and on Home widgets are
+  in sentence case without wide letter spacing.
+- The "v" and "@" between team names can be translated.
+- Multiview: "Channel and programme" is a saved Live TV setting, read off the main thread
+  and carried in the setup backup; "Hide score on this picture" stays set while Live TV is
+  open, including after closing and reopening multiview.
+
 ## Reliability
 
 - A stream is replaced only after the previous decoder and HTTP connections have

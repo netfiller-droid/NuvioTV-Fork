@@ -37,7 +37,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -468,8 +467,7 @@ private fun PanelCategories(state: IptvLiveState, modifier: Modifier, onFavourit
 
 @Composable
 internal fun SectionLabel(text: String, modifier: Modifier = Modifier) {
-    Text(text, style = iptvMetaStyle(), color = NuvioTheme.colors.TextTertiary,
-        letterSpacing = 1.4.sp, maxLines = 1, overflow = TextOverflow.Ellipsis,
+    Text(text, style = iptvMetaStyle(), fontWeight = FontWeight.SemiBold, color = NuvioTheme.colors.TextSecondary, maxLines = 1, overflow = TextOverflow.Ellipsis,
         modifier = modifier.padding(start = 12.dp, top = 6.dp, bottom = 2.dp))
 }
 

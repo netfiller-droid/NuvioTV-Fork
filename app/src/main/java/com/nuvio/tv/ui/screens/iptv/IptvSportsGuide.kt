@@ -100,7 +100,7 @@ internal fun IptvGamesNowLane(games: List<IptvFixtureItem>, sport: IptvSportsGui
     val requesters = remember { mutableMapOf<Int, FocusRequester>() }
     fun requester(index: Int) = requesters.getOrPut(index) { FocusRequester() }
     Row(modifier.fillMaxWidth().height(LANE_HEIGHT), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-        Text(stringResource(R.string.iptv_sport5g_games_now).uppercase(), style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.ExtraBold,
+        Text(stringResource(R.string.iptv_sport5g_games_now), style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Bold,
             color = NuvioTheme.colors.Error, maxLines = 1, modifier = Modifier.padding(start = 4.dp))
         LazyRow(state = listState, modifier = Modifier.weight(1f)
             .focusRestorer {

@@ -65,10 +65,11 @@ under "Earlier session notes" and the dated sections is history kept for referen
    motorsport shapes need checking first); no parser yet for lacrosse, college
    volleyball, water polo, field hockey or FIBA.
 3. Follow-ups (small, not started):
-   - Move the multiview "Channel and programme" setting (key `MultiviewLabels.KEY` =
-     `multiview-labels` in `core/iptv/MultiviewStrip.kt`, stored in the `iptv-live`
-     preferences and read in `IptvMultiview.kt`) into `IptvLivePreferences` and the
-     setup backup (`core/iptv/SetupBundle.kt`).
+   - Hard-coded "v"/"@" are still built in core text (`IptvSportTimeline.kt`,
+     `core/iptv/SportsFixtures.kt`, `SportsGuideCells.kt`, `SportsOverlayText.kt`, the
+     fixture title in `SportsFixturesParsers.kt`); the screens use
+     `iptv_ui25_sep_versus`/`iptv_ui25_sep_at`. A custom league can only be removed by
+     unticking it and leaving the picker.
    - Unused strings: `iptv_sport5_section_other_feeds`, `iptv_sport7_source_both`,
      `iptv_sport7_source_needs_key` (search `R.string.` and `R.plurals.` before removing;
      remove from all 41 values folders).

@@ -472,6 +472,7 @@ internal fun IptvSportsFixturesRow(source: IptvSourceRef?, hiddenCategories: Set
             val shelves = remember(state.rows, state.favourites, perRow) { sportShelves(state, perRow) }
             var lastKey by remember { mutableIntStateOf(0) }
             var lastSlot by remember { mutableIntStateOf(0) }
+            var chipFocused by remember { mutableStateOf(false) }
             val slots = shelves.size + if (lanes.isNotEmpty()) 1 else 0
             val rowsState = rememberLazyListState()
             val inner = LocalBringIntoViewSpec.current
@@ -480,7 +481,7 @@ internal fun IptvSportsFixturesRow(source: IptvSourceRef?, hiddenCategories: Set
                     .onPreviewKeyEvent { event ->
                         val native = event.nativeKeyEvent
                         if (native.action == AndroidKeyEvent.ACTION_DOWN) lastKey = native.keyCode
-                        toggle != null && native.keyCode == AndroidKeyEvent.KEYCODE_DPAD_DOWN && native.action == AndroidKeyEvent.ACTION_DOWN && lastSlot >= slots - 1 &&
+                        toggle != null && native.keyCode == AndroidKeyEvent.KEYCODE_DPAD_DOWN && native.action == AndroidKeyEvent.ACTION_DOWN && lastSlot >= slots - 1 && !chipFocused &&
                             runCatching { toggle.requestFocus(FocusDirection.Enter) }.getOrDefault(false)
                     }
                     .onFocusChanged { if (!it.hasFocus && lastKey == AndroidKeyEvent.KEYCODE_DPAD_DOWN) viewModel.focusFixture(null) }
@@ -492,8 +493,8 @@ internal fun IptvSportsFixturesRow(source: IptvSourceRef?, hiddenCategories: Set
                         item(key = shelf.row.key) {
                             SportSlot(at, rowsState, inner, onFocus = { lastSlot = at }) {
                                 SportFixtureRow(shelf, cardWidth, state, playingId, message.takeIf { index == 0 && state.failed }, onRail, blocked, restore.takeIf { at == lastSlot },
-                                    onScores = if (index == 0) ({ viewModel.prompt(IptvSportPrompt.Scores) }) else null,
-                                    onFocused = { viewModel.focusFixture(it.fixture.key) }, onClick = { open(it) }, onHold = { hold(it) }, onMenu = { options(it) })
+                                    onScores = if (index == 0) ({ viewModel.prompt(IptvSportPrompt.Scores) }) else null, onChip = { chipFocused = it },
+                                    onFocused = { chipFocused = false; viewModel.focusFixture(it.fixture.key) }, onClick = { open(it) }, onHold = { hold(it) }, onMenu = { options(it) })
                             }
                         }
                         if (index == 0 && lanes.isNotEmpty()) {
@@ -563,7 +564,7 @@ private fun sportShelves(state: IptvFixturesState, perRow: Int): List<IptvSportS
 
 @Composable
 private fun SportFixtureRow(shelf: IptvSportShelf, cardWidth: Dp, state: IptvFixturesState, playingId: String?, message: Int?, onRail: () -> Unit, blocked: Boolean,
-    restore: FocusRequester?, onScores: (() -> Unit)?,
+    restore: FocusRequester?, onScores: (() -> Unit)?, onChip: (Boolean) -> Unit,
     onFocused: (IptvFixtureItem) -> Unit, onClick: (IptvFixtureItem) -> Unit, onHold: (IptvFixtureItem) -> Unit, onMenu: (IptvFixtureItem) -> Unit) {
     val row = shelf.row
     val cards = shelf.items
@@ -581,7 +582,7 @@ private fun SportFixtureRow(shelf: IptvSportShelf, cardWidth: Dp, state: IptvFix
             if (row.section == FixtureSection.LIVE) Box(Modifier.size(8.dp).clip(CircleShape).background(NuvioTheme.colors.Error))
             Text(rowTitle(row), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, color = NuvioTheme.colors.TextPrimary, maxLines = 1)
             Text("${row.items.size}", style = MaterialTheme.typography.labelMedium, color = NuvioTheme.colors.TextTertiary, maxLines = 1)
-            if (onScores != null) SportChip(stringResource(R.string.iptv_sport5_section_all_scores), onScores, height = 22.dp,
+            if (onScores != null) SportChip(stringResource(R.string.iptv_sport5_section_all_scores), onScores, Modifier.onFocusChanged { onChip(it.isFocused) }, height = 22.dp,
                 icon = Icons.AutoMirrored.Filled.List, blocked = blocked)
             if (message != null) RowMessage(message, true)
         }
@@ -622,7 +623,8 @@ private fun FillLabel(kind: SportsFill, count: Int) {
                 SportsFill.RESULTS -> R.string.iptv_ui20_sport_fill_results
                 SportsFill.TOMORROW -> R.string.iptv_sport_tomorrow
                 SportsFill.TEAMS_NEXT -> R.string.iptv_ui20_sport_fill_teams_next
-            }), style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.SemiBold, color = NuvioTheme.colors.TextSecondary, maxLines = 3)
+            }), style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.SemiBold, color = NuvioTheme.colors.TextSecondary, maxLines = 3,
+                overflow = TextOverflow.Ellipsis)
             Text("$count", style = MaterialTheme.typography.labelMedium, color = NuvioTheme.colors.TextTertiary, maxLines = 1)
         }
     }
@@ -762,7 +764,7 @@ private val SPORT_ROW_HEIGHT = 168.dp
 private val SPORT_ROW_GAP = 12.dp
 private val SPORT_ROW_BLEED = 8.dp
 private val SPORT_ROW_PADDING = 4.dp
-private val FILL_LABEL_WIDTH = 96.dp
+private val FILL_LABEL_WIDTH = 120.dp
 private const val TICK_MILLIS = 60_000L
 private const val TIMELINE_KEY = "\u0000timeline"
 private const val FOLLOW_GOLFERS = 5

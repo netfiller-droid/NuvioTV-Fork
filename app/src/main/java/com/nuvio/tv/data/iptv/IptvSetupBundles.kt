@@ -13,6 +13,7 @@ import com.nuvio.tv.core.iptv.ExistingGuide
 import com.nuvio.tv.core.iptv.ExistingSource
 import com.nuvio.tv.core.iptv.GuideKey
 import com.nuvio.tv.core.iptv.MatchableChannel
+import com.nuvio.tv.core.iptv.MultiviewLabels
 import com.nuvio.tv.core.iptv.MultiviewLayout
 import com.nuvio.tv.core.iptv.MultiviewQuality
 import com.nuvio.tv.core.iptv.SetupBundle
@@ -159,7 +160,7 @@ class IptvSetupBundles(private val catalogue: IptvCatalogueStore, private val gu
         return BundleSettings(SetupSettings(SetupSettings.wire(preferences.defaultFormat), preferences.timeshift, preferences.sport, SetupSettings.wire(preferences.startView),
             SetupSettings.wire(preferences.multiviewLayout), SetupSettings.wire(preferences.multiviewQuality), preferences.recordEarlyMinutes, preferences.recordLateMinutes),
             preferences.autoPreview, preferences.showStats, appearance.theme?.takeIf { it.length <= 40 && it.all { c -> c.isLetterOrDigit() || c == '_' || c == '-' } },
-            appearance.black, appearance.solidPanels, appearance.plainBackground)
+            appearance.black, appearance.solidPanels, appearance.plainBackground, preferences.multiviewLabels)
     }
 
     private fun apply(settings: BundleSettings) {
@@ -174,6 +175,7 @@ class IptvSetupBundles(private val catalogue: IptvCatalogueStore, private val gu
         preferences.recordLateMinutes = live.recordLate
         preferences.autoPreview = settings.preview
         preferences.showStats = settings.stats
+        preferences.multiviewLabels = settings.labels
         preferences.updateAppearance { IptvAppearance(settings.theme, settings.black, settings.solid, settings.plain) }
     }
 

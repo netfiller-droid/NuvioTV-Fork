@@ -181,7 +181,8 @@ class IptvSportsSettingsViewModel @Inject constructor(private val preferences: I
 
     fun addLeague(item: SportsDbLeague) {
         val league = SportsDbLeagues.builtIn(item) ?: SportsDbLeagues.league(item).also { added ->
-            preferences.customLeagues = preferences.customLeagues.filter { it.id != added.id } + added
+            val chosen = preferences.leagues
+            preferences.customLeagues = listOf(added) + preferences.customLeagues.filter { it.id != added.id }.sortedBy { it.id !in chosen }
         }
         preferences.leagues = preferences.leagues + league.id
         reload()
@@ -209,8 +210,8 @@ class IptvSportsSettingsViewModel @Inject constructor(private val preferences: I
 
     fun keepFavourites(kept: List<String>) { preferences.favouriteTeams = preferences.favouriteTeams.filter { it in kept }.toSet(); reload() }
 
-    fun setLeagues(chosen: List<String>) {
-        preferences.customLeagues = preferences.customLeagues.filter { it.id in chosen }
+    fun setLeagues(chosen: List<String>, leaving: Boolean) {
+        if (leaving) preferences.customLeagues = preferences.customLeagues.filter { it.id in chosen }
         preferences.leagues = chosen.toSet()
         reload()
     }

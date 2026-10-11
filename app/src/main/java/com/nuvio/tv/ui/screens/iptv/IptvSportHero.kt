@@ -343,7 +343,8 @@ private fun TeamsLedger(item: IptvFixtureItem, home: FixtureTeam, away: FixtureT
                     scheduled -> Text(clock(fixture.startMillis), style = ledgerNumerals(big * .8f), color = NuvioTheme.colors.TextPrimary, maxLines = 1)
                     item.scheduleOnly && live -> Text(stringResource(R.string.iptv_sport5_section_no_live_score), style = MaterialTheme.typography.labelMedium,
                         color = NuvioTheme.colors.TextTertiary, maxLines = 1, modifier = Modifier.padding(bottom = 8.dp))
-                    else -> Text("v", style = ledgerNumerals(big * .5f), color = NuvioTheme.colors.TextTertiary, maxLines = 1)
+                    else -> Text(stringResource(if (awayFirst) R.string.iptv_ui25_sep_at else R.string.iptv_ui25_sep_versus), style = ledgerNumerals(big * .5f),
+                        color = NuvioTheme.colors.TextTertiary, maxLines = 1)
                 }
                 LedgerTeam(second, fixture.sport, scheduled && teams, compact, ball == second, Modifier.weight(1f, fill = false))
             }
@@ -373,10 +374,15 @@ private fun teamForm(team: FixtureTeam): String? = team.form
 private fun PreGameFacts(fixture: SportsFixture, first: FixtureTeam, second: FixtureTeam, facts: PreGame, modifier: Modifier) {
     BoxWithConstraints(modifier) {
         val lines = ((maxHeight + FACT_GAP) / (FACT_LINE + FACT_GAP)).toInt()
+        val pairable = maxWidth >= FACT_PAIR_WIDTH
         val teams = !facts.meetingOnly && lines >= 2
-        val meeting = facts.meeting?.takeIf { lines >= if (teams) 3 else 1 }
+        val meeting = facts.meeting?.takeIf { lines >= if (teams && !pairable) 3 else if (teams) 2 else 1 }
+        val paired = teams && meeting != null && lines < 3
         Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(FACT_GAP)) {
-            if (teams) {
+            if (paired) Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(24.dp)) {
+                FactRow(fixture, first, facts.firstForm, facts.firstStanding, Modifier.weight(1f))
+                FactRow(fixture, second, facts.secondForm, facts.secondStanding, Modifier.weight(1f))
+            } else if (teams) {
                 FactRow(fixture, first, facts.firstForm, facts.firstStanding)
                 FactRow(fixture, second, facts.secondForm, facts.secondStanding)
             }
@@ -386,10 +392,10 @@ private fun PreGameFacts(fixture: SportsFixture, first: FixtureTeam, second: Fix
 }
 
 @Composable
-private fun FactRow(fixture: SportsFixture, team: FixtureTeam, form: List<FormMark>?, standing: SportsStanding?) {
-    Row(Modifier.fillMaxWidth().height(FACT_LINE), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+private fun FactRow(fixture: SportsFixture, team: FixtureTeam, form: List<FormMark>?, standing: SportsStanding?, modifier: Modifier = Modifier.fillMaxWidth()) {
+    Row(modifier.height(FACT_LINE), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         TeamLogo(team, 16.dp)
-        Text(SportsLedger.code(team) ?: team.shortName ?: team.name, style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.SemiBold,
+        Text(SportsLedger.code(team) ?: team.shortName ?: team.name, style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.SemiBold,
             color = NuvioTheme.colors.TextPrimary, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.width(FACT_CODE))
         if (form != null) FormMarks(form)
         else sportRecord(fixture.sport, team.record)?.let {
@@ -479,7 +485,7 @@ private fun PeriodTable(fixture: SportsFixture, first: FixtureTeam, second: Fixt
                 Text(SportsFixtureText.periodLabel(fixture, index + 1) ?: "${index + 1}", style = SportCaps, maxLines = 1, textAlign = TextAlign.Center,
                     color = if (index == current) NuvioTheme.colors.TextPrimary else NuvioTheme.colors.TextTertiary, modifier = Modifier.width(TABLE_CELL))
             }
-            Text(stringResource(R.string.iptv_ui11_sport_total).uppercase(Locale.getDefault()), style = SportCaps, color = NuvioTheme.colors.TextTertiary, maxLines = 1,
+            Text(stringResource(R.string.iptv_ui11_sport_total), style = SportCaps, color = NuvioTheme.colors.TextTertiary, maxLines = 1,
                 textAlign = TextAlign.End, modifier = Modifier.width(TABLE_TOTAL))
         }
         listOf(first, second).forEachIndexed { row, team ->
@@ -558,7 +564,7 @@ private fun heroClock(fixture: SportsFixture, item: IptvFixtureItem, hidden: Boo
         is SportsDetail.Card -> {
             val bout = detail.live
             Clock(bout?.weightClass, bout?.let { b -> b.round?.let { stringResource(R.string.iptv_sport5_section_fight_round, it) } } ?: fixture.detail ?: live,
-                bout?.let { "${fighterName(it.first)} v ${fighterName(it.second)}" })
+                bout?.let { stringResource(R.string.iptv_sport2_versus, fighterName(it.first), fighterName(it.second)) })
         }
         is SportsDetail.Cricket -> {
             val batting = detail.innings.lastOrNull { it.batting } ?: detail.innings.lastOrNull()
@@ -682,6 +688,7 @@ private val FORM_MARK = 10.dp
 private val FACT_LINE = 18.dp
 private val FACT_GAP = 4.dp
 private val FACT_CODE = 44.dp
+private val FACT_PAIR_WIDTH = 440.dp
 private val HERO_SIDE = 236.dp
 private val COMPACT_HEIGHT = 196.dp
 private val TABLE_NAME = 64.dp

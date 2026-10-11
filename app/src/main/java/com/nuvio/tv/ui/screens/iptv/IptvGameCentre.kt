@@ -291,7 +291,7 @@ internal fun GameScoreLine(fixture: SportsFixture, hidden: Boolean, logo: Dp, st
             }
             fixture.status == FixtureStatus.SCHEDULED -> Text(clock(fixture.startMillis), style = big.copy(fontSize = style.fontSize * 1.2f), color = NuvioTheme.colors.TextPrimary,
                 maxLines = 1)
-            else -> Text(if (first) "@" else "v", style = big.copy(fontSize = style.fontSize * .75f), color = NuvioTheme.colors.TextTertiary, maxLines = 1)
+            else -> Text(stringResource(if (first) R.string.iptv_ui25_sep_at else R.string.iptv_ui25_sep_versus), style = big.copy(fontSize = style.fontSize * .75f), color = NuvioTheme.colors.TextTertiary, maxLines = 1)
         }
         LedgerName(right, logo, style, cities, Modifier.weight(1f, fill = false), ball = ball != null && !leftBall)
     }
@@ -397,7 +397,7 @@ private fun centreItems(tab: CentreTab, fixture: SportsFixture, summary: SportsS
 
 @Composable
 private fun CentreRow(item: CentreItem, onClick: (() -> Unit)?) {
-    if (item is CentreItem.Heading) { SectionLabel(stringResource(item.text).uppercase()); return }
+    if (item is CentreItem.Heading) { SectionLabel(stringResource(item.text)); return }
     var focused by remember { mutableStateOf(false) }
     Row(Modifier.fillMaxWidth()
         .focusProperties { left = FocusRequester.Cancel; right = FocusRequester.Cancel }

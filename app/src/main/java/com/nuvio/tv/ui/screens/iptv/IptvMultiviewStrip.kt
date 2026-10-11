@@ -123,7 +123,7 @@ private fun StripCentre(fixture: SportsFixture, first: MultiviewStripSide, secon
     val a = first.score
     val b = second.score
     when {
-        a == null || b == null -> Text(if (SportsFixtureText.awayFirst(fixture)) "@" else "v", style = small, color = Color.White.copy(alpha = .6f), maxLines = 1)
+        a == null || b == null -> Text(stringResource(if (SportsFixtureText.awayFirst(fixture)) R.string.iptv_ui25_sep_at else R.string.iptv_ui25_sep_versus), style = small, color = Color.White.copy(alpha = .6f), maxLines = 1)
         hidden -> Box(Modifier.width((size.score * 2.4f).dp).height((size.score * .7f).dp).clip(RoundedCornerShape(3.dp)).background(Color.White.copy(alpha = .22f)))
         else -> Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy((size.padding * .5f).dp)) {
             Text(a, style = big, color = if (first.behind) Color.White.copy(alpha = .62f) else Color.White, maxLines = 1)

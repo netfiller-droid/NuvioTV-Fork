@@ -68,6 +68,22 @@ class SetupBundleTest {
         try { SetupBundles.decode("not json"); fail() } catch (_: SetupInputException) { }
     }
 
+    @Test fun multiviewLabelsTravelWithTheSettings() {
+        val chosen = bundle.copy(settings = bundle.settings!!.copy(labels = MultiviewLabels.FOCUSED))
+        val text = SetupBundles.encode(chosen)
+        assertEquals("focused", JSONObject(text).getJSONObject("settings").getString("multiviewLabels"))
+        assertEquals(MultiviewLabels.FOCUSED, SetupBundles.decode(text).settings?.labels)
+        assertEquals(chosen, SetupBundles.decode(text))
+        val old = JSONObject(text).apply { getJSONObject("settings").remove("multiviewLabels") }
+        assertEquals(MultiviewLabels.ALWAYS, SetupBundles.decode(old.toString()).settings?.labels)
+        assertEquals(bundle.settings!!.live, SetupBundles.decode(old.toString()).settings?.live)
+        listOf("sometimes", "OFF").forEach { value ->
+            val bad = JSONObject(text).apply { getJSONObject("settings").put("multiviewLabels", value) }
+            try { SetupBundles.decode(bad.toString()); fail(value) } catch (_: SetupInputException) { }
+        }
+        assertEquals(MultiviewLabels.OFF, SetupBundles.readSettings(JSONObject().put("multiviewLabels", "off")).labels)
+    }
+
     @Test fun loginsAreRecognisedInAddresses() {
         assertTrue(SetupBundles.carriesLogin("http://a.example/get.php?username=a&password=b"))
         assertTrue(SetupBundles.carriesLogin("http://user:pw@a.example/list.m3u"))

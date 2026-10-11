@@ -10,6 +10,7 @@ import com.nuvio.tv.core.iptv.LiveUserAgent
 import com.nuvio.tv.core.iptv.LiveWidgetKind
 import com.nuvio.tv.core.iptv.LiveWidgetLayout
 import com.nuvio.tv.core.iptv.LiveWidgets
+import com.nuvio.tv.core.iptv.MultiviewLabels
 import com.nuvio.tv.core.iptv.MultiviewLayout
 import com.nuvio.tv.core.iptv.MultiviewQuality
 import com.nuvio.tv.core.iptv.RecordingLocations
@@ -46,6 +47,9 @@ class IptvLivePreferences(context: Context) {
     var multiviewQuality: MultiviewQuality
         get() = enumValue(QUALITY_KEY, MultiviewQuality.AUTO)
         set(value) = putString(QUALITY_KEY, value.name)
+    var multiviewLabels: MultiviewLabels
+        get() = MultiviewLabels.parse(preferences.getString(MultiviewLabels.KEY, null))
+        set(value) = putString(MultiviewLabels.KEY, value.name)
     var recordEarlyMinutes: Int
         get() = preferences.getInt(EARLY_KEY, 1).coerceIn(0, MAX_EARLY_MINUTES)
         set(value) = preferences.edit().putInt(EARLY_KEY, value.coerceIn(0, MAX_EARLY_MINUTES)).apply()

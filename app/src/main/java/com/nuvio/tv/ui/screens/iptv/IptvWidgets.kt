@@ -204,7 +204,7 @@ private fun WidgetTile(kind: LiveWidgetKind, width: Dp, requester: FocusRequeste
         val roomy = maxHeight >= 150.dp
         val short = maxHeight < 110.dp
         Column(Modifier.fillMaxSize().clipToBounds(), verticalArrangement = Arrangement.spacedBy(if (short) 4.dp else 6.dp)) {
-            if (kind != LiveWidgetKind.EMPTY || focused) Text(if (focused) stringResource(R.string.iptv_widgets_change) else stringResource(kindLabel(kind)).uppercase(),
+            if (kind != LiveWidgetKind.EMPTY || focused) Text(if (focused) stringResource(R.string.iptv_widgets_change) else stringResource(kindLabel(kind)),
                 style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis,
                 color = if (focused) NuvioTheme.colors.TextPrimary else NuvioTheme.colors.TextTertiary)
             Box(Modifier.fillMaxWidth().weight(1f)) { content(width >= LiveWidgets.WIDE.dp, roomy, short) }

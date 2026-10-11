@@ -40,7 +40,7 @@ data class BundleOverlay(val source: String, val match: ChannelMatch, val custom
 }
 
 data class BundleSettings(val live: SetupSettings, val preview: Boolean = true, val stats: Boolean = false, val theme: String? = null,
-    val black: Boolean = false, val solid: Boolean = true, val plain: Boolean = true)
+    val black: Boolean = false, val solid: Boolean = true, val plain: Boolean = true, val labels: MultiviewLabels = MultiviewLabels.ALWAYS)
 
 data class SetupBundleSummary(val sources: Int, val needLogin: Int, val guides: Int, val groups: Int, val overlays: Int, val settings: Boolean, val logins: Boolean)
 
@@ -71,6 +71,7 @@ object SetupBundles {
     const val MAX_OVERLAYS = 200_000
     private val KEY = Regex("[asg][0-9]{1,4}")
     private val FORMATS = listOf("auto", "hls", "mpegts")
+    private val LABELS = MultiviewLabels.entries.map { SetupSettings.wire(it) }
 
     fun locatorDigest(locator: String): String = SetupPairing.hex(MessageDigest.getInstance("SHA-256").digest(locator.toByteArray(Charsets.UTF_8))).take(32)
 
@@ -112,7 +113,7 @@ object SetupBundles {
     }
 
     fun settings(s: BundleSettings): JSONObject = JSONObject(s.live.toJson()).apply { remove("multiview") }.put("preview", s.preview).put("stats", s.stats)
-        .putOpt("theme", s.theme).put("black", s.black).put("solid", s.solid).put("plain", s.plain)
+        .putOpt("theme", s.theme).put("black", s.black).put("solid", s.solid).put("plain", s.plain).put("multiviewLabels", SetupSettings.wire(s.labels))
 
     fun decode(text: String): SetupBundle {
         val json = try { JSONObject(text) } catch (_: Exception) { throw SetupInputException("body") }
@@ -162,7 +163,8 @@ object SetupBundles {
             minutes("recordLate", SetupSettings.LATE_MINUTES, base.recordLate))
         val theme = if (json.has("theme") && !json.isNull("theme")) (json.opt("theme") as? String)?.takeIf { it.length <= 40 && it.all { c -> c.isLetterOrDigit() || c == '_' || c == '-' } }
             ?: throw SetupInputException("settings") else null
-        return BundleSettings(live, flag("preview", true), flag("stats", false), theme, flag("black", false), flag("solid", true), flag("plain", true))
+        val labels = SetupSettings.choice(MultiviewLabels.entries, choice("multiviewLabels", LABELS, SetupSettings.wire(MultiviewLabels.ALWAYS)))
+        return BundleSettings(live, flag("preview", true), flag("stats", false), theme, flag("black", false), flag("solid", true), flag("plain", true), labels)
     }
 
     private fun array(json: JSONObject, name: String, limit: Int): List<JSONObject> {

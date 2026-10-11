@@ -59,7 +59,6 @@ import com.nuvio.tv.core.iptv.multiviewMaxTiles
 import com.nuvio.tv.ui.screens.settings.SettingsActionRow
 import com.nuvio.tv.ui.screens.settings.SettingsPickerOption
 import com.nuvio.tv.ui.screens.settings.SettingsSingleChoiceDialog
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.material.icons.filled.Dashboard
@@ -75,6 +74,33 @@ import com.nuvio.tv.core.iptv.SportsFixtureText
 import com.nuvio.tv.core.iptv.MultiviewLabels
 import com.nuvio.tv.core.iptv.MultiviewStrip
 import com.nuvio.tv.data.iptv.IptvLivePreferences
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+
+@HiltViewModel
+class IptvMultiviewViewModel @Inject constructor(private val preferences: IptvLivePreferences) : ViewModel() {
+    private val labelState = MutableStateFlow<MultiviewLabels?>(null)
+    val labels: StateFlow<MultiviewLabels?> = labelState.asStateFlow()
+    private val scoreOffState = MutableStateFlow<Set<String>>(emptySet())
+    val scoreOff: StateFlow<Set<String>> = scoreOffState.asStateFlow()
+
+    init { viewModelScope.launch(Dispatchers.IO) { val saved = preferences.multiviewLabels; labelState.compareAndSet(null, saved) } }
+
+    fun setLabels(value: MultiviewLabels) {
+        labelState.value = value
+        viewModelScope.launch(Dispatchers.IO) { preferences.multiviewLabels = value }
+    }
+
+    fun toggleScore(channelId: String) = scoreOffState.update { if (channelId in it) it - channelId else it + channelId }
+}
 
 private sealed interface TilePick {
     data object Add : TilePick
@@ -91,7 +117,7 @@ internal fun Multiview(state: IptvLiveState, tiles: List<IptvTile>, now: Long, o
     onAdd: (IptvListedChannel) -> Unit, onReplace: (Int, IptvListedChannel) -> Unit, onRemove: (Int) -> Unit, onExit: () -> Unit,
     onSizes: (List<Int>) -> Unit, onShowLarge: (Int) -> Unit, onLayout: (MultiviewLayout) -> Unit, onQuality: (MultiviewQuality) -> Unit,
     onPickerSource: (com.nuvio.tv.data.iptv.IptvSourceRef?) -> Unit = {}, onPickerMore: () -> Unit = {},
-    onPickerCategory: (Boolean, String?) -> Unit = hiltViewModel<IptvLiveViewModel>()::pickerCategory) {
+    onPickerCategory: (Boolean, String?) -> Unit = hiltViewModel<IptvLiveViewModel>()::pickerCategory, multiview: IptvMultiviewViewModel = hiltViewModel()) {
     var choosingQuality by remember { mutableStateOf(false) }
     var choosingLayout by remember { mutableStateOf(false) }
     var pick by remember { mutableStateOf<TilePick?>(null) }
@@ -104,11 +130,10 @@ internal fun Multiview(state: IptvLiveState, tiles: List<IptvTile>, now: Long, o
     var dataMenu by remember { mutableStateOf<Int?>(null) }
     var choosingGame by remember { mutableStateOf<Int?>(null) }
     var dataFocus by remember { mutableStateOf<Int?>(null) }
-    val context = LocalContext.current
-    val livePreferences = remember { IptvLivePreferences(context) }
-    var labels by remember { mutableStateOf(MultiviewLabels.parse(livePreferences.preferences.getString(MultiviewLabels.KEY, null))) }
+    val savedLabels by multiview.labels.collectAsStateWithLifecycle()
+    val labels = savedLabels ?: MultiviewLabels.OFF
     var choosingLabels by remember { mutableStateOf(false) }
-    var scoreOff by remember { mutableStateOf(emptySet<String>()) }
+    val scoreOff by multiview.scoreOff.collectAsStateWithLifecycle()
     val games = remember(fixtures, tiles, now) {
         tiles.map { tile -> if (!fixtures.enabled) null else playingFixture(fixtures.rows, tile.row.item.channel.id, now)?.fixture?.takeIf { MultiviewStrip.shows(it, now) } }
     }
@@ -213,8 +238,8 @@ internal fun Multiview(state: IptvLiveState, tiles: List<IptvTile>, now: Long, o
     }
     if (choosingLabels) {
         SettingsSingleChoiceDialog(title = stringResource(R.string.iptv_ui20_multiview_labels), subtitle = stringResource(R.string.iptv_ui20_multiview_labels_description),
-            options = MultiviewLabels.entries.map { SettingsPickerOption(it, stringResource(multiviewLabelsLabel(it))) }, selectedValue = labels,
-            onOptionSelected = { labels = it; livePreferences.preferences.edit().putString(MultiviewLabels.KEY, it.name).apply(); choosingLabels = false },
+            options = MultiviewLabels.entries.map { SettingsPickerOption(it, stringResource(multiviewLabelsLabel(it))) }, selectedValue = savedLabels ?: MultiviewLabels.ALWAYS,
+            onOptionSelected = { multiview.setLabels(it); choosingLabels = false },
             onDismiss = { choosingLabels = false })
     }
     if (choosingLayout) {
@@ -239,13 +264,13 @@ internal fun Multiview(state: IptvLiveState, tiles: List<IptvTile>, now: Long, o
                 SettingsActionRow(title = stringResource(R.string.iptv_multiview_quality), subtitle = null, leadingIcon = Icons.Filled.HighQuality,
                     value = stringResource(qualityLabel(state.multiviewQuality)), onClick = { menuFor = null; choosingQuality = true })
                 SettingsActionRow(title = stringResource(R.string.iptv_ui20_multiview_labels), subtitle = null, leadingIcon = Icons.Filled.Subtitles,
-                    value = stringResource(multiviewLabelsLabel(labels)), onClick = { menuFor = null; choosingLabels = true })
+                    value = stringResource(multiviewLabelsLabel(savedLabels ?: MultiviewLabels.ALWAYS)), onClick = { menuFor = null; choosingLabels = true })
                 if (games.getOrNull(index) != null) {
                     val id = tile.row.item.channel.id
                     val off = id in scoreOff
                     SettingsActionRow(title = stringResource(if (off) R.string.iptv_ui20_multiview_score_show else R.string.iptv_ui20_multiview_score_hide),
                         subtitle = null, leadingIcon = Icons.Filled.SportsSoccer, trailingIcon = null,
-                        onClick = { menuFor = null; scoreOff = if (off) scoreOff - id else scoreOff + id })
+                        onClick = { menuFor = null; multiview.toggleScore(id) })
                 }
                 SettingsActionRow(title = stringResource(R.string.iptv_multiview_replace), subtitle = null, leadingIcon = Icons.Filled.SwapHoriz,
                     onClick = { menuFor = null; pick = TilePick.Replace(index) })
@@ -560,7 +585,7 @@ private fun ScoreCell(fixture: SportsFixture, hidden: Boolean, modifier: Modifie
     Column(modifier.height(SCORE_CELL).clip(RoundedCornerShape(8.dp)).background(NuvioTheme.colors.TextPrimary.copy(alpha = .06f))
         .then(if (close) Modifier.border(1.dp, NuvioTheme.colors.Secondary, RoundedCornerShape(8.dp)) else Modifier), verticalArrangement = Arrangement.spacedBy(2.dp)) {
         Row(Modifier.fillMaxWidth().height(22.dp).padding(horizontal = 10.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-            Text(sportLeagueName(fixture).uppercase(), style = SportCaps, color = NuvioTheme.colors.TextTertiary, maxLines = 1, overflow = TextOverflow.Ellipsis,
+            Text(sportLeagueName(fixture), style = SportCaps, color = NuvioTheme.colors.TextTertiary, maxLines = 1, overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.weight(1f))
             CardState(fixture, fixture.sportDetail, hidden)
         }
