@@ -7,7 +7,179 @@ Related: [progress](IPTV-PROGRESS.md), [draft release notes](IPTV-RELEASE-NOTES-
 [sports data fields](IPTV-SPORTS-DATA-FIELDS.md), [sports data scripts](IPTV-SPORTS-DATA-SCRIPTS.md).
 Older sections further down are history; read "Start here" first.
 
-## Start here — next session (from 10 October 2026)
+## Start here — next session (state on the morning of 12 October 2026, Brisbane)
+
+Read this section, then "Rules for this branch", "Code map" and "Target devices". Everything
+under "Earlier session notes" and the dated sections is history kept for reference.
+
+### State
+
+- All work is committed and pushed to `iptv/player-binding`. Build for the next device pass:
+  CI debug at `85fe99dce` (run 38171196925, result pending), app "Nuvio IPTV Prototype", file
+  `app-iptvPrototype-arm64-v8a-debug.apk`. Minified release (R8) was last built at
+  `c1685393a` (run 38058607115); build it again before shipping.
+- Host tests at that commit: core 945, data 299, androidTest compiles.
+  Translations: all 40 locales, `check_translations.py` prints `problems 0`.
+- Device testing: the user's last checklist pass was on 10 October, evening (`e7e1d17b5`;
+  7e and 7d passed apart from the findings fixed in 7f); on 11 October they recorded ~3 h to
+  an SMB NAS on `f79646c53` (findings fixed in 7i). Everything in checklist sections 7f to
+  7m is built and host-tested but not yet tried on a device.
+- A printable test sheet for the current build is made from the checklist (see "How to
+  check" below); the user prints it for each device pass.
+
+### Next, in order
+
+1. Device pass on `85fe99dce` (checklist 7m, then 7l, 7k, 7j, 7i, 7h, 7g, 7f). Record the
+   findings in a new "Device findings" section below, fix them, update the release notes in
+   the same commits, translate new strings, build, send the run link and a new test sheet.
+2. Keep processing the user's ESPN/TheSportsDB captures (process below). Still not seen in
+   real data: live Premier League added time, an NHL empty net or shootout in progress, an
+   MLB pitching change or full count, golf mid-round, live cricket, an F1 race with gaps or
+   pit stops (ESPN gives none during the race), a UFC bout in progress.
+3. Follow-ups (small, not started):
+   - Move the multiview "Channel and programme" setting (key `multiview-labels` in the
+     `iptv-live` preferences, read in `IptvMultiview.kt`) into `IptvLivePreferences` and the
+     setup backup (`core/iptv/SetupBundle.kt`).
+   - Unused strings: `iptv_sport5_section_other_feeds`, `iptv_sport7_source_both`,
+     `iptv_sport7_source_needs_key` (search `R.string.` and `R.plurals.` before removing;
+     remove from all 41 values folders).
+   - Tennis results from earlier days are dropped by the parser's 12-hour rule.
+   - NBA team fouls and timeouts are not stored.
+   - Recordings in the Movies folder store the MediaStore id rather than the file name.
+   - Men's college basketball needs a halves timeline in Game Centre (UI work).
+   - Ordinal table positions ("1st") are English only; other languages show the number.
+   - Not offered: ~200 minor football competitions, other golf tours, other MMA
+     promotions, FIBA and minor sports. Pre-game NHL/MLB team stats are season figures.
+4. Waiting on the user (do not do these without them; give a recommendation and wait):
+   - Channel-matching ideas for Sport (from the 11 October comparison): event and team
+     channel names, confidence labels on matches, remembering the feed the viewer chose,
+     grouping HD/4K versions of a channel, a "My countries" filter, more cricket.
+   - QR sign-in, TMDB and Trakt in CI builds: the fork needs the repository secret
+     `LOCAL_PROPERTIES_BASE64` (base64 of a local.properties with NUVIO_SUPABASE_URL,
+     NUVIO_SUPABASE_ANON_KEY and the TMDB/Trakt keys; the plain file contents also work,
+     `sdk.dir` is dropped, only key names are logged).
+   - TheSportsDB relay: not decided. Terms (17 September 2026) allow paid use in apps
+     within the rate limit, require crediting the source, forbid public use of artwork
+     without a confirmed licence and reselling. Recommendation: no key in the app; a small
+     caching relay is permitted. Today each viewer enters their own key (sealed on the box).
+   - HTTP/3: the user is doing it separately on a `feature/http3` branch (Cronet), not here.
+5. After a clean device pass: ship in the full app — enable `FEATURE_IPTV_ENABLED` in
+   `full`; move the `src/iptvPrototype/AndroidManifest.xml` additions (WAKE_LOCK, recording
+   service, receivers) into main; minified release build; check an upgrade from an existing
+   install (guide schema 6, VOD schema 2, catalogue schema 9, recordings JSON with
+   `playedAtMillis`/`fixtureKey`/resume and time index, sports cache with
+   `sportDetail`/`source`/`events`).
+6. Merge (user decision, 9 October): SQUASH-merge `iptv/player-binding` into `main`, done by
+   a separate agent; afterwards the user retires `iptv/player-binding`, `iptv/wip` and
+   `nuvio-test` (the user deletes branches). Never rewrite history.
+
+### Rules in short (full list in "Rules for this branch")
+
+- Git identity for every commit: user.name `ysosrs123`, user.email
+  `ysosrs123@users.noreply.github.com`, `commit.gpgsign false`; no trailers or attributions.
+- Push only to `iptv/player-binding`. (One-off tidy-ups of `iptv/wip` and `nuvio-test` were
+  allowed on 9 October; ask before touching them again.)
+- No pull requests, releases, branch deletion, history rewriting, or GitHub
+  comments/issues. GitHub use is limited to pushing commits and starting or reading the
+  `PR Full Debug Build` workflow (variant `iptvPrototype`, build_type `debug` or `release`;
+  one run at a time, a new run cancels the running one).
+- Nothing may look machine-written: no mention of automated tools or assistants in code,
+  comments, docs, commits or branch names.
+- Never store the user's TheSportsDB key anywhere (repo, docs, fixtures, app). Check every
+  capture for it before adding fixtures (see below); none has leaked so far.
+- Original work: nothing may look taken from other apps or developers (design, layout,
+  wording, code). Functional or factual mentions are fine (user-agent presets, "Open in
+  VLC", `#EXTVLCOPT`/`#KODIPROP`, protocol names, ESPN/TheSportsDB); genuine licence
+  comments stay. From the other sports app the user showed on 11 October, avoid in
+  particular: a gold or tinted wash over whole cards, letter-spaced capital section
+  headings, a network strip along the bottom of cards, and any of its wording.
+- Screens: most users have 4K TVs, some 1080p. Size layouts from the available width (most
+  boxes compose at 960 dp wide, some 4K boxes at 1920 dp) and load images at the pixel size
+  they are drawn at; keep memory sane on 2–4 GB boxes.
+- Keep this handover, the progress log, the checklist and the release notes current in the
+  same commits as the changes. Australian English. Say separately what is host-tested,
+  CI-built and device-tested.
+
+### How the work is done
+
+- Each device pass or capture: record findings here → fix them with parallel helpers that
+  each own a strict set of files → release notes in the same commits → translate new
+  strings into all 40 locales → `PR Full Debug Build` → give the user the run link, a short
+  list of what to test and the printable test sheet.
+- Helper brief (give every helper this, as the coordinator's own text): read this handover's
+  Start here, Rules, Code map and Target devices; edit only the files you own and describe
+  needed changes elsewhere (file, function, old → new); no commits or state-changing git;
+  dense Kotlin matching the surroundings, no explanatory comments or KDoc, no dependency
+  changes, guard APIs above 28; the originality and no-machine-wording rules above;
+  Australian English; new strings only in a named new `values/iptv_*.xml`, apostrophes
+  escaped, no translations; check callers in every source set (main, iptvPrototype, full,
+  test, androidTest); pure logic in `core/iptv` with JVM tests; host tests with a private
+  `IPTV_HOST_WORK` folder; Compose and Hilt compile only in CI, so read component sources
+  rather than guessing parameters; Android's org.json has no `JSONObject.keySet()`; a `var x
+  by …; private set` clashes with a function `setX`; network to ESPN/TheSportsDB is blocked
+  from the cloud environment; never write any API key; final report under 400 words with
+  per-item changes, files, new strings, tests, unverified points, changes needed in files
+  not owned, and one release-notes line per item. For visual work also give the screen
+  rules above and the 11 October originality list.
+- Committing while helpers still work: use a temporary worktree checked out at the main
+  tree's commit (`git worktree add`, then `git -C <wt> checkout -q --detach $(git rev-parse
+  HEAD)` run from the main tree — not the worktree's own HEAD, which may be stale), copy in
+  only the finished helper's files, run the host tests there, commit, push
+  `HEAD:iptv/player-binding`, then `git reset -q <new commit>` in the main tree (restore any
+  doc that was edited only in the worktree with `git checkout -- <file>`).
+
+### How to build and check
+
+- Host tests: `IPTV_HOST_WORK=<folder> python3 tools/iptv-host-tests/run.py` (core, data,
+  androidTest compile). Compose/Hilt UI compiles only in CI.
+- Translations: `python3 tools/iptv-host-tests/check_translations.py` must print
+  `problems 0`. Plural quantity sets per locale follow `iptv_guide_days_past` in
+  `values-XX/iptv_guide_import_strings.xml` (e.g. ar zero/one/two/few/many/other;
+  es/fr/it/pt one/many/other; ru/uk/pl/cs/sk/lt one/few/many/other; sl one/two/few/other;
+  hr/bs/sr one/few/other; iw one/two/many/other; ro one/few/other; ja/zh/vi/in other).
+- Timing-dependent test failures: `tools/iptv-host-tests/repeat_test.py <class> <runs>`
+  after a host-test run; run several copies at once to add load. Fix the race in the test
+  (two were fixed on 11 October: a latch in `IptvCaptureHttpTest`, a longer stream in
+  `IptvRecordingCopierTest`); never skip or loosen a test to get green.
+- CI: `PR Full Debug Build` on `iptv/player-binding`, inputs variant `iptvPrototype`,
+  build_type `debug` (or `release` for the R8 check); about 13–15 minutes. On failure read
+  the job log (the workflow prints a filtered error summary).
+- Printable test sheet: `python3 tools/iptv-host-tests/test_sheet.py
+  validation/IPTV-DEVICE-TEST-CHECKLIST.md <out.pdf> --build <commit> --run <run id>
+  --date "<date>" --sections 7m,7l,…,7f` (sections not yet passed, newest first;
+  A4 with Pass/Fail/N/T boxes and notes lines).
+  Add a new checklist section (the next letter after 7m) for each build's new items and update
+  the checklist header to the build.
+
+### Processing a sports capture
+
+- The user runs the capture scripts in `IPTV-SPORTS-DATA-SCRIPTS.md` and uploads zips (ESPN
+  scoreboards and summaries, TheSportsDB v1/v2 livescore and lookuptv). Unpack into a new
+  empty folder; first grep every file for the user's TheSportsDB key (it appears in the
+  v1 URL path in their scripts' logs) and never copy it anywhere.
+- A helper compares each sport's live and finished states with the parsers
+  (`core/iptv/SportsFixturesParsers.kt`, `SportsSummary.kt`, `SportsDetail.kt`,
+  `SportsDbExtras.kt`), adds trimmed real fixtures named `*-real-<yyyymmdd>.json` under
+  `app/src/test/resources/sports` with tests (`SportsRealData*Test.kt`), and adds a dated
+  pass to `IPTV-SPORTS-DATA-FIELDS.md`. UI changes that follow go to the Sport files.
+- Known ESPN behaviour: no summary endpoint for tennis, golf, motorsport or MMA (the app
+  no longer asks; 400/404/410 stop the watch for that game); NASCAR 502s are transient;
+  `form` is newest first (reversed when parsed); the F1 event status says FINAL while
+  sessions are still live, so the parser follows the sessions.
+- Capture schedule given to the user (Brisbane, UTC+10; European games one hour later from
+  25 October, US games one hour later from 1 November): best Monday 04:00–08:00 (NFL);
+  Monday ~10:30–13:00 (NFL Sunday night, NHL); Sunday 05:00–13:00 (college football, NHL,
+  MLB playoffs, UFC main card ~11:00–13:00); Tue–Sat 09:30–12:30 (NHL, NBA from ~21
+  October, World Series late October); Saturday 21:30–Sunday 02:30 and Sunday 23:00–Monday
+  02:00 (Premier League); Wednesday and Thursday 03:00–07:00 (Champions League); Fri–Sun
+  18:00–21:00 (A-League from late October, NBL); weekday afternoons (Asian tennis). Two or
+  three captures 15–30 minutes apart catch half-time, period ends, overtime and shootouts.
+  AFL and NRL are in the off-season.
+
+## Earlier session notes (8–11 October 2026; history, superseded by Start here)
+
+The dated updates below were the running notes of the 8–11 October session, newest first.
+Where they disagree with "Start here", "Start here" is current.
 
 Update 11 October (late): fifth capture checked (22:46 Brisbane; first live F1 race:
 lap and top three now shown; football HT; TheSportsDB status-less/OT rows; `d4fc94d24`).
@@ -241,8 +413,9 @@ How work was done (keep doing it this way):
   with the player's control deck and stats HUD, catch-up, search, multiview, Sport (guide
   and optional fixtures), recording (internal, USB, SMB, WebDAV, FTP, Movies folder),
   phone/PC setup and transfer, IPTV movies and series, experimental local timeshift and
-  the streaming-stability settings. Only `b68985a` and an early real-account run were
-  used on the AM9; everything since is untested on devices.
+  the streaming-stability settings. The user has tested on the AM9 and other boxes
+  regularly since 7 October (see the "Device findings" sections); the newest work is
+  listed as untested in "Start here".
 - Live TV is reached from Nuvio's sidebar and its settings are a main Settings category,
   only in the `iptvPrototype` flavour (`FEATURE_IPTV_ENABLED`); the `full` flavour hides
   them. Decision (user, 8 October 2026): IPTV ships as part of the full app. To do after
@@ -267,7 +440,7 @@ How work was done (keep doing it this way):
   a filtered error summary on failure. Without GitHub tools, run status is readable
   from the public REST API, but logs and re-runs need the user.
 
-## Current work plan (updated 7 October 2026)
+## Current work plan (7 October 2026; history)
 
 Everything below is host-tested and (unless marked) committed; none of it is
 device-tested. New strings are translated into all 40 locales unless marked.
@@ -690,7 +863,7 @@ Overall OK. Items and status:
 15. Defaults: Solid panels now off by default; Pure black and background artwork were
     already off.
 
-## Planned but not done (updated 7 October 2026)
+## Planned but not done (7 October 2026; history)
 
 Everything from the 7 October comparison is now built except:
 - Recording: crash/power-loss recovery validation on a device.
@@ -782,7 +955,7 @@ Android TV / Google TV built in, and the user's own Ugoos AM9 Pro (the main test
 player small, and size multiview from `IptvDeviceProfile` (memory, low-RAM flag,
 hardware AVC decoder instances) rather than fixed numbers.
 
-## Next session — work list (read first)
+## Next session — work list (7 October 2026; history)
 
 Status on 7 October 2026 (branch head after the work list; nothing device-tested):
 

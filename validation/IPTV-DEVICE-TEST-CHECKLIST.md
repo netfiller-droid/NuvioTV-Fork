@@ -1,6 +1,6 @@
-# Nuvio IPTV — device test checklist (build `d4fc94d24`, run 38142066345)
+# Nuvio IPTV — device test checklist (build `85fe99dce`, run 38171196925)
 
-For this build start with section 7l, then 7k, 7j, 7i, 7h, 7g, 7f, 7e, 7d, 7c (fixes from the second 9 October pass), then 7b, 7 (Sport) and the rest.
+For this build start with section 7m, then 7l, 7k, 7j, 7i, 7h, 7g and 7f (not yet tried on a device). 7e and earlier passed on earlier builds; repeat them only as a regression check.
 
 Mark each item pass / fail / not tested. For failures, note what happened and keep a
 logcat (`adb logcat -s NuvioIptv:V *:E`). Do not share logs that contain addresses.
@@ -83,6 +83,26 @@ logcat (`adb logcat -s NuvioIptv:V *:E`). Do not share logs that contain address
 11. Press Home on the remote with Game Centre open: logcat should show sports requests
    stop (`sports fetch` lines cease).
 12. Useful logs: `sports fetch service=`, `sports links`, `sports fixtures`.
+
+## 7m. Live NFL and NASCAR from the 12 October capture (build `85fe99dce`)
+1. Live NFL game, score over the video: three small bars beside each team logo show the
+   timeouts left; the side with the ball has the dot.
+2. When a team is inside the opponent's 20, the score bug's note turns to the accent colour
+   (or reads "Red zone") and the Sport hero adds "Red zone" after the down and distance.
+3. Sport hero during a drive: after the last play, a line such as "KC drive: 8 plays, 57
+   yards, 4:12."; it disappears once the drive ends.
+4. Game Centre and the multiview score strip for a live NFL game: a small dot after the name
+   of the team with the ball.
+5. Last plays (NFL and college football) start with the play itself, without "(Shotgun)" or
+   "No Huddle-Shotgun".
+6. With TheSportsDB as the source for an NFL game: the card shows the quarter and clock,
+   e.g. "Q4 · 3:08".
+7. TheSportsDB hockey (e.g. DEL): a game decided by a shoot-out shows as finished; a score
+   stuck on the third period long after the game should have ended is not shown as live.
+8. Formula 1 or NASCAR after the race: the score over the video shows the podium, not the
+   circuit; during a NASCAR race it shows the lap and running order.
+9. Tennis, golf, F1, NASCAR and UFC games open in Game Centre, multiview and full screen
+   without errors (no game summary is requested for these).
 
 ## 7l. Fourth and fifth 11 October captures: results, awards, live tennis and F1 (build `d4fc94d24`)
 1. A finished UFC card: the card shows the main event result, e.g. "Allen won ·
