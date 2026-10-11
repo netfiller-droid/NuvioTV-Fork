@@ -1,6 +1,6 @@
-# Nuvio IPTV — device test checklist (build `85fe99dce`, run 38171196925)
+# Nuvio IPTV — device test checklist (build `91e1e7f1b`, run 38178089678)
 
-For this build start with section 7n, then 7m, 7l, 7k, 7j, 7i, 7h, 7g and 7f (not yet tried on a device). 7e and earlier passed on earlier builds; repeat them only as a regression check.
+For this build start with section 7n, then 7m, 7l, 7k, 7j, 7i, 7h, 7g and 7f (not yet tried on a device). 7e and earlier passed on earlier builds; repeat them only as a regression check. After the 1.1.0-nt.5 merge, also repeat sections 1 and 2.
 
 Mark each item pass / fail / not tested. For failures, note what happened and keep a
 logcat (`adb logcat -s NuvioIptv:V *:E`). Do not share logs that contain addresses.
@@ -84,7 +84,7 @@ logcat (`adb logcat -s NuvioIptv:V *:E`). Do not share logs that contain address
    stop (`sports fetch` lines cease).
 12. Useful logs: `sports fetch service=`, `sports links`, `sports fixtures`.
 
-## 7n. Merge of 1.1.0-nt.5, second-pass fixes and the 6:42 12 October capture (build pending)
+## 7n. Merge of 1.1.0-nt.5, second-pass fixes and the 6:42 12 October capture (build `91e1e7f1b`)
 1. After installing: the sidebar shows Live TV next to Home and, if turned on, Calendar;
    Live TV opens and Back behaves as in section 1. Home shows Coming up first, then the
    Live TV rows.

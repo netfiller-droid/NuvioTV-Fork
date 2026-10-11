@@ -1118,6 +1118,12 @@ Phone setup (security review)
 
 ## Validation
 
+- Merge of the fork release 1.1.0-nt.5, the thirteenth sport capture (12 October 06:42) and
+  the second pass over the untested work (25 fixes): CI debug green at `91e1e7f1b` (run
+  38178089678); the merge itself at `0d1d90ab3` (run 38175520520; run 38174703576 at
+  `70540c6f4` stopped on a launcher icon the release removed, fixed). 968 core and 305
+  data-layer JVM tests on the host. Not device-tested.
+
 - Twelfth sport capture (12 October 05:46; live NFL timeouts, drive, red zone and
   possession; TheSportsDB NFL clock and hockey shoot-outs; podium after a race) and no
   summary requests for sports ESPN has none for: CI debug green at `85fe99dce`
