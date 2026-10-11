@@ -24,7 +24,8 @@ under "Earlier session notes" and the dated sections is history kept for referen
   (Modern), the playback-purpose and IPTV user-agent rules next to the new slow-start
   server handling in `PlayerPlaybackNetworking`/`PlayerMediaSourceFactory`, no watch party
   for recordings next to the new Speed button. The prototype manifest names the ten new
-  launcher icon choices "Nuvio IPTV Prototype" too. Host tests unchanged in count and
+  launcher icon choices "Nuvio IPTV Prototype" too, and the recording notification uses the
+  fork's notification icon `ic_arc_notification` (the release removed `drawable/ic_launcher`). Host tests unchanged in count and
   green on the merge; the rest of the upstream changes (V2 settings, player, calendar,
   media servers, watch party) need a regression look on the device.
 - All work is committed and pushed to `iptv/player-binding`. Build for the next device pass:

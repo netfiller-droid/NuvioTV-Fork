@@ -983,7 +983,8 @@ Phone setup (security review)
 - Based on the fork release 1.1.0-nt.5 since 12 October (merged, not rebased). Live TV
   sits next to the new Calendar in the sidebar and its Home rows follow Coming up; the
   rest of that release (V2 settings, player changes, calendar, media servers, watch
-  party, new launcher icons) has not been tried together with Live TV on a device.
+  party, new launcher icons) has not been tried together with Live TV on a device. The
+  recording notification uses the app's notification icon.
 
 - Device testing so far: the user's passes on 8 October (builds `f29cbe2`, `24d6868`), 9 October
   (`374e1f6`, `8354d89`), 10 October (`01f19bbed`, `e7e1d17b5`) and a ~3 hour recording to an

@@ -68,7 +68,7 @@ class IptvRecordingService : Service() {
     private fun enterForeground(): Boolean {
         val notification = try { notification(recorder.runningTitles()) } catch (error: Exception) {
             IptvLog.failure("recording notification", error)
-            NotificationCompat.Builder(this, CHANNEL_ID).setSmallIcon(R.drawable.ic_launcher).setOngoing(true).setSilent(true).build()
+            NotificationCompat.Builder(this, CHANNEL_ID).setSmallIcon(R.drawable.ic_arc_notification).setOngoing(true).setSilent(true).build()
         }
         try {
             ServiceCompat.startForeground(this, NOTIFICATION_ID, notification,
@@ -130,7 +130,7 @@ class IptvRecordingService : Service() {
         return NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle(getString(if (uploading) R.string.iptv_recording_notification_uploading else R.string.iptv_recording_notification_title))
             .setContentText(text)
-            .setSmallIcon(R.drawable.ic_launcher)
+            .setSmallIcon(R.drawable.ic_arc_notification)
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .setCategory(NotificationCompat.CATEGORY_SERVICE)
             .setOngoing(true)
