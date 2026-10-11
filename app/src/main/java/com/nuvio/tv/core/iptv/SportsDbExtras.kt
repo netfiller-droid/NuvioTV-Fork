@@ -15,6 +15,7 @@ object SportsDbLive {
     const val FRESH_MILLIS = 10L * 60 * 1000
     const val STALE_MILLIS = 3L * 60 * 60 * 1000
     const val STUCK_MILLIS = 30L * 60 * 1000
+    const val OVERRUN_MILLIS = 60L * 60 * 1000
     private const val MAX_SCORES = 500
     private val PATHS = mapOf("soccer" to "Soccer", "basketball" to "Basketball", "ice-hockey" to "Ice_Hockey", "baseball" to "Baseball",
         "american-football" to "American_Football")
@@ -22,6 +23,7 @@ object SportsDbLive {
     private val OVERTIME = mapOf("ice-hockey" to 4, "basketball" to 5, "american-football" to 5)
     private val MINUTE = Regex("[0-9]{1,3}(\\+[0-9]{1,2})?")
     private val QUARTER = Regex("([0-9]{1,2}:[0-9]{2})\\s*-\\s*(?:([1-4])(?:st|nd|rd|th)|([2-9]?)OT)", RegexOption.IGNORE_CASE)
+    private val BREAK = Regex("end of (?:[1-4](?:st|nd|rd|th)|[2-9]?ot)|half ?time", RegexOption.IGNORE_CASE)
     private val UPDATED = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
     private val UPDATED_ZONE = ZoneId.of("Europe/London")
     val SPORTS: Set<String> = PATHS.keys
@@ -29,7 +31,8 @@ object SportsDbLive {
     fun path(sport: String): String? = PATHS[sport]
 
     fun wanted(fixtures: List<SportsFixture>, nowMillis: Long): List<String> =
-        fixtures.filter { it.source == SportsService.THESPORTSDB && it.sport in PATHS && SportsRefresh.active(listOf(it), nowMillis) }
+        fixtures.filter { it.source == SportsService.THESPORTSDB && it.sport in PATHS && (SportsRefresh.active(listOf(it), nowMillis) || it.status != FixtureStatus.FINAL &&
+            it.startMillis <= nowMillis && nowMillis - it.startMillis < SportsRefresh.durationMillis(it) + OVERRUN_MILLIS) }
             .sortedBy { it.startMillis }.map { it.sport }.distinct().take(MAX_SPORTS)
 
     fun parse(json: String): List<SportsDbLiveScore> {
@@ -56,7 +59,8 @@ object SportsDbLive {
         val status = if (code in SportsDbEvents.FINISHED) FixtureStatus.FINAL else FixtureStatus.LIVE
         if (status == FixtureStatus.LIVE && score.updatedMillis?.let { nowMillis - it > STALE_MILLIS } == true) return fixture
         if (status == FixtureStatus.LIVE && nowMillis - fixture.startMillis > maxOf(STALE_MILLIS, 3 * SportsRefresh.durationMillis(fixture))) return fixture
-        if (code.isEmpty() && nowMillis - fixture.startMillis > SportsRefresh.durationMillis(fixture)) return fixture
+        val running = score.progress?.trim()?.takeIf { status == FixtureStatus.LIVE }?.let { QUARTER.matches(it) || BREAK.matches(it) } == true
+        if (code.isEmpty() && !running && nowMillis - fixture.startMillis > SportsRefresh.durationMillis(fixture)) return fixture
         if (status == FixtureStatus.LIVE && nowMillis - fixture.startMillis > SportsRefresh.durationMillis(fixture) && score.updatedMillis?.let { nowMillis - it > STUCK_MILLIS } == true)
             return fixture
         val live = status == FixtureStatus.LIVE

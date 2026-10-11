@@ -854,3 +854,65 @@ stops and fastest lap; NASCAR stages; tennis point score and a live tiebreak; ML
 change and a full count; NBA overtime; NHL empty net; UFC round in progress; cricket live
 innings; AFL/NRL live clock; golf after a cut or a playoff; football own goals, penalties,
 second yellows and extra time.
+
+## Thirteenth pass (12 October, 06:42)
+
+ESPN and TheSportsDB responses captured at 06:42 Brisbane time on Monday 12 October (20:42Z on
+11 October), 56 minutes after the twelfth pass; TheSportsDB `updated` reads 21:42 London time.
+In play: four NFL games (Giants at Commanders in overtime, 27–27 with 1:50 left; Broncos at
+Chargers at the end of the 1st quarter; Lions at Cardinals and 49ers at Seahawks in the 1st)
+and the NASCAR Cup race at Charlotte (lap 94). The other eight 1pm NFL games and the London game
+were final; Premier League finals (Crystal Palace 3–1 Nottingham Forest, Hull 2–2 Everton,
+Liverpool 0–3 Manchester City); finals for college football, the NBA preseason, NBL, AFL, NRL,
+UFC, PGA, F1 and tennis (no tennis live); NHL, MLB, A-League, URC and Champions League still to
+start. Only `nfl-summary-LIVE.json` is new; the other `*-LIVE.json` files are earlier-pass files,
+`nfl-summary.json` is the 11 October pre-game file, and the multi-sport header was a cached copy
+from about 05:00Z (every NFL game `pre`; the app does not use it). The `espn-pass.zip` inside the
+upload is byte-for-byte the seventh-pass capture (05:07 Brisbane on 11 October) and adds nothing.
+The TheSportsDB coverage zip was made at 20:42Z, but its `v2-livescore-app-*`, `v1-lookuptv-*`
+and `v1-eventsday-*` files are the twelfth-pass files from 19:46Z (the folder is reused); the
+calls zip holds the 20:42Z set. Every scoreboard and summary parses without errors. Trimmed copies
+are in `app/src/test/resources/sports/*-real-20261012b.json` (`SportsRealDataOvertimeTest`).
+
+| Shape | What the real response showed | Parser change |
+|---|---|---|
+| NFL overtime (live) | `STATUS_IN_PROGRESS`, `period` 5, `displayClock` `1:50`, `shortDetail` `1:50 - OT`; a fifth linescore (`0`) on both sides; `situation` as in regulation, with `homeTimeouts`/`awayTimeouts` 0 once both teams had used their two overtime timeouts. Summary header `displayPeriod` `5th`, `statusSecondary` `OT`, `timeoutsUsed` 2; regulation closed with an `End of Regulation` play 194 minutes after the listed start, the overtime kick-off came 4 minutes later and 8 minutes of game clock took 21 real minutes (a missed field goal, a punt, a lost fumble). Drives and scoring plays as in the twelfth pass. | none for the clock and line score (`OT · 1:50`, `6 6 7 8 0`, column `OT`); `SportsFixtureText.timeoutSlots` gives the number of timeout marks: 2 in NFL overtime, 1 in college overtime, otherwise 3 |
+| NFL end of quarter | `STATUS_END_PERIOD`, `displayClock` `0:00`, `shortDetail` `End of 1st`; `situation` keeps the down and spot (`4th & 17 at LAC 41`); `lastPlay` type `End Period`, text `END QUARTER 1` | none (`End of 1st` with the down as the extra line) |
+| NFL red zone | The first genuine one: `isRedZone` true at `2nd & 5 at SF 8`. Also true straight after a touchdown: `down` -1, no down text or possession, `yardLine` 85 (the conversion spot), `lastPlay` `Official Timeout`, its drive with `result` `TD`. | The red-zone flag is dropped when there is no down (`down` below 0) or the last play's drive is over; the bug read `Red zone` alone during the conversion timeout |
+| NASCAR race (live) | Lap 94, 39 cars in order; still no stage, caution or lap-total field | none |
+| Football (finals) | A second yellow is a `Yellow Card` (type 94) at 47' and then a `Red Card` (type 93, `redCard` true) at 62' for the same player, with no "second yellow" wording anywhere. No own goal, penalty or extra time in these games. | none: the Game Centre lists the yellow and the red, and the bug counts one red |
+| Others | F1 weekend final as in the twelfth pass; UFC card final; golf `Complete`; cricket still the 2015 match; AFL and NRL summaries are the old finals. | none |
+
+TheSportsDB at 20:42Z: livescore returned Soccer (76), Ice Hockey (24), Basketball (9) and
+American Football (12); every other sport answered `{"Message":"No data found"}`. The NFL rows
+read `1:55 - OT` (ESPN was five seconds of game clock further on), `End of 1st`, `5:06 - 1st`,
+`7:18 - 1st` (ESPN 6:54) and eight `Final`, all with `strStatus` null. The overtime game was 222
+minutes after its listed start, past the 210-minute NFL game length, so the eleventh-pass rule
+for rows without a status dropped it and a TheSportsDB fixture would have gone back to "not
+started"; the livescore was also no longer requested once a fixture passed its game length. A
+Portuguese Primeira Liga row sat at `HT` `45` 72 minutes after the start; finished rows had
+stoppage up to `90+10`. Hockey: six AHL, OHL and WHL rows at `BT`, an OHL shoot-out final `AP`;
+the two DEL `P3` rows from 14:30Z were four hours stale and the AHL, USHL and WHL rows from 10
+October were still there (all skipped as before). `lookuptv` returned channels for 17 of 65
+events, including the three new NFL games (13, 17 and 35 rows; Canada has 16 of them, plus
+Slovenia, Serbia, Croatia, Greece, Poland and New Zealand); every country named resolves.
+League lists: ESPN 17 sports and 357 leagues (219 football, 48 MMA, 25 rugby union ids),
+TheSportsDB 37 sports and 1,547 leagues (38 placeholders), both unchanged.
+
+Parser changes: a TheSportsDB row without a status stays live after the game length while its
+progress is a quarter clock (`1:55 - OT`) or a break (`End of 4th`, `Halftime`); a row that stops
+refreshing is still dropped 30 minutes after the game length; the livescore is requested for up
+to an hour after the game length for a TheSportsDB fixture that has not finished.
+
+Checked again on this data: NFL possession, drive and timeouts, formation tags in the last play,
+scoring-play times in the summary, NASCAR lap and running order, the finished F1 race, stale and
+stuck TheSportsDB rows, worldwide and Canadian channels.
+
+Confirmed now: NFL overtime, end of quarter and the red zone on the scoreboard; the NFL summary
+in overtime; football second yellows; TheSportsDB NFL overtime and end-of-quarter progress.
+
+Still unconfirmed: NFL half-time, the two-minute warning and an overtime final (`Final/OT`) on
+the scoreboard; NBA overtime; an NHL empty net or shootout in progress; an MLB pitching change
+or full count; tennis point score and the server in a tie-break; NASCAR stages; F1 gaps, pit
+stops and fastest lap; a UFC bout in progress; live cricket; AFL/NRL live clock (off season);
+golf after a cut or a playoff; football own goals, penalties and extra time.

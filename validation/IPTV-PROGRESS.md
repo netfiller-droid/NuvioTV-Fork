@@ -40,5 +40,6 @@ Updated 12 October 2026.
 | 11 Oct | d4fc94d24 | Fifth 11 October capture: live F1 race lap and top three (hero, cards, video score), football HT, TheSportsDB status-less and OT rows | 939 core + 298 data-layer host tests; CI debug green at d4fc94d24 (run 38142066345); device pending |
 | 12 Oct | d04640a31 – 85fe99dce | No summary requests for tennis, golf, racing and UFC; 12 October capture: live NFL timeouts, drive, red zone and possession, formation tags dropped from last plays, TheSportsDB NFL clock and hockey shoot-outs, podium after a race | 945 core + 299 data-layer host tests; CI debug green at 85fe99dce (run 38171196925); device pending |
 | 12 Oct | merge of 1.1.0-nt.5 | Fork release 1.1.0-nt.5 merged in (nine conflicts resolved keeping both sides; prototype names for the new launcher icons) | 945 core + 299 data-layer host tests on the merge; CI pending; device pending |
+| 12 Oct | after the merge | Thirteenth sports capture (12 October 06:42): first live NFL overtime, end of quarter and red zone; TheSportsDB overtime rows kept live past the game length; red zone dropped after a score; overtime fixtures and tests | 949 core + 299 data-layer host tests; CI pending; device pending |
 
 Design notes are in this folder (`IPTV-*-DESIGN.md`).

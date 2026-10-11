@@ -1,6 +1,6 @@
 # Nuvio IPTV — device test checklist (build `85fe99dce`, run 38171196925)
 
-For this build start with section 7m, then 7l, 7k, 7j, 7i, 7h, 7g and 7f (not yet tried on a device). 7e and earlier passed on earlier builds; repeat them only as a regression check.
+For this build start with section 7n, then 7m, 7l, 7k, 7j, 7i, 7h, 7g and 7f (not yet tried on a device). 7e and earlier passed on earlier builds; repeat them only as a regression check.
 
 Mark each item pass / fail / not tested. For failures, note what happened and keep a
 logcat (`adb logcat -s NuvioIptv:V *:E`). Do not share logs that contain addresses.
@@ -83,6 +83,20 @@ logcat (`adb logcat -s NuvioIptv:V *:E`). Do not share logs that contain address
 11. Press Home on the remote with Game Centre open: logcat should show sports requests
    stop (`sports fetch` lines cease).
 12. Useful logs: `sports fetch service=`, `sports links`, `sports fixtures`.
+
+## 7n. Merge of 1.1.0-nt.5, second-pass fixes and the 6:42 12 October capture (build pending)
+1. After installing: the sidebar shows Live TV next to Home and, if turned on, Calendar;
+   Live TV opens and Back behaves as in section 1. Home shows Coming up first, then the
+   Live TV rows.
+2. Nuvio's player (a movie or an IPTV recording): the Speed button is there; a recording
+   still has no watch party button.
+3. Start a recording: the notification shows the app's notification icon.
+4. Settings → Appearance → app icon: choose one of the new icons; the launcher still names
+   the prototype "Nuvio IPTV Prototype".
+5. TheSportsDB as the NFL source: a game in overtime past three and a half hours still shows
+   live with "OT · m:ss".
+6. ESPN NFL: straight after a touchdown, the score bug does not show "Red zone" while the
+   conversion is pending; inside the 20 the down line is accented.
 
 ## 7m. Live NFL and NASCAR from the 12 October capture (build `85fe99dce`)
 1. Live NFL game, score over the video: three small bars beside each team logo show the

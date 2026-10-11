@@ -46,13 +46,24 @@ under "Earlier session notes" and the dated sections is history kept for referen
 1. Device pass on `85fe99dce` (checklist 7m, then 7l, 7k, 7j, 7i, 7h, 7g, 7f). Record the
    findings in a new "Device findings" section below, fix them, update the release notes in
    the same commits, translate new strings, build, send the run link and a new test sheet.
-2. Keep processing the user's ESPN/TheSportsDB captures (process below). Still not seen in
-   real data (see the latest pass in `IPTV-SPORTS-DATA-FIELDS.md` for the full list): NFL
-   red zone, half-time, end of quarter and overtime; NBA overtime; an NHL empty net or
+2. Keep processing the user's ESPN/TheSportsDB captures (process below). The thirteenth
+   pass (12 October 06:42) showed NFL overtime, end of quarter and a real red zone, and a
+   football second yellow (a yellow, then a red for the same player, no other wording).
+   Still not seen in real data (see the latest pass in `IPTV-SPORTS-DATA-FIELDS.md` for
+   the full list): NFL half-time, two-minute warning and an overtime final on the
+   scoreboard; NBA overtime; an NHL empty net or
    shootout in progress; an MLB pitching change or full count; tennis point score and the
    server during a match tie-break; NASCAR stages; a UFC bout in progress; live cricket;
    AFL/NRL clocks (off season); football own goals, penalties, second yellows and extra
-   time. ESPN sends no gaps, pit stops or fastest lap during an F1 race.
+   time. ESPN sends no gaps, pit stops or fastest lap during an F1 race. Coverage ideas from
+   the 12 October league lists (not added; user decision): South American and Nordic
+   football on ESPN that the parser already reads (chi.1, col.1, uru.1, per.1, ecu.1,
+   par.1, ven.1, bol.1, Copa Sudamericana, bra.2, Copa do Brasil, arg.2, swe.1, nor.1,
+   den.1, sco.2, eng.5, ned.2, caf.champions, rsa.1, ind.1); Australian leagues only on
+   TheSportsDB (Supercars 4489, Super Netball 4540, WNBL 5113, AFLW 5311, Sheffield Shield
+   5530, Australia Cup 5180, State of Origin 5835, ABL 5107, United Cup 5872; netball and
+   motorsport shapes need checking first); no parser yet for lacrosse, college
+   volleyball, water polo, field hockey or FIBA.
 3. Follow-ups (small, not started):
    - Move the multiview "Channel and programme" setting (key `MultiviewLabels.KEY` =
      `multiview-labels` in `core/iptv/MultiviewStrip.kt`, stored in the `iptv-live`

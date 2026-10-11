@@ -387,6 +387,9 @@ object SportsFixtureText {
 
     private fun overtime(number: Int): String = if (number <= 1) "OT" else "${number}OT"
 
+    fun timeoutSlots(fixture: SportsFixture, left: Int?): Int = maxOf(left ?: 0,
+        if (fixture.sport == "american-football" && (fixture.period ?: 0) > 4) (if (fixture.league == "college-football") 1 else 2) else 3)
+
     fun bug(fixture: SportsFixture): SportsBugText = when (val detail = fixture.sportDetail) {
         is SportsDetail.Tennis -> tennis(fixture, detail)
         is SportsDetail.Golf -> golf(fixture, detail)

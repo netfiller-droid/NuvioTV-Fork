@@ -837,6 +837,12 @@ Sport data (capture of 12 October, 05:46; first live NFL and a NASCAR race in pr
 - After a Grand Prix or race weekend, the score bug shows the podium instead of the
   circuit. NASCAR races in progress show the lap and running order like Formula 1.
 
+Sport data (capture of 12 October, 06:42; first live NFL overtime):
+- NFL games from TheSportsDB that go to overtime stay live past the usual game length
+  (e.g. "OT · 1:55") instead of going back to not started, and their live score keeps
+  being fetched for up to an hour past the game length while they have not finished.
+- The red-zone marker no longer appears after a touchdown while the conversion is pending.
+
 ## Reliability
 
 - A stream is replaced only after the previous decoder and HTTP connections have
@@ -1026,9 +1032,10 @@ Phone setup (security review)
   need the viewer's own key (the free test key is not allowed in published apps). ESPN and
   TheSportsDB responses were checked against real captures taken before, during and after
   play (10–12 October), including live NFL, MLB, NBA, NHL, college football, tennis, golf,
-  F1 and NASCAR. Not yet seen live: NFL red zone, half-time and overtime; NBA overtime; an
-  NHL empty net; an MLB pitching change; tennis point scores; a UFC round in progress;
-  live cricket; AFL and NRL clocks; football own goals, penalties and extra time.
+  F1 and NASCAR, and NFL overtime, end of quarter and red zone. Not yet seen live: NFL
+  half-time, the two-minute warning and an overtime final; NBA overtime; an NHL empty net;
+  an MLB pitching change; tennis point scores; a UFC round in progress; live cricket; AFL
+  and NRL clocks; football own goals, penalties and extra time.
   Team logos and league badges are third-party trademarks; TheSportsDB artwork without a
   confirmed licence must not be shown in public builds (Team logos setting: ESPN only by
   default). Credit: "Sports data from ESPN and TheSportsDB".

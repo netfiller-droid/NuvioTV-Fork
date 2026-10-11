@@ -511,7 +511,8 @@ object EspnScoreboard {
             ?.text("description")
             ?.takeIf { (LEADING.find(it)?.value?.toIntOrNull() ?: 0) > 0 }?.take(60)
         if (downDistance == null && possession == null && lastPlay == null && homeWin == null) return null
-        return FixtureSituation(downDistance, possession, lastPlay, homeWin, json.optBoolean("isRedZone"), timeouts("homeTimeouts"),
+        val redZone = json.optBoolean("isRedZone") && (json.optIntOrNull("down") ?: 0) >= 0 && last?.optJSONObject("drive")?.text("result") == null
+        return FixtureSituation(downDistance, possession, lastPlay, homeWin, redZone, timeouts("homeTimeouts"),
             timeouts("awayTimeouts"), drive)
     }
 
