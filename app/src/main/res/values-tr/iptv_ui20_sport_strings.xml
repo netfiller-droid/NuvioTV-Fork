@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui20_sport_fill_results">Bugün daha önce</string>
+    <string name="iptv_ui20_sport_fill_teams_next">Takımlarınızın sıradaki maçları</string>
+    <plurals name="iptv_ui20_sport_more_feeds">
+        <item quantity="one">+%d kanal</item>
+        <item quantity="other">+%d kanal</item>
+    </plurals>
+    <string name="iptv_ui20_sport_in_hours_minutes">%1$d sa %2$d dk sonra</string>
+    <string name="iptv_ui20_sport_in_hours">%1$d sa sonra</string>
+    <string name="iptv_ui20_sport_in_minutes">%1$d dk sonra</string>
+    <plurals name="iptv_ui20_sport_in_days">
+        <item quantity="one">%d gün sonra</item>
+        <item quantity="other">%d gün sonra</item>
+    </plurals>
+    <string name="iptv_ui20_sport_full_time">Bitti</string>
+    <string name="iptv_ui20_sport_last_met">Son karşılaşma</string>
+    <string name="iptv_ui20_sport_points">%1$s puan</string>
+</resources>

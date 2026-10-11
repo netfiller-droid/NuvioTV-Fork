@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui20_sport_fill_results">இன்று முன்னதாக</string>
+    <string name="iptv_ui20_sport_fill_teams_next">உங்கள் அணிகளின் அடுத்த ஆட்டங்கள்</string>
+    <plurals name="iptv_ui20_sport_more_feeds">
+        <item quantity="one">+%d சேனல்</item>
+        <item quantity="other">+%d சேனல்கள்</item>
+    </plurals>
+    <string name="iptv_ui20_sport_in_hours_minutes">%1$d ம %2$d நி இல்</string>
+    <string name="iptv_ui20_sport_in_hours">%1$d ம இல்</string>
+    <string name="iptv_ui20_sport_in_minutes">%1$d நி இல்</string>
+    <plurals name="iptv_ui20_sport_in_days">
+        <item quantity="one">%d நாளில்</item>
+        <item quantity="other">%d நாட்களில்</item>
+    </plurals>
+    <string name="iptv_ui20_sport_full_time">முடிவு</string>
+    <string name="iptv_ui20_sport_last_met">கடைசி சந்திப்பு</string>
+    <string name="iptv_ui20_sport_points">%1$s புள்ளி</string>
+</resources>

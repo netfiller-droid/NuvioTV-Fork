@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui20_multiview_labels">ערוץ ותוכנית</string>
+    <string name="iptv_ui20_multiview_labels_description">מציג את הערוץ ואת מה ששודר עכשיו בתחתית כל תמונה. תוצאות חיות עדיין מוצגות בתמונות שמותאמות למשחק.</string>
+    <string name="iptv_ui20_multiview_labels_always">תמיד</string>
+    <string name="iptv_ui20_multiview_labels_focused">רק התמונה שנבחרה</string>
+    <string name="iptv_ui20_multiview_labels_off">כבוי</string>
+    <string name="iptv_ui20_multiview_score_hide">הסתרת התוצאה בתמונה הזו</string>
+    <string name="iptv_ui20_multiview_score_show">הצגת התוצאה בתמונה הזו</string>
+</resources>

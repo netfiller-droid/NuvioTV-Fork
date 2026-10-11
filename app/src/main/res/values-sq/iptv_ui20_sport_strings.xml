@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui20_sport_fill_results">Më herët sot</string>
+    <string name="iptv_ui20_sport_fill_teams_next">Ndeshjet e ardhshme të ekipeve tuaja</string>
+    <plurals name="iptv_ui20_sport_more_feeds">
+        <item quantity="one">+%d kanal</item>
+        <item quantity="other">+%d kanale</item>
+    </plurals>
+    <string name="iptv_ui20_sport_in_hours_minutes">pas %1$d o %2$d min</string>
+    <string name="iptv_ui20_sport_in_hours">pas %1$d o</string>
+    <string name="iptv_ui20_sport_in_minutes">pas %1$d min</string>
+    <plurals name="iptv_ui20_sport_in_days">
+        <item quantity="one">pas %d dite</item>
+        <item quantity="other">pas %d ditësh</item>
+    </plurals>
+    <string name="iptv_ui20_sport_full_time">Fund</string>
+    <string name="iptv_ui20_sport_last_met">Takimi i fundit</string>
+    <string name="iptv_ui20_sport_points">%1$s pikë</string>
+</resources>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui20_sport_fill_results">Ранее сегодня</string>
+    <string name="iptv_ui20_sport_fill_teams_next">Следующие матчи ваших команд</string>
+    <plurals name="iptv_ui20_sport_more_feeds">
+        <item quantity="one">+%d канал</item>
+        <item quantity="few">+%d канала</item>
+        <item quantity="many">+%d каналов</item>
+        <item quantity="other">+%d канала</item>
+    </plurals>
+    <string name="iptv_ui20_sport_in_hours_minutes">через %1$d ч %2$d мин</string>
+    <string name="iptv_ui20_sport_in_hours">через %1$d ч</string>
+    <string name="iptv_ui20_sport_in_minutes">через %1$d мин</string>
+    <plurals name="iptv_ui20_sport_in_days">
+        <item quantity="one">через %d день</item>
+        <item quantity="few">через %d дня</item>
+        <item quantity="many">через %d дней</item>
+        <item quantity="other">через %d дня</item>
+    </plurals>
+    <string name="iptv_ui20_sport_full_time">Конец</string>
+    <string name="iptv_ui20_sport_last_met">Последняя встреча</string>
+    <string name="iptv_ui20_sport_points">%1$s очк.</string>
+</resources>

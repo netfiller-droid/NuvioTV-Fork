@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui20_sport_fill_results">Šiandien anksčiau</string>
+    <string name="iptv_ui20_sport_fill_teams_next">Kitos jūsų komandų rungtynės</string>
+    <plurals name="iptv_ui20_sport_more_feeds">
+        <item quantity="one">+%d kanalas</item>
+        <item quantity="few">+%d kanalai</item>
+        <item quantity="many">+%d kanalo</item>
+        <item quantity="other">+%d kanalų</item>
+    </plurals>
+    <string name="iptv_ui20_sport_in_hours_minutes">po %1$d val. %2$d min.</string>
+    <string name="iptv_ui20_sport_in_hours">po %1$d val.</string>
+    <string name="iptv_ui20_sport_in_minutes">po %1$d min.</string>
+    <plurals name="iptv_ui20_sport_in_days">
+        <item quantity="one">po %d dienos</item>
+        <item quantity="few">po %d dienų</item>
+        <item quantity="many">po %d dienos</item>
+        <item quantity="other">po %d dienų</item>
+    </plurals>
+    <string name="iptv_ui20_sport_full_time">Pabaiga</string>
+    <string name="iptv_ui20_sport_last_met">Paskutinis susitikimas</string>
+    <string name="iptv_ui20_sport_points">%1$s tšk.</string>
+</resources>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui20_sport_fill_results">Plus tôt aujourd\'hui</string>
+    <string name="iptv_ui20_sport_fill_teams_next">Prochains matchs de vos équipes</string>
+    <plurals name="iptv_ui20_sport_more_feeds">
+        <item quantity="one">+%d chaîne</item>
+        <item quantity="many">+%d chaînes</item>
+        <item quantity="other">+%d chaînes</item>
+    </plurals>
+    <string name="iptv_ui20_sport_in_hours_minutes">dans %1$d h %2$d min</string>
+    <string name="iptv_ui20_sport_in_hours">dans %1$d h</string>
+    <string name="iptv_ui20_sport_in_minutes">dans %1$d min</string>
+    <plurals name="iptv_ui20_sport_in_days">
+        <item quantity="one">dans %d jour</item>
+        <item quantity="many">dans %d jours</item>
+        <item quantity="other">dans %d jours</item>
+    </plurals>
+    <string name="iptv_ui20_sport_full_time">Fin</string>
+    <string name="iptv_ui20_sport_last_met">Dernière rencontre</string>
+    <string name="iptv_ui20_sport_points">%1$s pts</string>
+</resources>

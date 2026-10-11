@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui20_sport_fill_results">Раније данас</string>
+    <string name="iptv_ui20_sport_fill_teams_next">Следеће утакмице твојих тимова</string>
+    <plurals name="iptv_ui20_sport_more_feeds">
+        <item quantity="one">+%d канал</item>
+        <item quantity="few">+%d канала</item>
+        <item quantity="other">+%d канала</item>
+    </plurals>
+    <string name="iptv_ui20_sport_in_hours_minutes">за %1$d ч %2$d мин</string>
+    <string name="iptv_ui20_sport_in_hours">за %1$d ч</string>
+    <string name="iptv_ui20_sport_in_minutes">за %1$d мин</string>
+    <plurals name="iptv_ui20_sport_in_days">
+        <item quantity="one">за %d дан</item>
+        <item quantity="few">за %d дана</item>
+        <item quantity="other">за %d дана</item>
+    </plurals>
+    <string name="iptv_ui20_sport_full_time">Крај</string>
+    <string name="iptv_ui20_sport_last_met">Последњи сусрет</string>
+    <string name="iptv_ui20_sport_points">%1$s бод.</string>
+</resources>

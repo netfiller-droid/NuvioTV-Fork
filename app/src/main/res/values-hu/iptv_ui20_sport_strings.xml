@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui20_sport_fill_results">Ma korábban</string>
+    <string name="iptv_ui20_sport_fill_teams_next">Csapataid következő meccsei</string>
+    <plurals name="iptv_ui20_sport_more_feeds">
+        <item quantity="one">+%d csatorna</item>
+        <item quantity="other">+%d csatorna</item>
+    </plurals>
+    <string name="iptv_ui20_sport_in_hours_minutes">%1$d ó %2$d p múlva</string>
+    <string name="iptv_ui20_sport_in_hours">%1$d ó múlva</string>
+    <string name="iptv_ui20_sport_in_minutes">%1$d p múlva</string>
+    <plurals name="iptv_ui20_sport_in_days">
+        <item quantity="one">%d nap múlva</item>
+        <item quantity="other">%d nap múlva</item>
+    </plurals>
+    <string name="iptv_ui20_sport_full_time">Vége</string>
+    <string name="iptv_ui20_sport_last_met">Legutóbbi találkozó</string>
+    <string name="iptv_ui20_sport_points">%1$s p</string>
+</resources>

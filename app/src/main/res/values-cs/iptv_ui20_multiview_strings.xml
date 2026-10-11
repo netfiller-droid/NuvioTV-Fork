@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui20_multiview_labels">Kanál a pořad</string>
+    <string name="iptv_ui20_multiview_labels_description">Zobrazí kanál a aktuální pořad ve spodní části každého obrazu. Živé výsledky se dál zobrazují u obrazů přiřazených k zápasu.</string>
+    <string name="iptv_ui20_multiview_labels_always">Vždy</string>
+    <string name="iptv_ui20_multiview_labels_focused">Jen vybraný obraz</string>
+    <string name="iptv_ui20_multiview_labels_off">Vypnuto</string>
+    <string name="iptv_ui20_multiview_score_hide">Skrýt skóre v tomto obrazu</string>
+    <string name="iptv_ui20_multiview_score_show">Zobrazit skóre v tomto obrazu</string>
+</resources>

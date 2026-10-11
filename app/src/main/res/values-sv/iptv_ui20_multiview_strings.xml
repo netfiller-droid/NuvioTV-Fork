@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui20_multiview_labels">Kanal och program</string>
+    <string name="iptv_ui20_multiview_labels_description">Visar kanalen och vad som sänds längst ned i varje bild. Liveresultat visas fortfarande på bilder som är kopplade till en match.</string>
+    <string name="iptv_ui20_multiview_labels_always">Alltid</string>
+    <string name="iptv_ui20_multiview_labels_focused">Endast vald bild</string>
+    <string name="iptv_ui20_multiview_labels_off">Av</string>
+    <string name="iptv_ui20_multiview_score_hide">Dölj resultat i den här bilden</string>
+    <string name="iptv_ui20_multiview_score_show">Visa resultat i den här bilden</string>
+</resources>

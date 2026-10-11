@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui20_sport_fill_results">আজ আগে</string>
+    <string name="iptv_ui20_sport_fill_teams_next">আপনার দলের পরের খেলা</string>
+    <plurals name="iptv_ui20_sport_more_feeds">
+        <item quantity="one">+%dটি চ্যানেল</item>
+        <item quantity="other">+%dটি চ্যানেল</item>
+    </plurals>
+    <string name="iptv_ui20_sport_in_hours_minutes">%1$d ঘ %2$d মি পরে</string>
+    <string name="iptv_ui20_sport_in_hours">%1$d ঘ পরে</string>
+    <string name="iptv_ui20_sport_in_minutes">%1$d মি পরে</string>
+    <plurals name="iptv_ui20_sport_in_days">
+        <item quantity="one">%d দিন পরে</item>
+        <item quantity="other">%d দিন পরে</item>
+    </plurals>
+    <string name="iptv_ui20_sport_full_time">শেষ</string>
+    <string name="iptv_ui20_sport_last_met">শেষ সাক্ষাৎ</string>
+    <string name="iptv_ui20_sport_points">%1$s পয়েন্ট</string>
+</resources>

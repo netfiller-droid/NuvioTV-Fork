@@ -19,7 +19,7 @@ data class SummaryPlayer(val jersey: String?, val name: String, val position: St
 
 data class SummaryRoster(val side: FixtureSide, val starters: List<SummaryPlayer>, val subs: List<SummaryPlayer>, val formation: String? = null)
 
-data class SummaryStanding(val team: String, val side: FixtureSide?, val stats: List<Pair<String, String>>)
+data class SummaryStanding(val team: String, val side: FixtureSide?, val stats: List<Pair<String, String>>, val rank: Int? = null)
 
 data class SummaryTable(val name: String?, val rows: List<SummaryStanding>)
 
@@ -343,7 +343,9 @@ object EspnSummary {
             key to value.take(12)
         }
         val wanted = TABLE_STATS.mapNotNull { key -> stats.firstOrNull { it.first.equals(key, ignoreCase = true) } }
-        return SummaryStanding(name.take(80), side, (wanted.ifEmpty { stats }).distinctBy { it.first }.take(6))
+        val rank = entry.optJSONArray("stats")?.let(::objs).orEmpty().firstOrNull { it.str("name") == "rank" || it.str("abbreviation") == "R" }
+            ?.let { it.str("displayValue") ?: it.str("value")?.let(::whole) }?.toIntOrNull()?.takeIf { it in 1..999 }
+        return SummaryStanding(name.take(80), side, (wanted.ifEmpty { stats }).distinctBy { it.first }.take(6), rank)
     }
 
     private fun headToHead(root: JSONObject, sides: Sides): List<SummaryMeeting> {

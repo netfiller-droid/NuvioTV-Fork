@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui20_multiview_labels">チャンネルと番組</string>
+    <string name="iptv_ui20_multiview_labels_description">各画面の下部にチャンネルと放送中の番組を表示します。試合に一致した画面にはライブスコアも表示されます。</string>
+    <string name="iptv_ui20_multiview_labels_always">常に表示</string>
+    <string name="iptv_ui20_multiview_labels_focused">選択中の画面のみ</string>
+    <string name="iptv_ui20_multiview_labels_off">オフ</string>
+    <string name="iptv_ui20_multiview_score_hide">この画面のスコアを隠す</string>
+    <string name="iptv_ui20_multiview_score_show">この画面のスコアを表示</string>
+</resources>

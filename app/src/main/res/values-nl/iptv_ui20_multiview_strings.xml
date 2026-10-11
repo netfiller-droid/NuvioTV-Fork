@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui20_multiview_labels">Zender en programma</string>
+    <string name="iptv_ui20_multiview_labels_description">Toont de zender en wat er nu op is onderaan elk beeld. Livescores blijven zichtbaar op beelden die aan een wedstrijd zijn gekoppeld.</string>
+    <string name="iptv_ui20_multiview_labels_always">Altijd</string>
+    <string name="iptv_ui20_multiview_labels_focused">Alleen geselecteerd beeld</string>
+    <string name="iptv_ui20_multiview_labels_off">Uit</string>
+    <string name="iptv_ui20_multiview_score_hide">Score in dit beeld verbergen</string>
+    <string name="iptv_ui20_multiview_score_show">Score in dit beeld tonen</string>
+</resources>

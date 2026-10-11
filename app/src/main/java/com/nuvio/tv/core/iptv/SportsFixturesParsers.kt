@@ -432,7 +432,8 @@ object EspnScoreboard {
         val record = (records.firstOrNull { it.text("type") == "total" || it.text("name")?.lowercase() == "overall" } ?: records.firstOrNull())
             ?.text("summary")?.takeIf { RECORD.matches(it) }
         val colour = json.text("color")?.removePrefix("#")?.takeIf { COLOUR.matches(it) }?.lowercase()
-        return FixtureTeam(name, short, json.text("abbreviation"), alternatives, json.text("logo")?.let(::sportsImage) ?: logo(json), colour, record)
+        val form = competitor.text("form")?.uppercase()?.takeIf { it.length in 1..10 && it.all { c -> c in "WDLT" } }?.reversed()
+        return FixtureTeam(name, short, json.text("abbreviation"), alternatives, json.text("logo")?.let(::sportsImage) ?: logo(json), colour, record, form)
     }
 
     private fun logo(json: JSONObject): String? = json.optJSONArray("logos")?.let(::objects)?.let { logos ->

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui20_multiview_labels">القناة والبرنامج</string>
+    <string name="iptv_ui20_multiview_labels_description">يعرض القناة وما يُعرض الآن أسفل كل صورة. تبقى النتائج المباشرة ظاهرة على الصور المرتبطة بمباراة.</string>
+    <string name="iptv_ui20_multiview_labels_always">دائمًا</string>
+    <string name="iptv_ui20_multiview_labels_focused">الصورة المحددة فقط</string>
+    <string name="iptv_ui20_multiview_labels_off">إيقاف</string>
+    <string name="iptv_ui20_multiview_score_hide">إخفاء النتيجة في هذه الصورة</string>
+    <string name="iptv_ui20_multiview_score_show">إظهار النتيجة في هذه الصورة</string>
+</resources>

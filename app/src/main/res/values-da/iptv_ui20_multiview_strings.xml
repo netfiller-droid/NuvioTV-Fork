@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui20_multiview_labels">Kanal og program</string>
+    <string name="iptv_ui20_multiview_labels_description">Viser kanalen og hvad der sendes nederst i hvert billede. Livestillinger vises stadig på billeder, der er koblet til en kamp.</string>
+    <string name="iptv_ui20_multiview_labels_always">Altid</string>
+    <string name="iptv_ui20_multiview_labels_focused">Kun valgt billede</string>
+    <string name="iptv_ui20_multiview_labels_off">Fra</string>
+    <string name="iptv_ui20_multiview_score_hide">Skjul stillingen i dette billede</string>
+    <string name="iptv_ui20_multiview_score_show">Vis stillingen i dette billede</string>
+</resources>

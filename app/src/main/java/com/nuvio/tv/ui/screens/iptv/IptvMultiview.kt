@@ -25,6 +25,7 @@ import androidx.compose.material.icons.filled.Fullscreen
 import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material.icons.filled.ViewModule
 import androidx.compose.material.icons.filled.SportsSoccer
+import androidx.compose.material.icons.filled.Subtitles
 import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.runtime.*
 import com.nuvio.tv.ui.v2.components.GlassRole
@@ -36,7 +37,6 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.res.stringResource
@@ -59,6 +59,7 @@ import com.nuvio.tv.core.iptv.multiviewMaxTiles
 import com.nuvio.tv.ui.screens.settings.SettingsActionRow
 import com.nuvio.tv.ui.screens.settings.SettingsPickerOption
 import com.nuvio.tv.ui.screens.settings.SettingsSingleChoiceDialog
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.material.icons.filled.Dashboard
@@ -71,6 +72,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nuvio.tv.core.iptv.FixtureStatus
 import com.nuvio.tv.core.iptv.SportsFixture
 import com.nuvio.tv.core.iptv.SportsFixtureText
+import com.nuvio.tv.core.iptv.MultiviewLabels
+import com.nuvio.tv.core.iptv.MultiviewStrip
+import com.nuvio.tv.data.iptv.IptvLivePreferences
 
 private sealed interface TilePick {
     data object Add : TilePick
@@ -100,6 +104,14 @@ internal fun Multiview(state: IptvLiveState, tiles: List<IptvTile>, now: Long, o
     var dataMenu by remember { mutableStateOf<Int?>(null) }
     var choosingGame by remember { mutableStateOf<Int?>(null) }
     var dataFocus by remember { mutableStateOf<Int?>(null) }
+    val context = LocalContext.current
+    val livePreferences = remember { IptvLivePreferences(context) }
+    var labels by remember { mutableStateOf(MultiviewLabels.parse(livePreferences.preferences.getString(MultiviewLabels.KEY, null))) }
+    var choosingLabels by remember { mutableStateOf(false) }
+    var scoreOff by remember { mutableStateOf(emptySet<String>()) }
+    val games = remember(fixtures, tiles, now) {
+        tiles.map { tile -> if (!fixtures.enabled) null else playingFixture(fixtures.rows, tile.row.item.channel.id, now)?.fixture?.takeIf { MultiviewStrip.shows(it, now) } }
+    }
     val total = tiles.size + data.size
     val streamRoom = tiles.size < multiviewMaxTiles(state.multiviewLayout, state.maxTiles)
     val addSlot = total < MAX_SLOTS && (streamRoom || fixtures.enabled)
@@ -144,7 +156,9 @@ internal fun Multiview(state: IptvLiveState, tiles: List<IptvTile>, now: Long, o
                 val rects = multiviewGeometry(layout, slots, state.mainTile.coerceIn(0, (tiles.size - 1).coerceAtLeast(0)), maxWidth.value, maxHeight.value, gap.value)
                 rects.forEachIndexed { index, rect ->
                     val modifier = Modifier.offset(rect.x.dp, rect.y.dp).size(rect.width.dp, rect.height.dp).focusProperties { canFocus = pick == null }
-                    if (index < tiles.size) TileSlot(state, tiles, index, now, requesters, modifier, { menuFor = it }, onFocusTile, onFull)
+                    if (index < tiles.size) TileSlot(state, tiles, index, now, requesters, modifier, { menuFor = it }, onFocusTile, onFull,
+                        TileText(rect.width, rect.height, maxWidth.value, games.getOrNull(index)?.takeIf { tiles[index].row.item.channel.id !in scoreOff },
+                            games.getOrNull(index)?.let { scoreHidden(fixtures, it) } ?: false, labels))
                     else if (index < total) DataSlot(data[index - tiles.size], fixtures, index, requesters[index], modifier) { dataMenu = index - tiles.size }
                     else AddSlot(requesters[index], modifier) { if (streamRoom) pick = TilePick.Add else dataMenu = ADD_DATA }
                 }
@@ -197,6 +211,12 @@ internal fun Multiview(state: IptvLiveState, tiles: List<IptvTile>, now: Long, o
             })) },
             selectedValue = state.multiviewQuality, onOptionSelected = { onQuality(it); choosingQuality = false }, onDismiss = { choosingQuality = false })
     }
+    if (choosingLabels) {
+        SettingsSingleChoiceDialog(title = stringResource(R.string.iptv_ui20_multiview_labels), subtitle = stringResource(R.string.iptv_ui20_multiview_labels_description),
+            options = MultiviewLabels.entries.map { SettingsPickerOption(it, stringResource(multiviewLabelsLabel(it))) }, selectedValue = labels,
+            onOptionSelected = { labels = it; livePreferences.preferences.edit().putString(MultiviewLabels.KEY, it.name).apply(); choosingLabels = false },
+            onDismiss = { choosingLabels = false })
+    }
     if (choosingLayout) {
         SettingsSingleChoiceDialog(title = stringResource(R.string.iptv_multiview_layout), subtitle = stringResource(R.string.iptv_multiview_layout_description),
             options = MultiviewLayout.entries.map { SettingsPickerOption(it, stringResource(multiviewLayoutLabel(it))) },
@@ -218,6 +238,15 @@ internal fun Multiview(state: IptvLiveState, tiles: List<IptvTile>, now: Long, o
                     value = stringResource(multiviewLayoutLabel(state.multiviewLayout)), onClick = { menuFor = null; choosingLayout = true })
                 SettingsActionRow(title = stringResource(R.string.iptv_multiview_quality), subtitle = null, leadingIcon = Icons.Filled.HighQuality,
                     value = stringResource(qualityLabel(state.multiviewQuality)), onClick = { menuFor = null; choosingQuality = true })
+                SettingsActionRow(title = stringResource(R.string.iptv_ui20_multiview_labels), subtitle = null, leadingIcon = Icons.Filled.Subtitles,
+                    value = stringResource(multiviewLabelsLabel(labels)), onClick = { menuFor = null; choosingLabels = true })
+                if (games.getOrNull(index) != null) {
+                    val id = tile.row.item.channel.id
+                    val off = id in scoreOff
+                    SettingsActionRow(title = stringResource(if (off) R.string.iptv_ui20_multiview_score_show else R.string.iptv_ui20_multiview_score_hide),
+                        subtitle = null, leadingIcon = Icons.Filled.SportsSoccer, trailingIcon = null,
+                        onClick = { menuFor = null; scoreOff = if (off) scoreOff - id else scoreOff + id })
+                }
                 SettingsActionRow(title = stringResource(R.string.iptv_multiview_replace), subtitle = null, leadingIcon = Icons.Filled.SwapHoriz,
                     onClick = { menuFor = null; pick = TilePick.Replace(index) })
                 SettingsActionRow(title = stringResource(R.string.iptv_multiview_remove), subtitle = null, leadingIcon = Icons.Filled.Close,
@@ -316,10 +345,12 @@ private fun qualityLabel(quality: MultiviewQuality): Int = when (quality) {
     MultiviewQuality.LIGHTEST -> R.string.iptv_multiview_quality_lightest
 }
 
+private data class TileText(val width: Float, val height: Float, val screen: Float, val game: SportsFixture?, val hidden: Boolean, val labels: MultiviewLabels)
+
 @Composable
 private fun TileSlot(state: IptvLiveState, tiles: List<IptvTile>, index: Int, now: Long, requesters: List<FocusRequester>, modifier: Modifier,
-    onMenu: (Int) -> Unit, onFocusTile: (Int) -> Unit, onFull: (Int) -> Unit) {
-    Tile(state, tiles[index], index, index == state.tileFocus, now, requesters[index], modifier,
+    onMenu: (Int) -> Unit, onFocusTile: (Int) -> Unit, onFull: (Int) -> Unit, text: TileText) {
+    Tile(state, tiles[index], index, index == state.tileFocus, now, requesters[index], modifier, text,
         onFocus = { onFocusTile(index) }, onSelect = { onFull(index) }, onMenu = { onMenu(index) })
 }
 
@@ -329,7 +360,7 @@ private fun Modifier.tileFocus(focused: Boolean, shape: RoundedCornerShape): Mod
 
 @Composable
 private fun Tile(state: IptvLiveState, tile: IptvTile, index: Int, audio: Boolean, now: Long, requester: FocusRequester, modifier: Modifier,
-    onFocus: () -> Unit, onSelect: () -> Unit, onMenu: () -> Unit) {
+    text: TileText, onFocus: () -> Unit, onSelect: () -> Unit, onMenu: () -> Unit) {
     var focused by remember { mutableStateOf(false) }
     val longPress = rememberLongPressKeyTracker()
     var held by remember { mutableStateOf(false) }
@@ -357,22 +388,20 @@ private fun Tile(state: IptvLiveState, tile: IptvTile, index: Int, audio: Boolea
             Text(stringResource(tile.failure), style = MaterialTheme.typography.bodyMedium, color = Color.White.copy(alpha = .85f), textAlign = TextAlign.Center,
                 modifier = Modifier.align(Alignment.Center).padding(24.dp))
         } else if (!tile.playing) LoadingIndicator(Modifier.align(Alignment.Center).size(40.dp))
-        Row(Modifier.align(Alignment.BottomStart).fillMaxWidth()
-            .background(Brush.verticalGradient(listOf(Color.Transparent, Color.Black.copy(alpha = if (focused) .75f else .55f))))
-            .padding(horizontal = 14.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            ChannelLogo(logoUrl(tile.row), channelName(tile.row), Modifier.size(48.dp, 28.dp))
-            Column(Modifier.weight(1f)) {
-                Text(channelName(tile.row), style = MaterialTheme.typography.labelLarge, color = Color.White, fontWeight = FontWeight.SemiBold,
-                    maxLines = 1, overflow = TextOverflow.Ellipsis)
-                liveProgramme(state, tile.row.item.channel.id, now)?.let {
-                    Text(title(it), style = MaterialTheme.typography.labelSmall, color = Color.White.copy(alpha = .75f), maxLines = 1, overflow = TextOverflow.Ellipsis)
-                }
+        val label = text.labels.shown(focused)
+        if (text.game != null || label) {
+            val (pictureWidth, pictureHeight) = MultiviewStrip.picture(text.width, text.height)
+            val strip = remember(pictureWidth, text.screen) { MultiviewStrip.size(pictureWidth, text.screen) }
+            Box(Modifier.align(Alignment.Center).size(pictureWidth.dp, pictureHeight.dp)) {
+                MultiviewTileStrip(text.game, text.hidden, tile.row.takeIf { label }, if (label) liveProgramme(state, tile.row.item.channel.id, now) else null, now,
+                    strip, pictureWidth, Modifier.align(Alignment.BottomCenter))
             }
-            if (audio) Icon(Icons.AutoMirrored.Filled.VolumeUp, stringResource(R.string.iptv_multiview_audio), Modifier.size(18.dp), tint = Color.White)
         }
-        Text("${index + 1}", style = MaterialTheme.typography.labelLarge, color = Color.White.copy(alpha = .85f),
-            modifier = Modifier.align(Alignment.TopStart).padding(8.dp).clip(RoundedCornerShape(4.dp))
-                .background(Color.Black.copy(alpha = .45f)).padding(horizontal = 8.dp, vertical = 2.dp))
+        Row(Modifier.align(Alignment.TopStart).padding(8.dp).clip(RoundedCornerShape(4.dp)).background(Color.Black.copy(alpha = .45f))
+            .padding(horizontal = 8.dp, vertical = 2.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            Text("${index + 1}", style = MaterialTheme.typography.labelLarge, color = Color.White.copy(alpha = .85f))
+            if (audio) Icon(Icons.AutoMirrored.Filled.VolumeUp, stringResource(R.string.iptv_multiview_audio), Modifier.size(16.dp), tint = Color.White)
+        }
     }
 }
 

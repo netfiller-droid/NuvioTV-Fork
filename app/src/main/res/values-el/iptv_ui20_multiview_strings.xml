@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui20_multiview_labels">Κανάλι και εκπομπή</string>
+    <string name="iptv_ui20_multiview_labels_description">Δείχνει το κανάλι και τι προβάλλεται στο κάτω μέρος κάθε εικόνας. Τα ζωντανά σκορ εμφανίζονται στις εικόνες που αντιστοιχούν σε αγώνα.</string>
+    <string name="iptv_ui20_multiview_labels_always">Πάντα</string>
+    <string name="iptv_ui20_multiview_labels_focused">Μόνο η επιλεγμένη εικόνα</string>
+    <string name="iptv_ui20_multiview_labels_off">Ανενεργό</string>
+    <string name="iptv_ui20_multiview_score_hide">Απόκρυψη σκορ σε αυτή την εικόνα</string>
+    <string name="iptv_ui20_multiview_score_show">Εμφάνιση σκορ σε αυτή την εικόνα</string>
+</resources>

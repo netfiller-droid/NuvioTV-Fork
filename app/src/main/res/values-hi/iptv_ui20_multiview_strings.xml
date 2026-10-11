@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui20_multiview_labels">चैनल और कार्यक्रम</string>
+    <string name="iptv_ui20_multiview_labels_description">हर तस्वीर के नीचे चैनल और अभी चल रहा कार्यक्रम दिखाता है। मैच से जुड़ी तस्वीरों पर लाइव स्कोर दिखते रहेंगे।</string>
+    <string name="iptv_ui20_multiview_labels_always">हमेशा</string>
+    <string name="iptv_ui20_multiview_labels_focused">केवल चुनी गई तस्वीर</string>
+    <string name="iptv_ui20_multiview_labels_off">बंद</string>
+    <string name="iptv_ui20_multiview_score_hide">इस तस्वीर पर स्कोर छिपाएँ</string>
+    <string name="iptv_ui20_multiview_score_show">इस तस्वीर पर स्कोर दिखाएँ</string>
+</resources>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui20_multiview_labels">சேனல் மற்றும் நிகழ்ச்சி</string>
+    <string name="iptv_ui20_multiview_labels_description">ஒவ்வொரு படத்தின் கீழும் சேனலையும் தற்போதைய நிகழ்ச்சியையும் காட்டும். போட்டியுடன் பொருந்திய படங்களில் நேரடி மதிப்பெண் தொடர்ந்து காட்டப்படும்.</string>
+    <string name="iptv_ui20_multiview_labels_always">எப்போதும்</string>
+    <string name="iptv_ui20_multiview_labels_focused">தேர்ந்தெடுத்த படம் மட்டும்</string>
+    <string name="iptv_ui20_multiview_labels_off">முடக்கு</string>
+    <string name="iptv_ui20_multiview_score_hide">இந்தப் படத்தில் மதிப்பெண்ணை மறை</string>
+    <string name="iptv_ui20_multiview_score_show">இந்தப் படத்தில் மதிப்பெண்ணைக் காட்டு</string>
+</resources>

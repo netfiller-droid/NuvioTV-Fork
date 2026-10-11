@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui20_multiview_labels">Canal e programa</string>
+    <string name="iptv_ui20_multiview_labels_description">Mostra o canal e o que está a dar na parte inferior de cada imagem. Os resultados em direto continuam a aparecer nas imagens ligadas a um jogo.</string>
+    <string name="iptv_ui20_multiview_labels_always">Sempre</string>
+    <string name="iptv_ui20_multiview_labels_focused">Só a imagem selecionada</string>
+    <string name="iptv_ui20_multiview_labels_off">Desligado</string>
+    <string name="iptv_ui20_multiview_score_hide">Ocultar resultado nesta imagem</string>
+    <string name="iptv_ui20_multiview_score_show">Mostrar resultado nesta imagem</string>
+</resources>

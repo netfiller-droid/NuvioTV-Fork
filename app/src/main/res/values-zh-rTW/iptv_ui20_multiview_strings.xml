@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui20_multiview_labels">頻道和節目</string>
+    <string name="iptv_ui20_multiview_labels_description">在每個畫面底部顯示頻道和正在播出的節目。與比賽相符的畫面仍會顯示即時比分。</string>
+    <string name="iptv_ui20_multiview_labels_always">一律顯示</string>
+    <string name="iptv_ui20_multiview_labels_focused">僅所選畫面</string>
+    <string name="iptv_ui20_multiview_labels_off">關閉</string>
+    <string name="iptv_ui20_multiview_score_hide">隱藏此畫面的比分</string>
+    <string name="iptv_ui20_multiview_score_show">顯示此畫面的比分</string>
+</resources>

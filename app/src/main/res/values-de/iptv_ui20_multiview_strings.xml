@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui20_multiview_labels">Sender und Sendung</string>
+    <string name="iptv_ui20_multiview_labels_description">Zeigt Sender und laufende Sendung unten in jedem Bild. Live-Spielstände bleiben bei Bildern sichtbar, die einem Spiel zugeordnet sind.</string>
+    <string name="iptv_ui20_multiview_labels_always">Immer</string>
+    <string name="iptv_ui20_multiview_labels_focused">Nur ausgewähltes Bild</string>
+    <string name="iptv_ui20_multiview_labels_off">Aus</string>
+    <string name="iptv_ui20_multiview_score_hide">Spielstand in diesem Bild ausblenden</string>
+    <string name="iptv_ui20_multiview_score_show">Spielstand in diesem Bild einblenden</string>
+</resources>

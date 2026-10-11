@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui20_multiview_labels">Saluran dan acara</string>
+    <string name="iptv_ui20_multiview_labels_description">Menampilkan saluran dan acara yang sedang tayang di bagian bawah setiap gambar. Skor langsung tetap tampil pada gambar yang cocok dengan pertandingan.</string>
+    <string name="iptv_ui20_multiview_labels_always">Selalu</string>
+    <string name="iptv_ui20_multiview_labels_focused">Hanya gambar yang dipilih</string>
+    <string name="iptv_ui20_multiview_labels_off">Mati</string>
+    <string name="iptv_ui20_multiview_score_hide">Sembunyikan skor di gambar ini</string>
+    <string name="iptv_ui20_multiview_score_show">Tampilkan skor di gambar ini</string>
+</resources>

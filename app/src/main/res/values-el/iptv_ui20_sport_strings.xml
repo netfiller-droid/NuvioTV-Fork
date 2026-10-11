@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui20_sport_fill_results">Νωρίτερα σήμερα</string>
+    <string name="iptv_ui20_sport_fill_teams_next">Οι επόμενοι αγώνες των ομάδων σας</string>
+    <plurals name="iptv_ui20_sport_more_feeds">
+        <item quantity="one">+%d κανάλι</item>
+        <item quantity="other">+%d κανάλια</item>
+    </plurals>
+    <string name="iptv_ui20_sport_in_hours_minutes">σε %1$d ώ %2$d λ</string>
+    <string name="iptv_ui20_sport_in_hours">σε %1$d ώ</string>
+    <string name="iptv_ui20_sport_in_minutes">σε %1$d λ</string>
+    <plurals name="iptv_ui20_sport_in_days">
+        <item quantity="one">σε %d ημέρα</item>
+        <item quantity="other">σε %d ημέρες</item>
+    </plurals>
+    <string name="iptv_ui20_sport_full_time">Τέλος</string>
+    <string name="iptv_ui20_sport_last_met">Τελευταία αναμέτρηση</string>
+    <string name="iptv_ui20_sport_points">%1$s β.</string>
+</resources>

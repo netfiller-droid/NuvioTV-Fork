@@ -44,6 +44,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
@@ -70,6 +71,9 @@ import com.nuvio.tv.core.iptv.SportsDetail
 import com.nuvio.tv.core.iptv.SportsFavourites
 import com.nuvio.tv.core.iptv.SportsFixture
 import com.nuvio.tv.core.iptv.SportsFixtureSections
+import com.nuvio.tv.core.iptv.SportsFill
+import com.nuvio.tv.core.iptv.SportsLeagues
+import com.nuvio.tv.core.iptv.SportsPage
 import com.nuvio.tv.core.iptv.SportsPendingRecords
 import com.nuvio.tv.core.iptv.SportsRecordedWindow
 import com.nuvio.tv.core.iptv.SportsReminder
@@ -85,6 +89,7 @@ import com.nuvio.tv.data.iptv.IptvLivePreferences
 import com.nuvio.tv.data.iptv.IptvLog
 import com.nuvio.tv.data.iptv.IptvRecording
 import com.nuvio.tv.data.iptv.IptvSourceRef
+import com.nuvio.tv.data.iptv.SportsFetchException
 import com.nuvio.tv.data.iptv.IptvSportsFixtures
 import com.nuvio.tv.data.iptv.IptvSportsFixturesRepository
 import com.nuvio.tv.data.iptv.IptvSportsLive
@@ -148,7 +153,7 @@ sealed class IptvSportPrompt {
 
 @HiltViewModel
 class IptvSportsFixturesViewModel @Inject constructor(private val repository: IptvSportsFixturesRepository, private val preferences: IptvSportsPreferences,
-    private val live: IptvSportsLive, private val recorder: IptvRecorder, summaryClient: IptvSportsSummaryClient, private val nuvio: IptvSportsNuvio,
+    private val live: IptvSportsLive, private val recorder: IptvRecorder, private val summaryClient: IptvSportsSummaryClient, private val nuvio: IptvSportsNuvio,
     private val livePreferences: IptvLivePreferences, refreshes: IptvRefreshCoordinator, @ApplicationContext private val context: Context) : ViewModel() {
     private val mutable = MutableStateFlow(preferences.enabled.let { IptvFixturesState(enabled = it, loading = it) })
     val state = mutable.asStateFlow()
@@ -158,6 +163,11 @@ class IptvSportsFixturesViewModel @Inject constructor(private val repository: Ip
     val reminderDue: SharedFlow<SportsReminder> = live.reminderDue
     private val summaryWatch = IptvSportsSummaryWatch(summaryClient, viewModelScope)
     val summary: StateFlow<SportsSummary?> = summaryWatch.summary
+    private val previewState = MutableStateFlow<SportsSummary?>(null)
+    val preview: StateFlow<SportsSummary?> = previewState.asStateFlow()
+    private val previews = LinkedHashMap<String, Pair<Long, SportsSummary>>()
+    private var previewJob: Job? = null
+    private var previewFixture: SportsFixture? = null
     private val promptState = MutableStateFlow<IptvSportPrompt?>(null)
     val prompt = promptState.asStateFlow()
     private val revealed = mutableSetOf<String>()
@@ -210,7 +220,7 @@ class IptvSportsFixturesViewModel @Inject constructor(private val repository: Ip
         opened = ref to hiddenCategories
         booked()
         SportsDays.guideDays(IptvGuideDaysPreference(livePreferences).days.future)
-        if (handle == null) { handle = live.acquire(IptvSportsMode.LIVE_TV); summaryFixture?.let(::watchSummary) }
+        if (handle == null) { handle = live.acquire(IptvSportsMode.LIVE_TV); summaryFixture?.let(::watchSummary); previewFixture?.let(::pregame) }
         live.snapshot.value?.takeIf { it.mode == IptvSportsMode.LIVE_TV }?.let(::accept)
     }
 
@@ -259,9 +269,29 @@ class IptvSportsFixturesViewModel @Inject constructor(private val repository: Ip
         else summaryWatch.start(fixture)
     }
 
-    override fun onCleared() { summaryWatch.stop(); handle?.release(); handle = null }
+    fun pregame(fixture: SportsFixture?) {
+        previewJob?.cancel()
+        previewFixture = fixture
+        val league = fixture?.takeIf { handle != null && it.status == FixtureStatus.SCHEDULED && it.source == SportsService.ESPN && it.teams && it.sport in PREVIEW_SPORTS }
+            ?.let { SportsLeagues.byId(it.league) }?.takeIf { it.espn != null }
+        if (fixture == null || league == null) { previewState.value = null; return }
+        val now = System.currentTimeMillis()
+        previews[fixture.key]?.takeIf { now - it.first in 0 until PREVIEW_MILLIS }?.let { previewState.value = it.second; return }
+        previewState.value = null
+        previewJob = viewModelScope.launch {
+            delay(PREVIEW_DELAY_MILLIS)
+            val result = (try { summaryClient.summary(league, fixture.id) } catch (cancel: CancellationException) { throw cancel }
+                catch (error: Exception) { if (error !is SportsFetchException) IptvLog.failure("sports preview", error); null }) ?: return@launch
+            previews.remove(fixture.key)
+            previews[fixture.key] = System.currentTimeMillis() to result
+            while (previews.size > PREVIEW_CACHE) previews.remove(previews.keys.first())
+            previewState.value = result
+        }
+    }
 
-    fun close() { summaryWatch.stop(); handle?.release(); handle = null; linkJob?.cancel(); linkJob = null; pendingSignature = null; publish() }
+    override fun onCleared() { summaryWatch.stop(); previewJob?.cancel(); handle?.release(); handle = null }
+
+    fun close() { summaryWatch.stop(); previewJob?.cancel(); handle?.release(); handle = null; linkJob?.cancel(); linkJob = null; pendingSignature = null; publish() }
 
     fun show(ref: IptvSourceRef, hiddenCategories: Set<String>, started: Boolean) {
         viewing = true
@@ -271,7 +301,7 @@ class IptvSportsFixturesViewModel @Inject constructor(private val repository: Ip
         if (loaded != null) relink(ref, hiddenCategories, System.currentTimeMillis())
     }
 
-    fun hide() { viewing = false; summaryWatch.stop(); promptState.value = null }
+    fun hide() { viewing = false; summaryWatch.stop(); previewJob?.cancel(); promptState.value = null }
 
     fun focusFixture(key: String?) { heroKey.value = key }
 
@@ -369,6 +399,10 @@ class IptvSportsFixturesViewModel @Inject constructor(private val repository: Ip
     companion object {
         const val FEATURED = "\u0000featured"
         private const val RELINK_MILLIS = 5L * 60 * 1000
+        private const val PREVIEW_MILLIS = 30L * 60 * 1000
+        private const val PREVIEW_DELAY_MILLIS = 700L
+        private const val PREVIEW_CACHE = 6
+        private val PREVIEW_SPORTS = setOf("soccer", "rugby", "rugby-league", "australian-football")
     }
 }
 
@@ -413,56 +447,62 @@ internal fun IptvSportsFixturesRow(source: IptvSourceRef?, hiddenCategories: Set
         else -> null
     }
     val warning = state.failed || state.missingKey
-    if (state.rows.isEmpty()) {
-        Column(modifier.fillMaxWidth().height(SPORT_ROW_HEIGHT + SPORT_ROW_BLEED), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-            Row(Modifier.height(22.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                Text(stringResource(R.string.iptv_sport_fixtures), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold,
-                    color = NuvioTheme.colors.TextPrimary, maxLines = 1)
-                if (state.loading && message != null) RowMessage(message, false)
-            }
-            if (state.loading) SportCardsPlaceholder()
-            else Row(Modifier.fillMaxWidth().height(SPORT_CARD_HEIGHT).iptvPanel(SportCardShape).padding(horizontal = 24.dp),
-                verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                Icon(Icons.Filled.SportsSoccer, null, Modifier.size(32.dp), tint = NuvioTheme.colors.TextTertiary)
-                if (message != null) Text(stringResource(message), style = MaterialTheme.typography.bodyMedium, maxLines = 2, overflow = TextOverflow.Ellipsis,
-                    color = if (warning) NuvioTheme.colors.Error else NuvioTheme.colors.TextSecondary)
-            }
-        }
-    } else {
-        val window = remember(now / TIMELINE_HOUR_MILLIS) { sportTimelineWindow(now) }
-        val lanes = remember(state.rows, window) { SportsTimeline.lanes(state.items.map { it.fixture }, window.first, window.second) }
-        var lastKey by remember { mutableIntStateOf(0) }
-        var lastSlot by remember { mutableIntStateOf(0) }
-        val slots = state.rows.size + if (lanes.isNotEmpty()) 1 else 0
-        val rowsState = rememberLazyListState()
-        val inner = LocalBringIntoViewSpec.current
-        CompositionLocalProvider(LocalBringIntoViewSpec provides SportRowsSpec) {
-            LazyColumn(modifier.fillMaxWidth().height(SPORT_ROW_HEIGHT + SPORT_ROW_BLEED)
-                .onPreviewKeyEvent { event ->
-                    val native = event.nativeKeyEvent
-                    if (native.action == AndroidKeyEvent.ACTION_DOWN) lastKey = native.keyCode
-                    toggle != null && native.keyCode == AndroidKeyEvent.KEYCODE_DPAD_DOWN && native.action == AndroidKeyEvent.ACTION_DOWN && lastSlot >= slots - 1 &&
-                        runCatching { toggle.requestFocus(FocusDirection.Enter) }.getOrDefault(false)
+    BoxWithConstraints(modifier.fillMaxWidth()) {
+        val room = (maxWidth - SPORT_ROW_PADDING * 2).value
+        val perRow = SportsPage.perRow(room)
+        val cardWidth = SportsPage.cardWidth(room, perRow).dp
+        if (state.rows.isEmpty()) {
+            Column(Modifier.fillMaxWidth().height(SPORT_ROW_HEIGHT + SPORT_ROW_BLEED), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Row(Modifier.height(22.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Text(stringResource(R.string.iptv_sport_fixtures), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold,
+                        color = NuvioTheme.colors.TextPrimary, maxLines = 1)
+                    if (state.loading && message != null) RowMessage(message, false)
                 }
-                .onFocusChanged { if (!it.hasFocus && lastKey == AndroidKeyEvent.KEYCODE_DPAD_DOWN) viewModel.focusFixture(null) }
-                .focusProperties { onEnter = { if (blocked) cancelFocusChange() } }
-                .focusGroup(), state = rowsState, contentPadding = PaddingValues(bottom = SPORT_ROW_BLEED), verticalArrangement = Arrangement.spacedBy(SPORT_ROW_GAP)) {
-                var slot = 0
-                state.rows.forEachIndexed { index, row ->
-                    val at = slot++
-                    item(key = row.key) {
-                        SportSlot(at, rowsState, inner, onFocus = { lastSlot = at }) {
-                            SportFixtureRow(row, state, playingId, message.takeIf { index == 0 && state.failed }, onRail, blocked, restore.takeIf { at == lastSlot },
-                                onScores = if (index == 0) ({ viewModel.prompt(IptvSportPrompt.Scores) }) else null,
-                                onFocused = { viewModel.focusFixture(it.fixture.key) }, onClick = { open(it) }, onHold = { hold(it) }, onMenu = { options(it) })
-                        }
+                if (state.loading) SportCardsPlaceholder(cardWidth, perRow)
+                else Row(Modifier.fillMaxWidth().height(SPORT_CARD_HEIGHT).iptvPanel(SportCardShape).padding(horizontal = 24.dp),
+                    verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                    Icon(Icons.Filled.SportsSoccer, null, Modifier.size(32.dp), tint = NuvioTheme.colors.TextTertiary)
+                    if (message != null) Text(stringResource(message), style = MaterialTheme.typography.bodyMedium, maxLines = 2, overflow = TextOverflow.Ellipsis,
+                        color = if (warning) NuvioTheme.colors.Error else NuvioTheme.colors.TextSecondary)
+                }
+            }
+        } else {
+            val window = remember(now / TIMELINE_HOUR_MILLIS) { sportTimelineWindow(now) }
+            val lanes = remember(state.rows, window) { SportsTimeline.lanes(state.items.map { it.fixture }, window.first, window.second) }
+            val shelves = remember(state.rows, state.favourites, perRow) { sportShelves(state, perRow) }
+            var lastKey by remember { mutableIntStateOf(0) }
+            var lastSlot by remember { mutableIntStateOf(0) }
+            val slots = shelves.size + if (lanes.isNotEmpty()) 1 else 0
+            val rowsState = rememberLazyListState()
+            val inner = LocalBringIntoViewSpec.current
+            CompositionLocalProvider(LocalBringIntoViewSpec provides SportRowsSpec) {
+                LazyColumn(Modifier.fillMaxWidth().height(SPORT_ROW_HEIGHT + SPORT_ROW_BLEED)
+                    .onPreviewKeyEvent { event ->
+                        val native = event.nativeKeyEvent
+                        if (native.action == AndroidKeyEvent.ACTION_DOWN) lastKey = native.keyCode
+                        toggle != null && native.keyCode == AndroidKeyEvent.KEYCODE_DPAD_DOWN && native.action == AndroidKeyEvent.ACTION_DOWN && lastSlot >= slots - 1 &&
+                            runCatching { toggle.requestFocus(FocusDirection.Enter) }.getOrDefault(false)
                     }
-                    if (index == 0 && lanes.isNotEmpty()) {
-                        val ruler = slot++
-                        item(key = TIMELINE_KEY) {
-                            SportSlot(ruler, rowsState, inner, restore.takeIf { ruler == lastSlot }, onFocus = { lastSlot = ruler }) {
-                                IptvSportTimeline(lanes, window, now, state, playingId, Modifier.fillMaxWidth().height(SPORT_ROW_HEIGHT), onRail,
-                                    onFocused = { viewModel.focusFixture(it.fixture.key) }, onOpen = { open(it) }, onHold = { hold(it) }, onMenu = { options(it) })
+                    .onFocusChanged { if (!it.hasFocus && lastKey == AndroidKeyEvent.KEYCODE_DPAD_DOWN) viewModel.focusFixture(null) }
+                    .focusProperties { onEnter = { if (blocked) cancelFocusChange() } }
+                    .focusGroup(), state = rowsState, contentPadding = PaddingValues(bottom = SPORT_ROW_BLEED), verticalArrangement = Arrangement.spacedBy(SPORT_ROW_GAP)) {
+                    var slot = 0
+                    shelves.forEachIndexed { index, shelf ->
+                        val at = slot++
+                        item(key = shelf.row.key) {
+                            SportSlot(at, rowsState, inner, onFocus = { lastSlot = at }) {
+                                SportFixtureRow(shelf, cardWidth, state, playingId, message.takeIf { index == 0 && state.failed }, onRail, blocked, restore.takeIf { at == lastSlot },
+                                    onScores = if (index == 0) ({ viewModel.prompt(IptvSportPrompt.Scores) }) else null,
+                                    onFocused = { viewModel.focusFixture(it.fixture.key) }, onClick = { open(it) }, onHold = { hold(it) }, onMenu = { options(it) })
+                            }
+                        }
+                        if (index == 0 && lanes.isNotEmpty()) {
+                            val ruler = slot++
+                            item(key = TIMELINE_KEY) {
+                                SportSlot(ruler, rowsState, inner, restore.takeIf { ruler == lastSlot }, onFocus = { lastSlot = ruler }) {
+                                    IptvSportTimeline(lanes, window, now, state, playingId, Modifier.fillMaxWidth().height(SPORT_ROW_HEIGHT), onRail,
+                                        onFocused = { viewModel.focusFixture(it.fixture.key) }, onOpen = { open(it) }, onHold = { hold(it) }, onMenu = { options(it) })
+                                }
                             }
                         }
                     }
@@ -507,14 +547,35 @@ private fun RowMessage(message: Int, warning: Boolean) {
         color = if (warning) NuvioTheme.colors.Error else NuvioTheme.colors.TextSecondary)
 }
 
+internal class IptvSportShelf(val row: IptvFixtureRow, val segments: List<Pair<SportsFill, List<IptvFixtureItem>>>) {
+    val items: List<IptvFixtureItem> = row.items + segments.flatMap { it.second }
+}
+
+private fun sportShelves(state: IptvFixturesState, perRow: Int): List<IptvSportShelf> {
+    val rows = state.rows.associateBy { it.key }
+    val items = state.rows.flatMap { it.items }.associateBy { it.fixture.key }
+    return SportsPage.shelves(state.rows.map { row -> FixtureRow(row.section, row.items.map { it.fixture }, row.day) }, perRow, state.favourites, System.currentTimeMillis())
+        .mapNotNull { shelf ->
+            val row = rows["${shelf.row.section.name}:${shelf.row.day ?: ""}"] ?: return@mapNotNull null
+            IptvSportShelf(row, shelf.segments.map { segment -> segment.kind to segment.fixtures.mapNotNull { items[it.key] } }.filter { it.second.isNotEmpty() })
+        }
+}
+
 @Composable
-private fun SportFixtureRow(row: IptvFixtureRow, state: IptvFixturesState, playingId: String?, message: Int?, onRail: () -> Unit, blocked: Boolean,
+private fun SportFixtureRow(shelf: IptvSportShelf, cardWidth: Dp, state: IptvFixturesState, playingId: String?, message: Int?, onRail: () -> Unit, blocked: Boolean,
     restore: FocusRequester?, onScores: (() -> Unit)?,
     onFocused: (IptvFixtureItem) -> Unit, onClick: (IptvFixtureItem) -> Unit, onHold: (IptvFixtureItem) -> Unit, onMenu: (IptvFixtureItem) -> Unit) {
+    val row = shelf.row
+    val cards = shelf.items
     val listState = rememberLazyListState()
     var lastFocused by remember(row.key) { mutableIntStateOf(0) }
     val requesters = remember(row.key) { mutableMapOf<Int, FocusRequester>() }
     fun requester(index: Int) = requesters.getOrPut(index) { FocusRequester() }
+    val positions = remember(cards) { cards.withIndex().associate { it.value.fixture.key to it.index } }
+    val starts = remember(shelf) {
+        var at = row.items.size
+        shelf.segments.associate { (kind, items) -> val start = at; at += items.size; start to (kind to items.size) }
+    }
     Column(Modifier.fillMaxWidth().height(SPORT_ROW_HEIGHT), verticalArrangement = Arrangement.spacedBy(6.dp)) {
         Row(Modifier.height(22.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             if (row.section == FixtureSection.LIVE) Box(Modifier.size(8.dp).clip(CircleShape).background(NuvioTheme.colors.Error))
@@ -526,7 +587,7 @@ private fun SportFixtureRow(row: IptvFixtureRow, state: IptvFixturesState, playi
         }
         LazyRow(state = listState, modifier = Modifier.fillMaxWidth()
             .focusRestorer {
-                val visible = listState.layoutInfo.visibleItemsInfo.map { it.index }
+                val visible = listState.layoutInfo.visibleItemsInfo.mapNotNull { info -> (info.key as? String)?.let(positions::get) }
                 val index = lastFocused.takeIf { it in visible } ?: visible.firstOrNull()
                 index?.let { requesters[it] } ?: FocusRequester.Default
             }
@@ -536,13 +597,33 @@ private fun SportFixtureRow(row: IptvFixtureRow, state: IptvFixturesState, playi
                 val left = native.keyCode == AndroidKeyEvent.KEYCODE_DPAD_LEFT && lastFocused == 0
                 if (left && native.action == AndroidKeyEvent.ACTION_DOWN && native.repeatCount == 0) onRail()
                 left
-            }, contentPadding = PaddingValues(horizontal = 4.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            itemsIndexed(row.items, key = { _, item -> item.fixture.key }) { index, item ->
-                SportFixtureCard(item, state.hidden(item.fixture), state.spoiler(item.fixture), state.favourites, item.fixture.key in state.reminders,
-                    playing = item.links.any { it.row.item.channel.id == playingId },
-                    modifier = Modifier.focusRequester(requester(index)).then(if (restore != null && index == lastFocused) Modifier.focusRequester(restore) else Modifier),
-                    onFocused = { lastFocused = index; onFocused(item) }, onClick = { onClick(item) }, onHold = { onHold(item) }, onMenu = { onMenu(item) }, blocked = blocked)
+            }, contentPadding = PaddingValues(horizontal = SPORT_ROW_PADDING), horizontalArrangement = Arrangement.spacedBy(SportsPage.CARD_GAP_DP.dp)) {
+            cards.forEachIndexed { index, entry ->
+                starts[index]?.let { (kind, count) -> item(key = "\u0000fill:${kind.name}") { FillLabel(kind, count) } }
+                item(key = entry.fixture.key) {
+                    SportFixtureCard(entry, state.hidden(entry.fixture), state.spoiler(entry.fixture), state.favourites, entry.fixture.key in state.reminders,
+                        playing = entry.links.any { it.row.item.channel.id == playingId },
+                        modifier = Modifier.focusRequester(requester(index)).then(if (restore != null && index == lastFocused) Modifier.focusRequester(restore) else Modifier),
+                        onFocused = { lastFocused = index; onFocused(entry) }, onClick = { onClick(entry) }, onHold = { onHold(entry) }, onMenu = { onMenu(entry) },
+                        blocked = blocked, width = cardWidth)
+                }
             }
+        }
+    }
+}
+
+@Composable
+private fun FillLabel(kind: SportsFill, count: Int) {
+    Row(Modifier.width(FILL_LABEL_WIDTH).height(SPORT_CARD_HEIGHT).padding(vertical = 10.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+        Box(Modifier.width(2.dp).fillMaxHeight().clip(SportPlaceholderShape).background(NuvioTheme.colors.TextPrimary.copy(alpha = .16f)))
+        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Text(stringResource(when (kind) {
+                SportsFill.LATER -> R.string.iptv_sport_later_today
+                SportsFill.RESULTS -> R.string.iptv_ui20_sport_fill_results
+                SportsFill.TOMORROW -> R.string.iptv_sport_tomorrow
+                SportsFill.TEAMS_NEXT -> R.string.iptv_ui20_sport_fill_teams_next
+            }), style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.SemiBold, color = NuvioTheme.colors.TextSecondary, maxLines = 3)
+            Text("$count", style = MaterialTheme.typography.labelMedium, color = NuvioTheme.colors.TextTertiary, maxLines = 1)
         }
     }
 }
@@ -647,11 +728,11 @@ internal fun FixtureChannelsDialog(item: IptvFixtureItem, onWatch: (IptvListedCh
 }
 
 @Composable
-private fun SportCardsPlaceholder() {
+private fun SportCardsPlaceholder(cardWidth: Dp, count: Int) {
     val brush = rememberShimmerBrush(backdropAware = LocalV2Appearance.current != null)
-    Row(Modifier.fillMaxWidth().padding(horizontal = 4.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-        repeat(PLACEHOLDER_CARDS) {
-            Column(Modifier.width(SPORT_CARD_WIDTH).height(SPORT_CARD_HEIGHT).clip(SportCardShape)
+    Row(Modifier.fillMaxWidth().padding(horizontal = SPORT_ROW_PADDING), horizontalArrangement = Arrangement.spacedBy(SportsPage.CARD_GAP_DP.dp)) {
+        repeat(count) {
+            Column(Modifier.width(cardWidth).height(SPORT_CARD_HEIGHT).clip(SportCardShape)
                 .background(NuvioTheme.colors.TextPrimary.copy(alpha = .05f), SportCardShape)
                 .border(1.dp, NuvioTheme.colors.TextPrimary.copy(alpha = .08f), SportCardShape)) {
                 Box(Modifier.padding(start = 12.dp, top = 10.dp).width(72.dp).height(10.dp).clip(SportPlaceholderShape).background(brush))
@@ -680,7 +761,8 @@ internal val SportPlaceholderShape = RoundedCornerShape(4.dp)
 private val SPORT_ROW_HEIGHT = 168.dp
 private val SPORT_ROW_GAP = 12.dp
 private val SPORT_ROW_BLEED = 8.dp
-private const val PLACEHOLDER_CARDS = 6
+private val SPORT_ROW_PADDING = 4.dp
+private val FILL_LABEL_WIDTH = 96.dp
 private const val TICK_MILLIS = 60_000L
 private const val TIMELINE_KEY = "\u0000timeline"
 private const val FOLLOW_GOLFERS = 5

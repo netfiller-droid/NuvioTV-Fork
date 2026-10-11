@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui20_multiview_labels">Kanal in oddaja</string>
+    <string name="iptv_ui20_multiview_labels_description">Na dnu vsake slike prikaže kanal in trenutno oddajo. Rezultati v živo so še vedno prikazani na slikah, povezanih s tekmo.</string>
+    <string name="iptv_ui20_multiview_labels_always">Vedno</string>
+    <string name="iptv_ui20_multiview_labels_focused">Samo izbrana slika</string>
+    <string name="iptv_ui20_multiview_labels_off">Izklopljeno</string>
+    <string name="iptv_ui20_multiview_score_hide">Skrij rezultat na tej sliki</string>
+    <string name="iptv_ui20_multiview_score_show">Pokaži rezultat na tej sliki</string>
+</resources>

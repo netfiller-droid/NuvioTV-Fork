@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui20_sport_fill_results">Sớm hơn hôm nay</string>
+    <string name="iptv_ui20_sport_fill_teams_next">Trận tiếp theo của đội bạn</string>
+    <plurals name="iptv_ui20_sport_more_feeds">
+        <item quantity="other">+%d kênh</item>
+    </plurals>
+    <string name="iptv_ui20_sport_in_hours_minutes">sau %1$d giờ %2$d phút</string>
+    <string name="iptv_ui20_sport_in_hours">sau %1$d giờ</string>
+    <string name="iptv_ui20_sport_in_minutes">sau %1$d phút</string>
+    <plurals name="iptv_ui20_sport_in_days">
+        <item quantity="other">sau %d ngày</item>
+    </plurals>
+    <string name="iptv_ui20_sport_full_time">Hết giờ</string>
+    <string name="iptv_ui20_sport_last_met">Lần gặp gần nhất</string>
+    <string name="iptv_ui20_sport_points">%1$s điểm</string>
+</resources>

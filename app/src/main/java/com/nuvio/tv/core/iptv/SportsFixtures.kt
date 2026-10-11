@@ -13,7 +13,7 @@ enum class FixtureSection { LIVE, CLOSE, TODAY, TOMORROW, DAY, FINISHED }
 enum class FixtureSide { HOME, AWAY }
 
 data class FixtureTeam(val name: String, val shortName: String? = null, val abbreviation: String? = null, val alternatives: List<String> = emptyList(),
-    val logo: String? = null, val colour: String? = null, val record: String? = null) {
+    val logo: String? = null, val colour: String? = null, val record: String? = null, val form: String? = null) {
     val strongNames: List<String> get() = listOfNotNull(name, shortName).filter(String::isNotBlank).distinct()
     val weakNames: List<String> get() = (alternatives + listOfNotNull(abbreviation)).filter(String::isNotBlank).distinct() - strongNames.toSet()
 }
@@ -534,7 +534,7 @@ object SportsFixtureCodec {
     private fun team(team: FixtureTeam) = JSONObject().apply {
         put("name", team.name); team.shortName?.let { put("short", it) }; team.abbreviation?.let { put("abbreviation", it) }
         put("alternatives", JSONArray(team.alternatives))
-        team.logo?.let { put("logo", it) }; team.colour?.let { put("colour", it) }; team.record?.let { put("record", it) }
+        team.logo?.let { put("logo", it) }; team.colour?.let { put("colour", it) }; team.record?.let { put("record", it) }; team.form?.let { put("form", it) }
     }
 
     private fun event(event: FixtureEvent) = JSONObject().apply {
@@ -569,7 +569,8 @@ object SportsFixtureCodec {
     }
 
     private fun team(json: JSONObject): FixtureTeam? =
-        json.text("name")?.let { FixtureTeam(it, json.text("short"), json.text("abbreviation"), json.strings("alternatives"), json.text("logo"), json.text("colour"), json.text("record")) }
+        json.text("name")?.let { FixtureTeam(it, json.text("short"), json.text("abbreviation"), json.strings("alternatives"), json.text("logo"), json.text("colour"), json.text("record"),
+            json.text("form")?.takeIf { it.length <= 10 && it.all { c -> c in "WDLT" } }) }
 
     private fun line(json: JSONObject) = FixtureLine(json.text("score"), json.strings("periods"))
 

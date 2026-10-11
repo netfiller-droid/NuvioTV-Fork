@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui20_sport_fill_results">في وقت سابق اليوم</string>
+    <string name="iptv_ui20_sport_fill_teams_next">مباريات فرقك القادمة</string>
+    <plurals name="iptv_ui20_sport_more_feeds">
+        <item quantity="zero">+%d قناة</item>
+        <item quantity="one">+قناة واحدة</item>
+        <item quantity="two">+قناتان</item>
+        <item quantity="few">+%d قنوات</item>
+        <item quantity="many">+%d قناة</item>
+        <item quantity="other">+%d قناة</item>
+    </plurals>
+    <string name="iptv_ui20_sport_in_hours_minutes">بعد %1$d س %2$d د</string>
+    <string name="iptv_ui20_sport_in_hours">بعد %1$d س</string>
+    <string name="iptv_ui20_sport_in_minutes">بعد %1$d د</string>
+    <plurals name="iptv_ui20_sport_in_days">
+        <item quantity="zero">بعد %d يوم</item>
+        <item quantity="one">بعد يوم واحد</item>
+        <item quantity="two">بعد يومين</item>
+        <item quantity="few">بعد %d أيام</item>
+        <item quantity="many">بعد %d يومًا</item>
+        <item quantity="other">بعد %d يوم</item>
+    </plurals>
+    <string name="iptv_ui20_sport_full_time">نهاية</string>
+    <string name="iptv_ui20_sport_last_met">آخر لقاء</string>
+    <string name="iptv_ui20_sport_points">%1$s نقطة</string>
+</resources>

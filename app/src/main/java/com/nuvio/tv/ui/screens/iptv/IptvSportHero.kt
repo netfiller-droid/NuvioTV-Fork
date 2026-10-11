@@ -1,6 +1,7 @@
 @file:OptIn(androidx.tv.material3.ExperimentalTvMaterial3Api::class)
 package com.nuvio.tv.ui.screens.iptv
 
+import android.icu.text.RuleBasedNumberFormat
 import android.view.KeyEvent as AndroidKeyEvent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -37,12 +38,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -57,6 +63,7 @@ import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import com.nuvio.tv.R
 import com.nuvio.tv.core.iptv.FixtureSide
+import com.nuvio.tv.core.iptv.FormMark
 import com.nuvio.tv.core.iptv.FixtureStatus
 import com.nuvio.tv.core.iptv.FixtureTeam
 import com.nuvio.tv.core.iptv.PeriodName
@@ -65,6 +72,10 @@ import com.nuvio.tv.core.iptv.SportsFixture
 import com.nuvio.tv.core.iptv.SportsFixtureText
 import com.nuvio.tv.core.iptv.SportsGoalies
 import com.nuvio.tv.core.iptv.SportsLedger
+import com.nuvio.tv.core.iptv.SportsMeeting
+import com.nuvio.tv.core.iptv.SportsPage
+import com.nuvio.tv.core.iptv.SportsRecords
+import com.nuvio.tv.core.iptv.SportsStanding
 import com.nuvio.tv.core.iptv.SportsSummary
 import com.nuvio.tv.data.iptv.IptvFixtureLink
 import com.nuvio.tv.ui.components.rememberShimmerBrush
@@ -82,17 +93,21 @@ internal fun IptvSportHero(active: Boolean, modifier: Modifier, blocked: Boolean
     val state by viewModel.state.collectAsStateWithLifecycle()
     val key by viewModel.hero.collectAsStateWithLifecycle()
     val summary by viewModel.summary.collectAsStateWithLifecycle()
+    val preview by viewModel.preview.collectAsStateWithLifecycle()
     val item = when (val wanted = key) {
         null -> null
         IptvSportsFixturesViewModel.FEATURED -> state.rows.firstOrNull()?.items?.firstOrNull()
         else -> state.item(wanted)
     }
     val watched = item?.fixture?.takeIf { it.status == FixtureStatus.LIVE && !state.hidden(it) && it.teams && (it.sport == "soccer" || it.sport == "ice-hockey") }
+    val upcoming = item?.takeIf { !it.scheduleOnly }?.fixture?.takeIf { it.status == FixtureStatus.SCHEDULED && it.teams }
     LaunchedEffect(watched?.key) { viewModel.watchSummary(watched) }
-    DisposableEffect(viewModel) { onDispose { viewModel.watchSummary(null) } }
+    LaunchedEffect(upcoming?.key) { viewModel.pregame(upcoming) }
+    DisposableEffect(viewModel) { onDispose { viewModel.watchSummary(null); viewModel.pregame(null) } }
     when {
         !state.enabled -> fallback(modifier)
-        item != null -> SportHero(item, state, summary?.takeIf { watched != null && it.eventId == watched.id }, modifier,
+        item != null -> SportHero(item, state, summary?.takeIf { watched != null && it.eventId == watched.id }
+            ?: preview?.takeIf { upcoming != null && it.eventId == upcoming.id }, modifier,
             onWatch = { links -> if (links.size == 1) viewModel.prompt(IptvSportPrompt.Watch(links.first().row)) else viewModel.prompt(IptvSportPrompt.Channels(item.fixture.key)) },
             onFeeds = { viewModel.prompt(IptvSportPrompt.Channels(item.fixture.key)) }, onFollow = { viewModel.prompt(IptvSportPrompt.Options(item.fixture.key)) },
             onRemind = { viewModel.toggleReminder(item.fixture) }, blocked = blocked)
@@ -124,7 +139,7 @@ private fun SportHeroPlaceholder(modifier: Modifier) {
     }
 }
 
-private class Clock(val label: String?, val big: String?, val sentence: String?)
+private class Clock(val label: String?, val big: String?, val sentence: String?, val variants: List<String> = emptyList())
 
 @Composable
 private fun SportHero(item: IptvFixtureItem, state: IptvFixturesState, summary: SportsSummary?, modifier: Modifier, onWatch: (List<IptvFixtureLink>) -> Unit,
@@ -137,7 +152,7 @@ private fun SportHero(item: IptvFixtureItem, state: IptvFixturesState, summary: 
     BoxWithConstraints(modifier.iptvPanel().padding(horizontal = 20.dp, vertical = 12.dp)) {
         val compact = maxHeight < COMPACT_HEIGHT
         Column(Modifier.fillMaxWidth().fillMaxHeight()) {
-            Box(Modifier.fillMaxWidth().height(2.dp).background(NuvioTheme.colors.TextPrimary))
+            HeroRule(fixture)
             Spacer(Modifier.height(if (compact) 8.dp else 12.dp))
             Row(Modifier.fillMaxWidth().weight(1f)) {
                 Column(Modifier.weight(1f).fillMaxHeight(), verticalArrangement = Arrangement.spacedBy(if (compact) 6.dp else 10.dp)) {
@@ -165,7 +180,9 @@ private fun SportHero(item: IptvFixtureItem, state: IptvFixturesState, summary: 
                             if (bases != null) BasesDiamond(bases.first, bases.second, bases.third, 24.dp)
                         }
                     }
-                    clock.sentence?.let {
+                    if (clock.variants.isNotEmpty()) SportFitPlain(clock.variants, MaterialTheme.typography.bodySmall, NuvioTheme.colors.TextSecondary,
+                        Modifier.weight(1f), maxLines = if (compact) 1 else 3)
+                    else clock.sentence?.let {
                         Text(it, style = MaterialTheme.typography.bodySmall, color = NuvioTheme.colors.TextSecondary, maxLines = if (compact) 1 else 3,
                             overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
                     } ?: Spacer(Modifier.weight(1f))
@@ -173,6 +190,22 @@ private fun SportHero(item: IptvFixtureItem, state: IptvFixturesState, summary: 
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun HeroRule(fixture: SportsFixture) {
+    val base = NuvioTheme.colors.BackgroundCard.toArgb()
+    val awayFirst = SportsFixtureText.awayFirst(fixture)
+    val first = (if (awayFirst) fixture.away else fixture.home)?.colour
+    val second = (if (awayFirst) fixture.home else fixture.away)?.colour
+    val colours = remember(first, second, base) { SportsPage.ruleColours(first, second, base) }
+    val rule = Modifier.fillMaxWidth().height(2.dp)
+    if (colours == null) Box(rule.background(NuvioTheme.colors.TextPrimary))
+    else {
+        val a = Color(colours.first)
+        val b = Color(colours.second)
+        Box(rule.clip(RuleShape).background(Brush.horizontalGradient(0f to a, .42f to a, .58f to b, 1f to b)))
     }
 }
 
@@ -292,10 +325,13 @@ private fun TeamsLedger(item: IptvFixtureItem, home: FixtureTeam, away: FixtureT
     val big = if (compact) 44.sp else 60.sp
     val built = remember(fixture, summary) { SportsStrip.build(fixture, summary) }
     val strip = !hidden && live && built != null && (fixture.situation?.homeWinPercent == null || summary != null)
+    val facts = remember(fixture, summary, awayFirst) { if (scheduled && !item.scheduleOnly) preGame(fixture, first, second, awayFirst, summary) else null }
+    val teams = facts == null || facts.meetingOnly
     Column(modifier, verticalArrangement = Arrangement.spacedBy(if (compact) 6.dp else 10.dp)) {
-        Box(Modifier.fillMaxWidth().weight(1f), contentAlignment = Alignment.BottomStart) {
+        if (facts != null) PreGameFacts(fixture, first, second, facts, Modifier.fillMaxWidth().weight(1f))
+        Box(if (facts != null) Modifier.fillMaxWidth() else Modifier.fillMaxWidth().weight(1f), contentAlignment = Alignment.BottomStart) {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.spacedBy(if (compact) 10.dp else 14.dp)) {
-                LedgerTeam(first, fixture.sport, scheduled, compact, ball == first, Modifier.weight(1f, fill = false))
+                LedgerTeam(first, fixture.sport, scheduled && teams, compact, ball == first, Modifier.weight(1f, fill = false))
                 when {
                     scores != null && hidden -> MaskBar(if (compact) 90.dp else 120.dp, Modifier.padding(bottom = 10.dp))
                     scores != null -> {
@@ -308,13 +344,98 @@ private fun TeamsLedger(item: IptvFixtureItem, home: FixtureTeam, away: FixtureT
                         color = NuvioTheme.colors.TextTertiary, maxLines = 1, modifier = Modifier.padding(bottom = 8.dp))
                     else -> Text("v", style = ledgerNumerals(big * .5f), color = NuvioTheme.colors.TextTertiary, maxLines = 1)
                 }
-                LedgerTeam(second, fixture.sport, scheduled, compact, ball == second, Modifier.weight(1f, fill = false))
+                LedgerTeam(second, fixture.sport, scheduled && teams, compact, ball == second, Modifier.weight(1f, fill = false))
             }
         }
         if (strip) SportHeroStrip(fixture, summary, Modifier.fillMaxWidth())
         else if (!compact && scores != null && !hidden) PeriodTable(fixture, first, second, awayFirst)
     }
 }
+
+private class PreGame(val firstForm: List<FormMark>?, val secondForm: List<FormMark>?, val firstStanding: SportsStanding?, val secondStanding: SportsStanding?,
+    val meeting: SportsMeeting?, val records: Boolean) {
+    val meetingOnly: Boolean get() = firstForm == null && secondForm == null && firstStanding == null && secondStanding == null && !records
+}
+
+private fun preGame(fixture: SportsFixture, first: FixtureTeam, second: FixtureTeam, awayFirst: Boolean, summary: SportsSummary?): PreGame? {
+    val firstSide = if (awayFirst) FixtureSide.AWAY else FixtureSide.HOME
+    val secondSide = if (awayFirst) FixtureSide.HOME else FixtureSide.AWAY
+    val records = SportsRecords.parse(fixture.sport, first.record) != null || SportsRecords.parse(fixture.sport, second.record) != null
+    val facts = PreGame(SportsPage.form(teamForm(first)), SportsPage.form(teamForm(second)), SportsPage.standing(summary, firstSide),
+        SportsPage.standing(summary, secondSide), SportsPage.lastMeeting(summary, firstSide), records)
+    return facts.takeIf { !it.meetingOnly || it.meeting != null }
+}
+
+private fun teamForm(team: FixtureTeam): String? = team.form
+
+@Composable
+private fun PreGameFacts(fixture: SportsFixture, first: FixtureTeam, second: FixtureTeam, facts: PreGame, modifier: Modifier) {
+    BoxWithConstraints(modifier) {
+        val lines = ((maxHeight + FACT_GAP) / (FACT_LINE + FACT_GAP)).toInt()
+        val teams = !facts.meetingOnly && lines >= 2
+        val meeting = facts.meeting?.takeIf { lines >= if (teams) 3 else 1 }
+        Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(FACT_GAP)) {
+            if (teams) {
+                FactRow(fixture, first, facts.firstForm, facts.firstStanding)
+                FactRow(fixture, second, facts.secondForm, facts.secondStanding)
+            }
+            if (meeting != null) MeetingRow(first, second, meeting)
+        }
+    }
+}
+
+@Composable
+private fun FactRow(fixture: SportsFixture, team: FixtureTeam, form: List<FormMark>?, standing: SportsStanding?) {
+    Row(Modifier.fillMaxWidth().height(FACT_LINE), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        TeamLogo(team, 16.dp)
+        Text(SportsLedger.code(team) ?: team.shortName ?: team.name, style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.SemiBold,
+            color = NuvioTheme.colors.TextPrimary, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.width(FACT_CODE))
+        if (form != null) FormMarks(form)
+        else sportRecord(fixture.sport, team.record)?.let {
+            Text(it, style = MaterialTheme.typography.labelMedium.copy(fontFeatureSettings = "tnum"), color = NuvioTheme.colors.TextSecondary, maxLines = 1)
+        }
+        standing?.let { place ->
+            val points = place.points?.let { stringResource(R.string.iptv_ui20_sport_points, it) }
+            val position = place.position?.let { ordinal(it) }
+            SportFitPlain(listOfNotNull(listOfNotNull(position, points).joinToString(" · "), position, points), MaterialTheme.typography.labelMedium,
+                NuvioTheme.colors.TextTertiary, Modifier.weight(1f, fill = false))
+        }
+    }
+}
+
+@Composable
+private fun FormMarks(form: List<FormMark>) {
+    Row(horizontalArrangement = Arrangement.spacedBy(3.dp), verticalAlignment = Alignment.CenterVertically) {
+        form.forEach { mark ->
+            Box(Modifier.size(FORM_MARK).clip(FormShape).background(when (mark) {
+                FormMark.WIN -> NuvioTheme.colors.Success
+                FormMark.DRAW -> NuvioTheme.colors.TextTertiary
+                FormMark.LOSS -> NuvioTheme.colors.Error
+            }))
+        }
+    }
+}
+
+@Composable
+private fun MeetingRow(first: FixtureTeam, second: FixtureTeam, meeting: SportsMeeting) {
+    val label = stringResource(R.string.iptv_ui20_sport_last_met)
+    val date = meeting.dateMillis?.let { sportDate(Instant.ofEpochMilli(it).atZone(ZoneId.systemDefault()).toLocalDate(), "dMMMyyyy") }
+    val score = "${SportsLedger.code(first) ?: first.shortName ?: first.name} ${meeting.first}–${meeting.second} ${SportsLedger.code(second) ?: second.shortName ?: second.name}"
+    val quiet = NuvioTheme.colors.TextTertiary
+    val strong = NuvioTheme.colors.TextPrimary
+    val variants = remember(label, date, score, quiet, strong) {
+        fun line(withLabel: Boolean, withDate: Boolean) = buildAnnotatedString {
+            if (withLabel) withStyle(SpanStyle(color = quiet)) { append(label); append("  ") }
+            if (withDate && date != null) withStyle(SpanStyle(color = quiet)) { append(date); append("  ·  ") }
+            withStyle(SpanStyle(color = strong, fontWeight = FontWeight.SemiBold)) { append(score) }
+        }
+        listOf(line(true, true), line(true, false), line(false, false)).distinct()
+    }
+    SportFitText(variants, MaterialTheme.typography.labelMedium.copy(fontFeatureSettings = "tnum"), strong, Modifier.fillMaxWidth().height(FACT_LINE))
+}
+
+private fun ordinal(value: Int): String = runCatching { RuleBasedNumberFormat(Locale.getDefault(), RuleBasedNumberFormat.ORDINAL).format(value.toLong()) }
+    .getOrDefault(value.toString())
 
 @Composable
 private fun LedgerTeam(team: FixtureTeam, sport: String, scheduled: Boolean, compact: Boolean, possession: Boolean, modifier: Modifier) {
@@ -402,9 +523,10 @@ private fun heroClock(fixture: SportsFixture, item: IptvFixtureItem, hidden: Boo
     val live = stringResource(R.string.iptv_sport_live)
     val detail = fixture.sportDetail.takeIf { !item.scheduleOnly }
     if (fixture.status == FixtureStatus.SCHEDULED) {
-        val broadcasters = fixture.broadcasters.takeIf { it.isNotEmpty() }?.let { stringResource(R.string.iptv_sport_broadcaster, it.joinToString(", ")) }
+        val lists = SportsPage.shortLists(fixture.broadcasters)
+        val variants = lists.map { stringResource(R.string.iptv_sport_broadcaster, it) } + lists
         val start = if (fixture.home != null && fixture.away != null && detail !is SportsDetail.Tennis) date else "$date · ${clock(fixture.startMillis)}"
-        return Clock(start, sportCountdown(now, fixture.startMillis), broadcasters)
+        return Clock(start, sportCountdown(now, fixture.startMillis), variants.firstOrNull(), variants)
     }
     if (fixture.status == FixtureStatus.FINAL) {
         val result = when (detail) {
@@ -504,23 +626,24 @@ private fun LedgerActions(item: IptvFixtureItem, reminded: Boolean, compact: Boo
     val crowded = listOf(feeds, follow, remind).count { it } > 2
     val small = if (compact) 24.dp else 26.dp
     Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(if (compact) 4.dp else 6.dp)) {
-        if (first != null) LedgerButton(stringResource(R.string.iptv_sport5_section_watch_on, channelName(first.row)), { onWatch(item.links) },
+        if (first != null) LedgerButton(listOf(stringResource(R.string.iptv_sport5_section_watch_on, channelName(first.row)), channelName(first.row)), { onWatch(item.links) },
             Modifier.fillMaxWidth(), primary = true, icon = Icons.Filled.PlayArrow, height = if (compact) 26.dp else 30.dp, blocked = blocked)
         else if (fixture.status != FixtureStatus.FINAL) Text(stringResource(if (item.linking) R.string.iptv_sport3_finding_channels else R.string.iptv_sport_no_channel),
             style = MaterialTheme.typography.labelMedium, color = NuvioTheme.colors.TextTertiary, maxLines = 1, overflow = TextOverflow.Ellipsis)
         if (feeds || follow || remind) Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-            if (feeds) LedgerButton(pluralStringResource(R.plurals.iptv_sport5_section_other_feeds, item.links.size - 1, item.links.size - 1), onFeeds,
-                Modifier.weight(1f, fill = false), height = small, blocked = blocked)
-            if (follow) LedgerButton(if (crowded) null else stringResource(if (item.favourite) R.string.iptv_sport5_section_following else R.string.iptv_sport5_section_follow),
-                onFollow, Modifier.weight(1f, fill = false), icon = if (item.favourite) Icons.Filled.Star else Icons.Filled.StarBorder, height = small, blocked = blocked)
-            if (remind) LedgerButton(if (crowded) null else stringResource(if (reminded) R.string.iptv_sport5_section_reminder_set else R.string.iptv_sport5_section_remind),
-                onRemind, Modifier.weight(1f, fill = false), icon = if (reminded) Icons.Filled.NotificationsActive else Icons.Filled.NotificationsNone, height = small, blocked = blocked)
+            val labelled = Modifier.weight(1f, fill = false)
+            if (feeds) LedgerButton(listOf(pluralStringResource(R.plurals.iptv_ui20_sport_more_feeds, item.links.size - 1, item.links.size - 1)), onFeeds,
+                labelled, height = small, blocked = blocked)
+            if (follow) LedgerButton(if (crowded) emptyList() else listOf(stringResource(if (item.favourite) R.string.iptv_sport5_section_following else R.string.iptv_sport5_section_follow)),
+                onFollow, if (crowded) Modifier else labelled, icon = if (item.favourite) Icons.Filled.Star else Icons.Filled.StarBorder, height = small, blocked = blocked)
+            if (remind) LedgerButton(if (crowded) emptyList() else listOf(stringResource(if (reminded) R.string.iptv_sport5_section_reminder_set else R.string.iptv_sport5_section_remind)),
+                onRemind, if (crowded) Modifier else labelled, icon = if (reminded) Icons.Filled.NotificationsActive else Icons.Filled.NotificationsNone, height = small, blocked = blocked)
         }
     }
 }
 
 @Composable
-private fun LedgerButton(text: String?, onClick: () -> Unit, modifier: Modifier = Modifier, primary: Boolean = false, icon: ImageVector? = null, height: Dp = 26.dp,
+private fun LedgerButton(texts: List<String>, onClick: () -> Unit, modifier: Modifier = Modifier, primary: Boolean = false, icon: ImageVector? = null, height: Dp = 26.dp,
     blocked: Boolean = false) {
     var focused by remember { mutableStateOf(false) }
     val content = if (primary && !focused) NuvioTheme.colors.Background else itemContent(focused)
@@ -536,12 +659,18 @@ private fun LedgerButton(text: String?, onClick: () -> Unit, modifier: Modifier 
         }
         .focusable(enabled = !blocked).padding(horizontal = 10.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
         if (icon != null) Icon(icon, null, Modifier.size(14.dp), tint = content)
-        if (text != null) Text(text, style = MaterialTheme.typography.labelMedium, fontWeight = if (primary) FontWeight.SemiBold else FontWeight.Normal, color = content,
-            maxLines = 1, overflow = TextOverflow.Ellipsis)
+        if (texts.isNotEmpty()) SportFitPlain(texts, MaterialTheme.typography.labelMedium.copy(fontWeight = if (primary) FontWeight.SemiBold else FontWeight.Normal),
+            content)
     }
 }
 
 private val LedgerButtonShape = RoundedCornerShape(6.dp)
+private val RuleShape = RoundedCornerShape(1.dp)
+private val FormShape = RoundedCornerShape(2.dp)
+private val FORM_MARK = 10.dp
+private val FACT_LINE = 18.dp
+private val FACT_GAP = 4.dp
+private val FACT_CODE = 44.dp
 private val HERO_SIDE = 236.dp
 private val COMPACT_HEIGHT = 196.dp
 private val TABLE_NAME = 64.dp

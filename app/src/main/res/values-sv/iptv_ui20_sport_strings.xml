@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui20_sport_fill_results">Tidigare i dag</string>
+    <string name="iptv_ui20_sport_fill_teams_next">Dina lags nästa matcher</string>
+    <plurals name="iptv_ui20_sport_more_feeds">
+        <item quantity="one">+%d kanal</item>
+        <item quantity="other">+%d kanaler</item>
+    </plurals>
+    <string name="iptv_ui20_sport_in_hours_minutes">om %1$d h %2$d min</string>
+    <string name="iptv_ui20_sport_in_hours">om %1$d h</string>
+    <string name="iptv_ui20_sport_in_minutes">om %1$d min</string>
+    <plurals name="iptv_ui20_sport_in_days">
+        <item quantity="one">om %d dag</item>
+        <item quantity="other">om %d dagar</item>
+    </plurals>
+    <string name="iptv_ui20_sport_full_time">Slut</string>
+    <string name="iptv_ui20_sport_last_met">Senaste mötet</string>
+    <string name="iptv_ui20_sport_points">%1$s p</string>
+</resources>

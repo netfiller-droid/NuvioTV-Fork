@@ -370,7 +370,7 @@ private fun centreItems(tab: CentreTab, fixture: SportsFixture, summary: SportsS
         CentreTab.TABLE -> buildList {
             summary?.tables?.firstOrNull()?.let { table ->
                 table.rows.forEachIndexed { i, row ->
-                    add(CentreItem.Line("${i + 1}  ${row.team}", row.stats.joinToString("  ") { "${it.first} ${it.second}" }, row.side != null, "t:$i"))
+                    add(CentreItem.Line("${row.rank ?: (i + 1)}  ${row.team}", row.stats.joinToString("  ") { "${it.first} ${it.second}" }, row.side != null, "t:$i"))
                 }
             }
             if (pointsText != null) add(CentreItem.Line(pointsText, null, true, "t:ends"))

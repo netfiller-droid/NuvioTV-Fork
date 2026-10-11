@@ -784,6 +784,21 @@ Sport data (third capture of 11 October, 11:03):
   instead of "Round 1".
 - College football: conversions and touchdowns read cleanly in the last plays.
 
+Sport page and multiview look (11 October; sized for 1080p and 4K screens):
+- Quiet days on the Sport page fill up with earlier results, tomorrow's games and your
+  teams' next games instead of leaving one card on its own.
+- Broadcaster names, the extra feeds button ("+5 feeds") and card footers shorten neatly
+  instead of being cut off.
+- Before kick-off the Sport hero shows each team's recent form as five marks, table
+  position and points, and the last meeting between them.
+- Game cards are sized to the screen, all the same height, with the live clock, kick-off
+  time or full-time mark always in the same corner.
+- The Sport hero's top line shows both teams' colours.
+- Multiview: pictures showing a live or about-to-start game get a slim score strip (crests,
+  score, clock or kick-off); it respects hidden scores and can be hidden per picture.
+- Multiview: a "Channel and programme" option (Always / Selected picture only / Off) shows
+  the channel and what's on, with progress, along the bottom of every picture.
+
 ## Ready below the UI (screens pending)
 
 - Provider account groups shared by several sources (each source has its own

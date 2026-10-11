@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui20_multiview_labels">Канал и передача</string>
+    <string name="iptv_ui20_multiview_labels_description">Показывает канал и текущую передачу внизу каждого изображения. Счёт в прямом эфире по-прежнему виден на изображениях, связанных с матчем.</string>
+    <string name="iptv_ui20_multiview_labels_always">Всегда</string>
+    <string name="iptv_ui20_multiview_labels_focused">Только выбранное изображение</string>
+    <string name="iptv_ui20_multiview_labels_off">Выкл.</string>
+    <string name="iptv_ui20_multiview_score_hide">Скрыть счёт на этом изображении</string>
+    <string name="iptv_ui20_multiview_score_show">Показать счёт на этом изображении</string>
+</resources>

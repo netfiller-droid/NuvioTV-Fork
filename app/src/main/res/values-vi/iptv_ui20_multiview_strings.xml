@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui20_multiview_labels">Kênh và chương trình</string>
+    <string name="iptv_ui20_multiview_labels_description">Hiển thị kênh và chương trình đang phát ở cuối mỗi khung hình. Tỉ số trực tiếp vẫn hiện trên các khung hình khớp với trận đấu.</string>
+    <string name="iptv_ui20_multiview_labels_always">Luôn luôn</string>
+    <string name="iptv_ui20_multiview_labels_focused">Chỉ khung đang chọn</string>
+    <string name="iptv_ui20_multiview_labels_off">Tắt</string>
+    <string name="iptv_ui20_multiview_score_hide">Ẩn tỉ số trên khung này</string>
+    <string name="iptv_ui20_multiview_score_show">Hiện tỉ số trên khung này</string>
+</resources>

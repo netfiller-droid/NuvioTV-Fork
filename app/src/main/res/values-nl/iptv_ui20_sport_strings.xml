@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui20_sport_fill_results">Eerder vandaag</string>
+    <string name="iptv_ui20_sport_fill_teams_next">Volgende wedstrijden van je teams</string>
+    <plurals name="iptv_ui20_sport_more_feeds">
+        <item quantity="one">+%d zender</item>
+        <item quantity="other">+%d zenders</item>
+    </plurals>
+    <string name="iptv_ui20_sport_in_hours_minutes">over %1$d u %2$d min</string>
+    <string name="iptv_ui20_sport_in_hours">over %1$d u</string>
+    <string name="iptv_ui20_sport_in_minutes">over %1$d min</string>
+    <plurals name="iptv_ui20_sport_in_days">
+        <item quantity="one">over %d dag</item>
+        <item quantity="other">over %d dagen</item>
+    </plurals>
+    <string name="iptv_ui20_sport_full_time">Einde</string>
+    <string name="iptv_ui20_sport_last_met">Laatste duel</string>
+    <string name="iptv_ui20_sport_points">%1$s ptn</string>
+</resources>

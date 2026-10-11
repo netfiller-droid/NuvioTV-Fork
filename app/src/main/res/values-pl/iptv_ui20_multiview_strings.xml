@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui20_multiview_labels">Kanał i program</string>
+    <string name="iptv_ui20_multiview_labels_description">Pokazuje kanał i bieżący program u dołu każdego obrazu. Wyniki na żywo nadal są widoczne na obrazach powiązanych z meczem.</string>
+    <string name="iptv_ui20_multiview_labels_always">Zawsze</string>
+    <string name="iptv_ui20_multiview_labels_focused">Tylko wybrany obraz</string>
+    <string name="iptv_ui20_multiview_labels_off">Wył.</string>
+    <string name="iptv_ui20_multiview_score_hide">Ukryj wynik w tym obrazie</string>
+    <string name="iptv_ui20_multiview_score_show">Pokaż wynik w tym obrazie</string>
+</resources>

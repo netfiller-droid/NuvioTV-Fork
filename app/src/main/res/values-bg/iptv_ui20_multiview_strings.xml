@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui20_multiview_labels">Канал и предаване</string>
+    <string name="iptv_ui20_multiview_labels_description">Показва канала и текущото предаване в долната част на всяка картина. Резултатите на живо остават на картините, свързани с мач.</string>
+    <string name="iptv_ui20_multiview_labels_always">Винаги</string>
+    <string name="iptv_ui20_multiview_labels_focused">Само избраната картина</string>
+    <string name="iptv_ui20_multiview_labels_off">Изключено</string>
+    <string name="iptv_ui20_multiview_score_hide">Скриване на резултата в тази картина</string>
+    <string name="iptv_ui20_multiview_score_show">Показване на резултата в тази картина</string>
+</resources>

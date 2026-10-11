@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui20_multiview_labels">Kanali dhe programi</string>
+    <string name="iptv_ui20_multiview_labels_description">Shfaq kanalin dhe programin aktual në fund të çdo figure. Rezultatet live vazhdojnë të shfaqen në figurat e lidhura me një ndeshje.</string>
+    <string name="iptv_ui20_multiview_labels_always">Gjithmonë</string>
+    <string name="iptv_ui20_multiview_labels_focused">Vetëm figura e zgjedhur</string>
+    <string name="iptv_ui20_multiview_labels_off">Joaktiv</string>
+    <string name="iptv_ui20_multiview_score_hide">Fshih rezultatin në këtë figurë</string>
+    <string name="iptv_ui20_multiview_score_show">Shfaq rezultatin në këtë figurë</string>
+</resources>

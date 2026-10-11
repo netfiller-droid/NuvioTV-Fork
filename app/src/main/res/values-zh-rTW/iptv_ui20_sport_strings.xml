@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui20_sport_fill_results">今天稍早</string>
+    <string name="iptv_ui20_sport_fill_teams_next">你關注球隊的下一場</string>
+    <plurals name="iptv_ui20_sport_more_feeds">
+        <item quantity="other">+%d 個頻道</item>
+    </plurals>
+    <string name="iptv_ui20_sport_in_hours_minutes">%1$d 小時 %2$d 分鐘後</string>
+    <string name="iptv_ui20_sport_in_hours">%1$d 小時後</string>
+    <string name="iptv_ui20_sport_in_minutes">%1$d 分鐘後</string>
+    <plurals name="iptv_ui20_sport_in_days">
+        <item quantity="other">%d 天後</item>
+    </plurals>
+    <string name="iptv_ui20_sport_full_time">完賽</string>
+    <string name="iptv_ui20_sport_last_met">上次交手</string>
+    <string name="iptv_ui20_sport_points">%1$s 分</string>
+</resources>

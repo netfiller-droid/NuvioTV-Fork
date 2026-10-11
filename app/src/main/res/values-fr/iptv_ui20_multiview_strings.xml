@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui20_multiview_labels">Chaîne et programme</string>
+    <string name="iptv_ui20_multiview_labels_description">Affiche la chaîne et le programme en cours en bas de chaque image. Les scores en direct restent affichés sur les images liées à un match.</string>
+    <string name="iptv_ui20_multiview_labels_always">Toujours</string>
+    <string name="iptv_ui20_multiview_labels_focused">Image sélectionnée uniquement</string>
+    <string name="iptv_ui20_multiview_labels_off">Désactivé</string>
+    <string name="iptv_ui20_multiview_score_hide">Masquer le score sur cette image</string>
+    <string name="iptv_ui20_multiview_score_show">Afficher le score sur cette image</string>
+</resources>

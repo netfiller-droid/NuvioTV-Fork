@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui20_multiview_labels">Kanalas ir laida</string>
+    <string name="iptv_ui20_multiview_labels_description">Kiekvieno vaizdo apačioje rodo kanalą ir dabar rodomą laidą. Su rungtynėmis susietuose vaizduose rezultatai ir toliau rodomi.</string>
+    <string name="iptv_ui20_multiview_labels_always">Visada</string>
+    <string name="iptv_ui20_multiview_labels_focused">Tik pasirinktas vaizdas</string>
+    <string name="iptv_ui20_multiview_labels_off">Išjungta</string>
+    <string name="iptv_ui20_multiview_score_hide">Slėpti rezultatą šiame vaizde</string>
+    <string name="iptv_ui20_multiview_score_show">Rodyti rezultatą šiame vaizde</string>
+</resources>

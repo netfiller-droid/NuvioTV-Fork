@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui20_multiview_labels">Channel and programme</string>
+    <string name="iptv_ui20_multiview_labels_description">Shows the channel and what\'s on along the bottom of each picture. Live scores still show on pictures matched to a game.</string>
+    <string name="iptv_ui20_multiview_labels_always">Always</string>
+    <string name="iptv_ui20_multiview_labels_focused">Selected picture only</string>
+    <string name="iptv_ui20_multiview_labels_off">Off</string>
+    <string name="iptv_ui20_multiview_score_hide">Hide score on this picture</string>
+    <string name="iptv_ui20_multiview_score_show">Show score on this picture</string>
+</resources>

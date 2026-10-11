@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui20_sport_fill_results">今日の終了分</string>
+    <string name="iptv_ui20_sport_fill_teams_next">フォロー中のチームの次の試合</string>
+    <plurals name="iptv_ui20_sport_more_feeds">
+        <item quantity="other">+%d チャンネル</item>
+    </plurals>
+    <string name="iptv_ui20_sport_in_hours_minutes">あと%1$d時間%2$d分</string>
+    <string name="iptv_ui20_sport_in_hours">あと%1$d時間</string>
+    <string name="iptv_ui20_sport_in_minutes">あと%1$d分</string>
+    <plurals name="iptv_ui20_sport_in_days">
+        <item quantity="other">あと%d日</item>
+    </plurals>
+    <string name="iptv_ui20_sport_full_time">終了</string>
+    <string name="iptv_ui20_sport_last_met">前回の対戦</string>
+    <string name="iptv_ui20_sport_points">%1$s pt</string>
+</resources>

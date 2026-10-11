@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui20_multiview_labels">Canale e programma</string>
+    <string name="iptv_ui20_multiview_labels_description">Mostra il canale e il programma in onda in basso in ogni riquadro. I punteggi dal vivo restano visibili sui riquadri associati a una partita.</string>
+    <string name="iptv_ui20_multiview_labels_always">Sempre</string>
+    <string name="iptv_ui20_multiview_labels_focused">Solo il riquadro selezionato</string>
+    <string name="iptv_ui20_multiview_labels_off">No</string>
+    <string name="iptv_ui20_multiview_score_hide">Nascondi punteggio in questo riquadro</string>
+    <string name="iptv_ui20_multiview_score_show">Mostra punteggio in questo riquadro</string>
+</resources>

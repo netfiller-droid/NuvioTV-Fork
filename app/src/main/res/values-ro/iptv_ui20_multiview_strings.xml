@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui20_multiview_labels">Canal și emisiune</string>
+    <string name="iptv_ui20_multiview_labels_description">Afișează canalul și ce rulează acum în partea de jos a fiecărei imagini. Scorurile live apar în continuare pe imaginile asociate unui meci.</string>
+    <string name="iptv_ui20_multiview_labels_always">Întotdeauna</string>
+    <string name="iptv_ui20_multiview_labels_focused">Doar imaginea selectată</string>
+    <string name="iptv_ui20_multiview_labels_off">Dezactivat</string>
+    <string name="iptv_ui20_multiview_score_hide">Ascunde scorul în această imagine</string>
+    <string name="iptv_ui20_multiview_score_show">Afișează scorul în această imagine</string>
+</resources>

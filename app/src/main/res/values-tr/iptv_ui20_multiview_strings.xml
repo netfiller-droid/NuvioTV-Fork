@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui20_multiview_labels">Kanal ve program</string>
+    <string name="iptv_ui20_multiview_labels_description">Her görüntünün altında kanalı ve yayındaki programı gösterir. Canlı skorlar bir maçla eşleşen görüntülerde görünmeye devam eder.</string>
+    <string name="iptv_ui20_multiview_labels_always">Her zaman</string>
+    <string name="iptv_ui20_multiview_labels_focused">Yalnızca seçili görüntü</string>
+    <string name="iptv_ui20_multiview_labels_off">Kapalı</string>
+    <string name="iptv_ui20_multiview_score_hide">Bu görüntüde skoru gizle</string>
+    <string name="iptv_ui20_multiview_score_show">Bu görüntüde skoru göster</string>
+</resources>

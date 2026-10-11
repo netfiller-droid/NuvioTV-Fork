@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui20_multiview_labels">Csatorna és műsor</string>
+    <string name="iptv_ui20_multiview_labels_description">Minden kép alján megjeleníti a csatornát és az aktuális műsort. Az élő eredmények a meccshez társított képeken továbbra is látszanak.</string>
+    <string name="iptv_ui20_multiview_labels_always">Mindig</string>
+    <string name="iptv_ui20_multiview_labels_focused">Csak a kijelölt kép</string>
+    <string name="iptv_ui20_multiview_labels_off">Ki</string>
+    <string name="iptv_ui20_multiview_score_hide">Eredmény elrejtése ezen a képen</string>
+    <string name="iptv_ui20_multiview_score_show">Eredmény megjelenítése ezen a képen</string>
+</resources>
