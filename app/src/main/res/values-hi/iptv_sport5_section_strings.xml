@@ -55,8 +55,4 @@
         <item quantity="one">%1$d आउट</item>
         <item quantity="other">%1$d आउट</item>
     </plurals>
-    <plurals name="iptv_sport5_section_other_feeds">
-        <item quantity="one">%1$d दूसरी फ़ीड</item>
-        <item quantity="other">%1$d दूसरी फ़ीड</item>
-    </plurals>
 </resources>

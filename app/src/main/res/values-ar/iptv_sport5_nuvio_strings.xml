@@ -44,7 +44,6 @@
     <string name="iptv_sport5_nuvio_start_early">ابدأ مبكرًا</string>
     <string name="iptv_sport5_nuvio_keep_going">استمر بعد النهاية</string>
     <string name="iptv_sport5_nuvio_live_tv_minutes">%1$d د (إعداد البث المباشر)</string>
-    <string name="iptv_sport5_nuvio_finals_minutes">%1$d د، +%2$d د في النهائيات</string>
     <string name="iptv_sport5_nuvio_save_to">الحفظ في</string>
     <string name="iptv_sport5_nuvio_live_tv_setting">إعداد البث المباشر</string>
     <string name="iptv_sport5_nuvio_no_channel_by">لا قناة حتى ضربة البداية</string>

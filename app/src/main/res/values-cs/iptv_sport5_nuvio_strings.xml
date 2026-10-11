@@ -44,7 +44,6 @@
     <string name="iptv_sport5_nuvio_start_early">Začít dřív</string>
     <string name="iptv_sport5_nuvio_keep_going">Pokračovat po konci</string>
     <string name="iptv_sport5_nuvio_live_tv_minutes">%1$d min (nastavení živé TV)</string>
-    <string name="iptv_sport5_nuvio_finals_minutes">%1$d min, +%2$d min ve finále</string>
     <string name="iptv_sport5_nuvio_save_to">Uložit do</string>
     <string name="iptv_sport5_nuvio_live_tv_setting">Nastavení živé TV</string>
     <string name="iptv_sport5_nuvio_no_channel_by">Žádný kanál do výkopu</string>

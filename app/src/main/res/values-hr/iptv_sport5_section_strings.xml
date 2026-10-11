@@ -58,9 +58,4 @@
         <item quantity="few">%1$d auta</item>
         <item quantity="other">%1$d autova</item>
     </plurals>
-    <plurals name="iptv_sport5_section_other_feeds">
-        <item quantity="one">%1$d drugi prijenos</item>
-        <item quantity="few">%1$d druga prijenosa</item>
-        <item quantity="other">%1$d drugih prijenosa</item>
-    </plurals>
 </resources>

@@ -44,7 +44,6 @@
     <string name="iptv_sport5_nuvio_start_early">আগে শুরু করুন</string>
     <string name="iptv_sport5_nuvio_keep_going">পরেও চালিয়ে যান</string>
     <string name="iptv_sport5_nuvio_live_tv_minutes">%1$d মিনিট (লাইভ টিভি সেটিং)</string>
-    <string name="iptv_sport5_nuvio_finals_minutes">%1$d মিনিট, ফাইনালে +%2$d মিনিট</string>
     <string name="iptv_sport5_nuvio_save_to">এখানে সেভ করুন</string>
     <string name="iptv_sport5_nuvio_live_tv_setting">লাইভ টিভি সেটিং</string>
     <string name="iptv_sport5_nuvio_no_channel_by">কিক-অফের মধ্যে কোনো চ্যানেল নেই</string>

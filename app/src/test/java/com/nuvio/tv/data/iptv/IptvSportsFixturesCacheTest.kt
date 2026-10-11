@@ -9,6 +9,7 @@ import com.nuvio.tv.core.iptv.SportsService
 import java.io.File
 import java.nio.file.Files
 import java.time.Instant
+import java.time.ZoneId
 import java.time.ZoneOffset
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
@@ -88,4 +89,23 @@ class IptvSportsFixturesCacheTest {
             assertEquals(9, server.requestCount)
         }
     } finally { SportsDays.guideDays(SportsDays.DEFAULT_DAYS - 1) }
+
+    @Test fun golfStaysOnAfterItsFirstDay() {
+        val directory = Files.createTempDirectory("sports-golf").toFile()
+        val body = javaClass.getResource("/sports/espn-pga-scoreboard-real-20261010.json")!!.readText()
+        val server = MockWebServer()
+        server.dispatcher = object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest): MockResponse = MockResponse().setBody(body)
+        }
+        try {
+            val cache = IptvSportsFixturesCache(IptvSportsFixturesClient(espnBase = server.url("/sports/")), IptvSportsFixturesStore(File(directory, "cache")))
+            val at = Instant.parse("2026-10-10T19:00:00Z").toEpochMilli()
+            val result = runBlocking { cache.load(listOf(SportsLeagues.byId("pga")!!), null, at, ZoneId.of("Australia/Brisbane"), refresh = true) }
+            assertEquals(listOf(FixtureStatus.LIVE), result.fixtures.map { it.status })
+            assertTrue(server.requestCount > 0)
+        } finally {
+            server.shutdown()
+            directory.deleteRecursively()
+        }
+    }
 }

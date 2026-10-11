@@ -14,9 +14,7 @@
     <string name="iptv_sport7_key_subtitle">اختياري. يضيف مفتاحك الخاص دوريات لا يغطيها ESPN، ونتائجها المباشرة، والقنوات التلفزيونية للفرق التي تتابعها، ومصدرًا احتياطيًا عند تعطّل ESPN. يُخزَّن مشفّرًا على هذا الجهاز.</string>
     <string name="iptv_sport7_key_hint">مفتاح TheSportsDB API الشخصي الخاص بك</string>
     <string name="iptv_sport7_source_espn">ESPN</string>
-    <string name="iptv_sport7_source_both">ESPN، مع TheSportsDB كمصدر احتياطي</string>
     <string name="iptv_sport7_source_sportsdb">TheSportsDB</string>
-    <string name="iptv_sport7_source_needs_key">TheSportsDB · يحتاج إلى مفتاحك</string>
     <string name="iptv_sport7_logos">شعارات الفرق</string>
     <string name="iptv_sport7_logos_subtitle">تُعرض الأحرف الأولى عند إيقاف الشعارات</string>
     <string name="iptv_sport7_logos_espn">شعارات ESPN فقط</string>

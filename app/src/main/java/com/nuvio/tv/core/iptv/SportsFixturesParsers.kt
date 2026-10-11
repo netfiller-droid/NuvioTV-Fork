@@ -466,7 +466,7 @@ object EspnScoreboard {
     }
 
     private fun logo(json: JSONObject): String? = json.optJSONArray("logos")?.let(::objects)?.let { logos ->
-        logos.sortedByDescending { logo -> logo.optJSONArray("rel")?.let { rel -> (0 until rel.length()).any { rel.optString(it) == "dark" } } == true }
+        logos.sortedByDescending { logo -> logo.optJSONArray("rel")?.let { rel -> (0 until rel.length()).any { !rel.isNull(it) && rel.optString(it) == "dark" } } == true }
             .firstNotNullOfOrNull { it.text("href")?.let(::sportsImage) } }
 
     private fun score(competitor: JSONObject?): String? {
@@ -519,7 +519,7 @@ object EspnScoreboard {
     private fun broadcasters(json: JSONObject): List<String> {
         val names = mutableListOf<String>()
         json.optJSONArray("broadcasts")?.let(::objects)?.forEach { broadcast ->
-            broadcast.optJSONArray("names")?.let { array -> (0 until array.length()).forEach { index -> array.optString(index).takeIf(String::isNotBlank)?.let(names::add) } }
+            broadcast.optJSONArray("names")?.let { array -> (0 until array.length()).forEach { index -> if (!array.isNull(index)) array.optString(index).takeIf(String::isNotBlank)?.let(names::add) } }
             broadcast.optJSONObject("media")?.text("shortName")?.let(names::add)
         }
         json.optJSONArray("geoBroadcasts")?.let(::objects)?.forEach { broadcast ->
@@ -603,6 +603,7 @@ object SportsDbEvents {
             code in FINISHED -> FixtureStatus.FINAL
             code in NOT_STARTED || code.isEmpty() -> if (code.isEmpty() && homeScore != null && start < nowMillis - 4L * 60 * 60 * 1000) FixtureStatus.FINAL else FixtureStatus.SCHEDULED
             start > nowMillis -> FixtureStatus.SCHEDULED
+            SportsDbLive.stale(start, league.durationMinutes * 60_000L, nowMillis) -> if (homeScore != null) FixtureStatus.FINAL else FixtureStatus.SCHEDULED
             else -> FixtureStatus.LIVE
         }
         val home = event.text("strHomeTeam")?.let { FixtureTeam(it, event.text("strHomeTeamShort"), null, emptyList(), event.text("strHomeTeamBadge")?.let(::sportsImage)) }

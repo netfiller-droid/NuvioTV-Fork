@@ -88,14 +88,16 @@ class IptvSportsSummaryWatch(private val client: IptvSportsSummaryClient, privat
     val summary: StateFlow<SportsSummary?> = state.asStateFlow()
     private var job: Job? = null
     private var key: String? = null
+    private var done = false
 
     @Synchronized fun start(fixture: SportsFixture) {
         val league = SportsLeagues.byId(fixture.league)?.takeIf { fixture.source == SportsService.ESPN && it.espn != null && IptvSportsSummaryClient.supported(it.sport) }
-        if (key == fixture.key && job?.isActive == true) return
+        if (key == fixture.key && (done || job?.isActive == true)) return
         job?.cancel()
-        if (key != fixture.key) state.value = null
+        if (key != fixture.key) { state.value = null; done = false }
         key = fixture.key
         if (league == null) { job = null; return }
+        val watched = fixture.key
         job = scope.launch {
             var failures = 0
             while (true) {
@@ -104,12 +106,12 @@ class IptvSportsSummaryWatch(private val client: IptvSportsSummaryClient, privat
                     state.value = result
                     failures = 0
                     when {
-                        result.status == FixtureStatus.FINAL || fixture.status == FixtureStatus.FINAL && result.status != FixtureStatus.LIVE -> return@launch
+                        result.status == FixtureStatus.FINAL || fixture.status == FixtureStatus.FINAL && result.status != FixtureStatus.LIVE -> { finish(watched); return@launch }
                         result.status == FixtureStatus.LIVE -> liveMillis
                         else -> waitingMillis
                     }
                 } catch (cancel: CancellationException) { throw cancel } catch (error: Exception) {
-                    if (error is SportsFetchException && error.status in GONE) return@launch
+                    if (error is SportsFetchException && error.status in GONE) { finish(watched); return@launch }
                     failures = minOf(failures + 1, 20)
                     if (error !is SportsFetchException) IptvLog.failure("sports summary", error)
                     backoff(failures)
@@ -118,6 +120,8 @@ class IptvSportsSummaryWatch(private val client: IptvSportsSummaryClient, privat
             }
         }
     }
+
+    @Synchronized private fun finish(watched: String) { if (key == watched) done = true }
 
     @Synchronized fun stop() {
         job?.cancel()

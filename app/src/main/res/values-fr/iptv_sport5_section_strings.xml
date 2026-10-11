@@ -58,9 +58,4 @@
         <item quantity="many">%1$d retraits</item>
         <item quantity="other">%1$d retraits</item>
     </plurals>
-    <plurals name="iptv_sport5_section_other_feeds">
-        <item quantity="one">%1$d autre flux</item>
-        <item quantity="many">%1$d autres flux</item>
-        <item quantity="other">%1$d autres flux</item>
-    </plurals>
 </resources>

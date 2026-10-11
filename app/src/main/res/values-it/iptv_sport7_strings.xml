@@ -14,9 +14,7 @@
     <string name="iptv_sport7_key_subtitle">Facoltativa. La tua chiave aggiunge i campionati non coperti da ESPN, i relativi punteggi in diretta, i canali TV delle squadre seguite e un\'alternativa quando ESPN non funziona. Salvata crittografata su questo dispositivo.</string>
     <string name="iptv_sport7_key_hint">La tua chiave API personale di TheSportsDB</string>
     <string name="iptv_sport7_source_espn">ESPN</string>
-    <string name="iptv_sport7_source_both">ESPN, con TheSportsDB come alternativa</string>
     <string name="iptv_sport7_source_sportsdb">TheSportsDB</string>
-    <string name="iptv_sport7_source_needs_key">TheSportsDB · richiede la tua chiave</string>
     <string name="iptv_sport7_logos">Loghi delle squadre</string>
     <string name="iptv_sport7_logos_subtitle">Quando i loghi sono disattivati vengono mostrati i monogrammi</string>
     <string name="iptv_sport7_logos_espn">Solo loghi ESPN</string>

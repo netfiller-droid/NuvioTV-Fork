@@ -44,7 +44,6 @@
     <string name="iptv_sport5_nuvio_start_early">התחלה מוקדמת</string>
     <string name="iptv_sport5_nuvio_keep_going">המשך אחרי הסיום</string>
     <string name="iptv_sport5_nuvio_live_tv_minutes">%1$d דק׳ (הגדרת הטלוויזיה החיה)</string>
-    <string name="iptv_sport5_nuvio_finals_minutes">%1$d דק׳, +%2$d דק׳ בגמרים</string>
     <string name="iptv_sport5_nuvio_save_to">שמירה ב</string>
     <string name="iptv_sport5_nuvio_live_tv_setting">הגדרת הטלוויזיה החיה</string>
     <string name="iptv_sport5_nuvio_no_channel_by">אין ערוץ עד שריקת הפתיחה</string>

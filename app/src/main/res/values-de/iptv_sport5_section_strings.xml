@@ -55,8 +55,4 @@
         <item quantity="one">%1$d Out</item>
         <item quantity="other">%1$d Outs</item>
     </plurals>
-    <plurals name="iptv_sport5_section_other_feeds">
-        <item quantity="one">%1$d weiterer Stream</item>
-        <item quantity="other">%1$d weitere Streams</item>
-    </plurals>
 </resources>

@@ -244,8 +244,10 @@ class IptvSportsDayCache(private val client: IptvSportsFixturesClient, private v
                 val got = load(primary.values.flatten(), key, nowMillis, fetch).toMutableMap()
                 val fallback = usable.filter { league -> key != null && league.espn != null && league.sportsDb != null &&
                     primary[league.id].orEmpty().all { got[it.key]?.fetchedAt == null } && primary[league.id].orEmpty().any { (got[it.key]?.failures ?: 0) > 0 } }
-                    .flatMap { wanted(SportsService.THESPORTSDB, it) }
-                got += load(fallback, key, nowMillis, fetch)
+                    .associate { it.id to wanted(SportsService.THESPORTSDB, it) }
+                got += load(fallback.values.flatten(), key, nowMillis, fetch)
+                fun complete(items: List<Wanted>?) = !items.isNullOrEmpty() && items.all { got[it.key]?.fetchedAt != null }
+                if (!fetch && usable.any { !complete(primary[it.id]) && !complete(fallback[it.id]) }) return@withContext IptvSportsFixtures(true)
                 got.values.toList()
             }
             val fixtures = SportsScoreDays.on(found.flatMap { it.fixtures }, date, nowMillis, zone)

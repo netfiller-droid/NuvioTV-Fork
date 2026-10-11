@@ -44,7 +44,6 @@
     <string name="iptv_sport5_nuvio_start_early">முன்கூட்டியே தொடங்கு</string>
     <string name="iptv_sport5_nuvio_keep_going">பிறகும் தொடர்</string>
     <string name="iptv_sport5_nuvio_live_tv_minutes">%1$d நிமி. (நேரலை டிவி அமைப்பு)</string>
-    <string name="iptv_sport5_nuvio_finals_minutes">%1$d நிமி., இறுதிப் போட்டிகளில் +%2$d நிமி.</string>
     <string name="iptv_sport5_nuvio_save_to">இதில் சேமி</string>
     <string name="iptv_sport5_nuvio_live_tv_setting">நேரலை டிவி அமைப்பு</string>
     <string name="iptv_sport5_nuvio_no_channel_by">கிக்-ஆஃப் வரை சேனல் இல்லை</string>

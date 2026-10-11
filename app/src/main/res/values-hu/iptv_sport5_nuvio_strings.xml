@@ -44,7 +44,6 @@
     <string name="iptv_sport5_nuvio_start_early">Korábbi kezdés</string>
     <string name="iptv_sport5_nuvio_keep_going">Folytatás utána</string>
     <string name="iptv_sport5_nuvio_live_tv_minutes">%1$d perc (Élő TV beállítás)</string>
-    <string name="iptv_sport5_nuvio_finals_minutes">%1$d perc, döntőkben +%2$d perc</string>
     <string name="iptv_sport5_nuvio_save_to">Mentés ide</string>
     <string name="iptv_sport5_nuvio_live_tv_setting">Élő TV beállítás</string>
     <string name="iptv_sport5_nuvio_no_channel_by">Nincs csatorna a kezdésig</string>

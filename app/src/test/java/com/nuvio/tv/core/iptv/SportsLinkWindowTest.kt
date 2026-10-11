@@ -76,7 +76,7 @@ class SportsLinkWindowTest {
     @Test fun pendingRecordsWaitForALinkAndExpire() {
         val empty = emptyList<SportsPendingRecord>()
         val added = SportsPendingRecords.toggle(empty, 1, game, now)
-        assertEquals(listOf(SportsPendingRecord(1, game.key, kickoff, kickoff + SportsRefresh.durationMillis(game))), added)
+        assertEquals(listOf(SportsPendingRecord(1, game.key, kickoff, kickoff + SportsRefresh.durationMillis(game), arsenal.name, leeds.name)), added)
         assertEquals(added, added.map(SportsPendingRecords::encode).mapNotNull(SportsPendingRecords::decode))
         assertTrue(SportsPendingRecords.toggle(added, 1, game, now).isEmpty())
         assertEquals(2, SportsPendingRecords.toggle(added, 2, game, now).size)

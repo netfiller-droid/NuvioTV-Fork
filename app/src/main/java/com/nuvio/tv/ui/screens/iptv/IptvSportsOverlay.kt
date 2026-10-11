@@ -468,7 +468,7 @@ private fun TeamsSegment(fixture: SportsFixture, home: FixtureTeam, away: Fixtur
     val leftTimeouts = situation?.let { if (first) it.awayTimeouts else it.homeTimeouts }
     val rightTimeouts = situation?.let { if (first) it.homeTimeouts else it.awayTimeouts }
     BugSegment {
-        Timeouts(leftTimeouts)
+        Timeouts(fixture, leftTimeouts)
         TeamLogo(left, 20.dp)
         RedCards(leftReds)
         if (leftHas) Dot()
@@ -482,15 +482,15 @@ private fun TeamsSegment(fixture: SportsFixture, home: FixtureTeam, away: Fixtur
         if (possession != null && !leftHas) Dot()
         RedCards(rightReds)
         TeamLogo(right, 20.dp)
-        Timeouts(rightTimeouts)
+        Timeouts(fixture, rightTimeouts)
     }
 }
 
 @Composable
-private fun Timeouts(left: Int?) {
+private fun Timeouts(fixture: SportsFixture, left: Int?) {
     if (left == null) return
     Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-        repeat(3) { Box(Modifier.size(8.dp, 2.dp).background(if (it < left) NuvioTheme.colors.TextPrimary else NuvioTheme.colors.TextTertiary.copy(alpha = .5f))) }
+        repeat(SportsFixtureText.timeoutSlots(fixture, left)) { Box(Modifier.size(8.dp, 2.dp).background(if (it < left) NuvioTheme.colors.TextPrimary else NuvioTheme.colors.TextTertiary.copy(alpha = .5f))) }
     }
 }
 

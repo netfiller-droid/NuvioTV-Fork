@@ -142,7 +142,7 @@ object SportsDetails {
                 }.take(MAX_LEADERS), json.long("end"))
             "sessions" -> SportsDetail.Sessions(json.text("venue"), json.objects("sessions").mapNotNull { session ->
                 RaceSession(session.text("abbreviation"), session.text("name") ?: return@mapNotNull null, session.long("start") ?: return@mapNotNull null,
-                    status(session.text("state")), session.optJSONArray("top")?.let { top -> (0 until minOf(top.length(), 3)).mapNotNull { top.optString(it).takeIf(String::isNotEmpty) } }.orEmpty(),
+                    status(session.text("state")), session.optJSONArray("top")?.let { top -> (0 until minOf(top.length(), 3)).mapNotNull { if (top.isNull(it)) null else top.optString(it).takeIf(String::isNotEmpty) } }.orEmpty(),
                     session.int("lap"))
             })
             "card" -> SportsDetail.Card(json.objects("bouts").mapNotNull { bout ->

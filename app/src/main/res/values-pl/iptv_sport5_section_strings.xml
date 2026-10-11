@@ -61,10 +61,4 @@
         <item quantity="many">%1$d autów</item>
         <item quantity="other">%1$d autu</item>
     </plurals>
-    <plurals name="iptv_sport5_section_other_feeds">
-        <item quantity="one">%1$d inna transmisja</item>
-        <item quantity="few">%1$d inne transmisje</item>
-        <item quantity="many">%1$d innych transmisji</item>
-        <item quantity="other">%1$d innej transmisji</item>
-    </plurals>
 </resources>

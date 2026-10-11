@@ -14,9 +14,7 @@
     <string name="iptv_sport7_key_subtitle">可选。使用您自己的密钥可添加 ESPN 未覆盖的联赛及其实时比分、所关注球队的电视频道，并在 ESPN 出错时作为备用来源。加密存储在此设备上。</string>
     <string name="iptv_sport7_key_hint">您个人的 TheSportsDB API 密钥</string>
     <string name="iptv_sport7_source_espn">ESPN</string>
-    <string name="iptv_sport7_source_both">ESPN，以 TheSportsDB 作为备用</string>
     <string name="iptv_sport7_source_sportsdb">TheSportsDB</string>
-    <string name="iptv_sport7_source_needs_key">TheSportsDB · 需要您的密钥</string>
     <string name="iptv_sport7_logos">球队标志</string>
     <string name="iptv_sport7_logos_subtitle">关闭标志时显示字母缩写</string>
     <string name="iptv_sport7_logos_espn">仅 ESPN 标志</string>

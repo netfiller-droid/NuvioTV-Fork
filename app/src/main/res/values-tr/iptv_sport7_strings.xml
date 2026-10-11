@@ -14,9 +14,7 @@
     <string name="iptv_sport7_key_subtitle">İsteğe bağlı. Kendi anahtarınız ESPN\'in kapsamadığı ligleri, bu liglerin canlı skorlarını, takip ettiğiniz takımların TV kanallarını ve ESPN çalışmadığında bir yedek kaynak ekler. Bu cihazda şifrelenmiş olarak saklanır.</string>
     <string name="iptv_sport7_key_hint">Kişisel TheSportsDB API anahtarınız</string>
     <string name="iptv_sport7_source_espn">ESPN</string>
-    <string name="iptv_sport7_source_both">ESPN, yedek olarak TheSportsDB</string>
     <string name="iptv_sport7_source_sportsdb">TheSportsDB</string>
-    <string name="iptv_sport7_source_needs_key">TheSportsDB · anahtarınız gerekir</string>
     <string name="iptv_sport7_logos">Takım logoları</string>
     <string name="iptv_sport7_logos_subtitle">Logolar kapalıyken monogramlar gösterilir</string>
     <string name="iptv_sport7_logos_espn">Yalnızca ESPN logoları</string>

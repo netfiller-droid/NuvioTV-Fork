@@ -58,9 +58,4 @@
         <item quantity="few">%1$d out-uri</item>
         <item quantity="other">%1$d de out-uri</item>
     </plurals>
-    <plurals name="iptv_sport5_section_other_feeds">
-        <item quantity="one">%1$d alt flux</item>
-        <item quantity="few">%1$d alte fluxuri</item>
-        <item quantity="other">%1$d de alte fluxuri</item>
-    </plurals>
 </resources>

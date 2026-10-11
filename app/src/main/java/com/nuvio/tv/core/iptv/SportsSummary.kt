@@ -139,11 +139,11 @@ object EspnSummary {
         root.optJSONObject("boxscore")?.optJSONArray("players")?.let(::objs).orEmpty().flatMap { team ->
             val side = sides.of(team) ?: return@flatMap emptyList()
             val group = team.optJSONArray("statistics")?.let(::objs)?.firstOrNull { it.str("name") == "goalies" } ?: return@flatMap emptyList()
-            val keys = group.optJSONArray("keys")?.let { array -> (0 until array.length()).map { array.optString(it) } }.orEmpty()
+            val keys = group.optJSONArray("keys")?.let { array -> (0 until array.length()).map { if (array.isNull(it)) "" else array.optString(it) } }.orEmpty()
             group.optJSONArray("athletes")?.let(::objs).orEmpty().mapNotNull { entry ->
                 val name = entry.optJSONObject("athlete")?.let { it.str("displayName") ?: it.str("shortName") } ?: return@mapNotNull null
                 val stats = entry.optJSONArray("stats")
-                fun value(key: String) = keys.indexOf(key).takeIf { it >= 0 }?.let { stats?.optString(it) }?.trim()?.takeIf { it.isNotEmpty() && it != "-" }
+                fun value(key: String) = keys.indexOf(key).takeIf { it >= 0 }?.let { index -> stats?.takeUnless { it.isNull(index) }?.optString(index) }?.trim()?.takeIf { it.isNotEmpty() && it != "-" }
                 SummaryGoalie(side, name.take(60), value("saves")?.toIntOrNull(), value("shotsAgainst")?.toIntOrNull(), value("savePct")?.take(8))
             }.take(2)
         }

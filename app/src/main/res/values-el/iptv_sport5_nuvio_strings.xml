@@ -44,7 +44,6 @@
     <string name="iptv_sport5_nuvio_start_early">Έναρξη νωρίτερα</string>
     <string name="iptv_sport5_nuvio_keep_going">Συνέχεια μετά</string>
     <string name="iptv_sport5_nuvio_live_tv_minutes">%1$d λεπ. (ρύθμιση ζωντανής TV)</string>
-    <string name="iptv_sport5_nuvio_finals_minutes">%1$d λεπ., +%2$d λεπ. σε τελικούς</string>
     <string name="iptv_sport5_nuvio_save_to">Αποθήκευση σε</string>
     <string name="iptv_sport5_nuvio_live_tv_setting">Ρύθμιση ζωντανής TV</string>
     <string name="iptv_sport5_nuvio_no_channel_by">Κανένα κανάλι έως την έναρξη</string>

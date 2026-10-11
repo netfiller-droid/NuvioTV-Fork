@@ -4,6 +4,7 @@ import com.nuvio.tv.core.iptv.SportsCacheEntry
 import com.nuvio.tv.core.iptv.SportsDays
 import com.nuvio.tv.core.iptv.SportsDbLeague
 import com.nuvio.tv.core.iptv.SportsFixture
+import com.nuvio.tv.core.iptv.SportsFixtureTimes
 import com.nuvio.tv.core.iptv.SportsLeague
 import com.nuvio.tv.core.iptv.SportsLeagues
 import com.nuvio.tv.core.iptv.SportsPolling
@@ -64,7 +65,7 @@ class IptvSportsFixturesCache(private val client: IptvSportsFixturesClient, priv
                         null -> null
                     }
                 }.flatten()
-                shown.flatMap { memory[it.key]?.fixtures.orEmpty() }.filter { it.startMillis >= from - EARLIER_MILLIS && it.startMillis < until }
+                shown.flatMap { memory[it.key]?.fixtures.orEmpty() }.filter { SportsFixtureTimes.shown(it, from - EARLIER_MILLIS, until, nowMillis) }
                     .distinctBy { it.key } to shown.any { (memory[it.key]?.failures ?: 0) > 0 }
             }
             val extended = if (refresh) fetching.withLock { extend(fixtures, favourites, key, country, nowMillis, true) }

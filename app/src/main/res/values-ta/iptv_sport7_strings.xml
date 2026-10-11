@@ -14,9 +14,7 @@
     <string name="iptv_sport7_key_subtitle">விருப்பத்தேர்வு. உங்கள் சொந்த விசை ESPN உள்ளடக்காத லீக்குகள், அவற்றின் நேரலை ஸ்கோர்கள், பின்தொடரும் அணிகளுக்கான டிவி சேனல்கள், ESPN தோல்வியடையும்போது காப்பு மூலம் ஆகியவற்றைச் சேர்க்கும். இந்தச் சாதனத்தில் மறையாக்கப்பட்டுச் சேமிக்கப்படும்.</string>
     <string name="iptv_sport7_key_hint">உங்கள் தனிப்பட்ட TheSportsDB API விசை</string>
     <string name="iptv_sport7_source_espn">ESPN</string>
-    <string name="iptv_sport7_source_both">ESPN, காப்பாக TheSportsDB</string>
     <string name="iptv_sport7_source_sportsdb">TheSportsDB</string>
-    <string name="iptv_sport7_source_needs_key">TheSportsDB · உங்கள் விசை தேவை</string>
     <string name="iptv_sport7_logos">அணி லோகோக்கள்</string>
     <string name="iptv_sport7_logos_subtitle">லோகோக்கள் முடக்கப்பட்டிருக்கும்போது மோனோகிராம்கள் காட்டப்படும்</string>
     <string name="iptv_sport7_logos_espn">ESPN லோகோக்கள் மட்டும்</string>

@@ -50,4 +50,38 @@ class SportsPendingRecordsTest {
         assertTrue(none.isEmpty())
         assertEquals(kept, again)
     }
+
+    @Test fun recordsFromALeagueThatIsNowBuiltInFindTheirGame() {
+        val stored = SportsPendingRecord(1, "sdb-4430:sdb-2290100", now + 2 * hour, now + 5 * hour)
+        val migrated = SportsPendingRecords.migrate(stored)
+        assertEquals("top-14:sdb-2290100", migrated.key)
+        assertEquals(setOf("top-14"), SportsPendingRecords.leagues(listOf(migrated)))
+        assertEquals(game.key, SportsPendingRecords.migrate(SportsPendingRecords.of(1, game)).key)
+        val espn = SportsFixture("401900001", "top-14", "rugby", "Toulouse v Toulon", FixtureTeam("Toulouse"), FixtureTeam("Toulon"), now + 2 * hour + 5 * 60_000,
+            FixtureStatus.SCHEDULED)
+        val updated = SportsPendingRecords.update(listOf(migrated), listOf(espn), now).single()
+        assertEquals(espn.key, updated.key)
+        assertEquals(listOf(espn), SportsPendingRecords.ready(listOf(updated), 1, listOf(espn), { true }, now))
+        val twin = espn.copy(id = "401900002", title = "Clermont v Pau", home = FixtureTeam("Clermont"), away = FixtureTeam("Pau"))
+        assertEquals(listOf(migrated), SportsPendingRecords.update(listOf(migrated), listOf(espn, twin), now))
+        val sameSource = espn.copy(id = "2290101", source = SportsService.THESPORTSDB)
+        assertEquals(listOf(migrated), SportsPendingRecords.update(listOf(migrated), listOf(sameSource), now))
+        assertEquals(listOf(migrated), SportsPendingRecords.update(listOf(migrated), listOf(espn.copy(startMillis = now + 4 * hour)), now))
+        assertTrue(SportsPendingRecords.update(listOf(migrated), listOf(espn.copy(status = FixtureStatus.FINAL)), now).isEmpty())
+    }
+
+    @Test fun recordsKeepTheirTeamsSoAnotherSourceCanTakeOver() {
+        val sportsDb = SportsFixture("2290100", "top-14", "rugby", "Stade Toulousain v RC Toulonnais", FixtureTeam("Toulouse"), FixtureTeam("Toulon"), now + 2 * hour,
+            FixtureStatus.SCHEDULED, source = SportsService.THESPORTSDB)
+        val record = SportsPendingRecords.of(1, sportsDb)
+        assertEquals("Toulouse" to "Toulon", record.home to record.away)
+        assertEquals(record, SportsPendingRecords.decode(SportsPendingRecords.encode(record)))
+        assertEquals(SportsPendingRecord(1, "epl:740100", 1, 2), SportsPendingRecords.decode("1|1|2|epl:740100"))
+        assertEquals(SportsPendingRecord(1, "epl:740100", 1, 2), SportsPendingRecords.decode("1|1|2|epl:740100\t\tLeeds"))
+        val espn = sportsDb.copy(id = "401900001", source = SportsService.ESPN, startMillis = now + 2 * hour + 10 * 60_000)
+        val twin = espn.copy(id = "401900002", home = FixtureTeam("Clermont"), away = FixtureTeam("Pau"))
+        assertEquals(espn.key, SportsPendingRecords.update(listOf(record), listOf(twin, espn), now).single().key)
+        assertEquals(espn.key, SportsPendingRecords.update(listOf(record), listOf(twin, espn.copy(home = espn.away, away = espn.home)), now).single().key)
+        assertEquals(listOf(record), SportsPendingRecords.update(listOf(record), listOf(twin), now))
+    }
 }

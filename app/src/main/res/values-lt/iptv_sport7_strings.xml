@@ -14,9 +14,7 @@
     <string name="iptv_sport7_key_subtitle">Neprivaloma. Su savo raktu gausite lygas, kurių ESPN neapima, jų tiesioginius rezultatus, stebimų komandų TV kanalus ir atsarginį šaltinį, kai ESPN neveikia. Saugomas užšifruotas šiame įrenginyje.</string>
     <string name="iptv_sport7_key_hint">Jūsų asmeninis TheSportsDB API raktas</string>
     <string name="iptv_sport7_source_espn">ESPN</string>
-    <string name="iptv_sport7_source_both">ESPN, su TheSportsDB kaip atsarginiu šaltiniu</string>
     <string name="iptv_sport7_source_sportsdb">TheSportsDB</string>
-    <string name="iptv_sport7_source_needs_key">TheSportsDB · reikia jūsų rakto</string>
     <string name="iptv_sport7_logos">Komandų logotipai</string>
     <string name="iptv_sport7_logos_subtitle">Kai logotipai išjungti, rodomos monogramos</string>
     <string name="iptv_sport7_logos_espn">Tik ESPN logotipai</string>

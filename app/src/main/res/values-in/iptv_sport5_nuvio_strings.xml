@@ -44,7 +44,6 @@
     <string name="iptv_sport5_nuvio_start_early">Mulai lebih awal</string>
     <string name="iptv_sport5_nuvio_keep_going">Lanjutkan setelahnya</string>
     <string name="iptv_sport5_nuvio_live_tv_minutes">%1$d mnt (pengaturan TV Live)</string>
-    <string name="iptv_sport5_nuvio_finals_minutes">%1$d mnt, +%2$d mnt di final</string>
     <string name="iptv_sport5_nuvio_save_to">Simpan ke</string>
     <string name="iptv_sport5_nuvio_live_tv_setting">Pengaturan TV Live</string>
     <string name="iptv_sport5_nuvio_no_channel_by">Tidak ada saluran saat kick-off</string>

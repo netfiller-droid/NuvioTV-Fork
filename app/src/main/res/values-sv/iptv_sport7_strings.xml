@@ -14,9 +14,7 @@
     <string name="iptv_sport7_key_subtitle">Valfritt. Med en egen nyckel får du ligor som ESPN inte täcker, liveresultat för dem, tv-kanaler för lag du följer och en reserv när ESPN inte fungerar. Lagras krypterad på den här enheten.</string>
     <string name="iptv_sport7_key_hint">Din personliga API-nyckel för TheSportsDB</string>
     <string name="iptv_sport7_source_espn">ESPN</string>
-    <string name="iptv_sport7_source_both">ESPN, med TheSportsDB som reserv</string>
     <string name="iptv_sport7_source_sportsdb">TheSportsDB</string>
-    <string name="iptv_sport7_source_needs_key">TheSportsDB · kräver din nyckel</string>
     <string name="iptv_sport7_logos">Laglogotyper</string>
     <string name="iptv_sport7_logos_subtitle">Monogram visas när logotyper är av</string>
     <string name="iptv_sport7_logos_espn">Endast ESPN-logotyper</string>

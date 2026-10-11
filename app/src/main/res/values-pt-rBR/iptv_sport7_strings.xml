@@ -14,9 +14,7 @@
     <string name="iptv_sport7_key_subtitle">Opcional. Sua própria chave adiciona ligas que a ESPN não cobre, placares ao vivo delas, canais de TV dos times que você segue e um backup quando a ESPN falha. Armazenada criptografada neste dispositivo.</string>
     <string name="iptv_sport7_key_hint">Sua chave pessoal da API do TheSportsDB</string>
     <string name="iptv_sport7_source_espn">ESPN</string>
-    <string name="iptv_sport7_source_both">ESPN, com o TheSportsDB como backup</string>
     <string name="iptv_sport7_source_sportsdb">TheSportsDB</string>
-    <string name="iptv_sport7_source_needs_key">TheSportsDB · precisa da sua chave</string>
     <string name="iptv_sport7_logos">Logos dos times</string>
     <string name="iptv_sport7_logos_subtitle">Monogramas são exibidos quando os logos estão desativados</string>
     <string name="iptv_sport7_logos_espn">Apenas logos da ESPN</string>

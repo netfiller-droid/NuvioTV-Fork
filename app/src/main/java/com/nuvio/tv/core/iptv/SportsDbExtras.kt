@@ -45,6 +45,13 @@ object SportsDbLive {
         }
     }
 
+    private fun settled(fixture: SportsFixture, nowMillis: Long): SportsFixture =
+        if (fixture.status != FixtureStatus.LIVE || nowMillis - fixture.startMillis <= SportsRefresh.durationMillis(fixture)) fixture
+        else fixture.copy(status = if (fixture.score != null || fixture.homeLine?.score != null) FixtureStatus.FINAL else FixtureStatus.SCHEDULED,
+            detail = null, period = null, clock = null)
+
+    fun stale(startMillis: Long, durationMillis: Long, nowMillis: Long): Boolean = nowMillis - startMillis > maxOf(STALE_MILLIS, 3 * durationMillis)
+
     internal fun updated(value: String): Long? = runCatching { LocalDateTime.parse(value.trim(), UPDATED).atZone(UPDATED_ZONE).toInstant().toEpochMilli() }.getOrNull()
 
     fun merge(fixtures: List<SportsFixture>, scores: Map<String, SportsDbLiveScore>, nowMillis: Long): List<SportsFixture> =
@@ -57,12 +64,12 @@ object SportsDbLive {
         val code = SportsGuide.normalise(raw).ifEmpty { SportsGuide.normalise(score.progress.orEmpty()).takeIf { it in SportsDbEvents.FINISHED }.orEmpty() }
         if (code in SKIPPED || code in SportsDbEvents.NOT_STARTED || (code.isEmpty() && fixture.startMillis > nowMillis)) return fixture
         val status = if (code in SportsDbEvents.FINISHED) FixtureStatus.FINAL else FixtureStatus.LIVE
-        if (status == FixtureStatus.LIVE && score.updatedMillis?.let { nowMillis - it > STALE_MILLIS } == true) return fixture
-        if (status == FixtureStatus.LIVE && nowMillis - fixture.startMillis > maxOf(STALE_MILLIS, 3 * SportsRefresh.durationMillis(fixture))) return fixture
+        if (status == FixtureStatus.LIVE && score.updatedMillis?.let { nowMillis - it > STALE_MILLIS } == true) return settled(fixture, nowMillis)
+        if (status == FixtureStatus.LIVE && stale(fixture.startMillis, SportsRefresh.durationMillis(fixture), nowMillis)) return settled(fixture, nowMillis)
         val running = score.progress?.trim()?.takeIf { status == FixtureStatus.LIVE }?.let { QUARTER.matches(it) || BREAK.matches(it) } == true
         if (code.isEmpty() && !running && nowMillis - fixture.startMillis > SportsRefresh.durationMillis(fixture)) return fixture
         if (status == FixtureStatus.LIVE && nowMillis - fixture.startMillis > SportsRefresh.durationMillis(fixture) && score.updatedMillis?.let { nowMillis - it > STUCK_MILLIS } == true)
-            return fixture
+            return settled(fixture, nowMillis)
         val live = status == FixtureStatus.LIVE
         val home = score.homeScore?.trim()?.takeIf { it.isNotEmpty() && it.length <= 8 }
         val away = score.awayScore?.trim()?.takeIf { it.isNotEmpty() && it.length <= 8 }
@@ -216,7 +223,7 @@ object SportsDbLeagues {
         val json = JSONObject(text)
         val id = json.getString("id").takeIf { it.matches(ID) } ?: return null
         val name = json.getString("name").trim().take(120).takeIf { it.isNotEmpty() } ?: return null
-        val aliases = json.optJSONArray("aliases")?.let { array -> (0 until minOf(array.length(), 8)).mapNotNull { array.optString(it).takeIf(String::isNotBlank) } }.orEmpty()
+        val aliases = json.optJSONArray("aliases")?.let { array -> (0 until minOf(array.length(), 8)).mapNotNull { if (array.isNull(it)) null else array.optString(it).takeIf(String::isNotBlank) } }.orEmpty()
         SportsLeague(CUSTOM_PREFIX + id, name, json.optString("sport").take(60).ifEmpty { "other" }, null, name, id, aliases,
             durationMinutes = json.optInt("minutes", 180).coerceIn(30, 720))
     }.getOrNull()

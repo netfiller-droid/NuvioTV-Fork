@@ -61,10 +61,4 @@
         <item quantity="few">%1$d auti</item>
         <item quantity="other">%1$d autov</item>
     </plurals>
-    <plurals name="iptv_sport5_section_other_feeds">
-        <item quantity="one">%1$d drug prenos</item>
-        <item quantity="two">%1$d druga prenosa</item>
-        <item quantity="few">%1$d drugi prenosi</item>
-        <item quantity="other">%1$d drugih prenosov</item>
-    </plurals>
 </resources>

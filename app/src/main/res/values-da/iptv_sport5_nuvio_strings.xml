@@ -44,7 +44,6 @@
     <string name="iptv_sport5_nuvio_start_early">Start tidligt</string>
     <string name="iptv_sport5_nuvio_keep_going">Fortsæt efter</string>
     <string name="iptv_sport5_nuvio_live_tv_minutes">%1$d min (Live-TV-indstilling)</string>
-    <string name="iptv_sport5_nuvio_finals_minutes">%1$d min, +%2$d min i finaler</string>
     <string name="iptv_sport5_nuvio_save_to">Gem i</string>
     <string name="iptv_sport5_nuvio_live_tv_setting">Live-TV-indstilling</string>
     <string name="iptv_sport5_nuvio_no_channel_by">Ingen kanal ved kickoff</string>

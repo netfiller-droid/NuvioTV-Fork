@@ -14,9 +14,7 @@
     <string name="iptv_sport7_key_subtitle">Opcjonalnie. Własny klucz dodaje ligi nieobsługiwane przez ESPN, wyniki na żywo z tych lig, kanały TV obserwowanych drużyn oraz zapasowe źródło, gdy ESPN zawiedzie. Przechowywany w postaci zaszyfrowanej na tym urządzeniu.</string>
     <string name="iptv_sport7_key_hint">Twój osobisty klucz API TheSportsDB</string>
     <string name="iptv_sport7_source_espn">ESPN</string>
-    <string name="iptv_sport7_source_both">ESPN, z TheSportsDB jako zapasowym źródłem</string>
     <string name="iptv_sport7_source_sportsdb">TheSportsDB</string>
-    <string name="iptv_sport7_source_needs_key">TheSportsDB · wymaga Twojego klucza</string>
     <string name="iptv_sport7_logos">Logo drużyn</string>
     <string name="iptv_sport7_logos_subtitle">Gdy logo są wyłączone, wyświetlane są monogramy</string>
     <string name="iptv_sport7_logos_espn">Tylko logo ESPN</string>

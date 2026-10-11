@@ -14,9 +14,7 @@
     <string name="iptv_sport7_key_subtitle">Opsional. Kunci Anda sendiri menambahkan liga yang tidak dicakup ESPN, skor langsungnya, saluran TV untuk tim yang diikuti, dan cadangan saat ESPN gagal. Disimpan terenkripsi di perangkat ini.</string>
     <string name="iptv_sport7_key_hint">Kunci API TheSportsDB pribadi Anda</string>
     <string name="iptv_sport7_source_espn">ESPN</string>
-    <string name="iptv_sport7_source_both">ESPN, dengan TheSportsDB sebagai cadangan</string>
     <string name="iptv_sport7_source_sportsdb">TheSportsDB</string>
-    <string name="iptv_sport7_source_needs_key">TheSportsDB · memerlukan kunci Anda</string>
     <string name="iptv_sport7_logos">Logo tim</string>
     <string name="iptv_sport7_logos_subtitle">Monogram ditampilkan saat logo nonaktif</string>
     <string name="iptv_sport7_logos_espn">Hanya logo ESPN</string>

@@ -44,7 +44,6 @@
     <string name="iptv_sport5_nuvio_start_early">提早開始</string>
     <string name="iptv_sport5_nuvio_keep_going">結束後繼續</string>
     <string name="iptv_sport5_nuvio_live_tv_minutes">%1$d 分鐘（直播電視設定）</string>
-    <string name="iptv_sport5_nuvio_finals_minutes">%1$d 分鐘，決賽 +%2$d 分鐘</string>
     <string name="iptv_sport5_nuvio_save_to">儲存到</string>
     <string name="iptv_sport5_nuvio_live_tv_setting">直播電視設定</string>
     <string name="iptv_sport5_nuvio_no_channel_by">開球前無頻道</string>

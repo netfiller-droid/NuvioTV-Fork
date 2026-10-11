@@ -14,9 +14,7 @@
     <string name="iptv_sport7_key_subtitle">Không bắt buộc. Khóa riêng của bạn bổ sung các giải đấu ESPN không có, tỉ số trực tiếp của chúng, kênh TV cho đội bạn theo dõi và nguồn dự phòng khi ESPN gặp lỗi. Được lưu mã hóa trên thiết bị này.</string>
     <string name="iptv_sport7_key_hint">Khóa API TheSportsDB cá nhân của bạn</string>
     <string name="iptv_sport7_source_espn">ESPN</string>
-    <string name="iptv_sport7_source_both">ESPN, dự phòng bằng TheSportsDB</string>
     <string name="iptv_sport7_source_sportsdb">TheSportsDB</string>
-    <string name="iptv_sport7_source_needs_key">TheSportsDB · cần khóa của bạn</string>
     <string name="iptv_sport7_logos">Logo đội</string>
     <string name="iptv_sport7_logos_subtitle">Hiển thị chữ viết tắt khi tắt logo</string>
     <string name="iptv_sport7_logos_espn">Chỉ logo ESPN</string>

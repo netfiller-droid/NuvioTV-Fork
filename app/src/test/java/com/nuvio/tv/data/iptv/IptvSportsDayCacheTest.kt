@@ -67,7 +67,24 @@ class IptvSportsDayCacheTest {
         val fixture = SportsFixture("7", "afl", "australian-football", "Stored game", null, null, Instant.parse("2026-09-26T05:00:00Z").toEpochMilli(),
             FixtureStatus.FINAL)
         store.write(IptvSportsFixturesStore.key(SportsService.ESPN, afl, LocalDate.of(2026, 9, 26)), SportsCacheEntry(listOf(fixture), now - 60_000))
+        assertTrue(cache.load(listOf(afl), null, day, sydney, now, fetch = false).fixtures.isEmpty())
+        store.write(IptvSportsFixturesStore.key(SportsService.ESPN, afl, LocalDate.of(2026, 9, 25)), SportsCacheEntry(emptyList(), now - 60_000))
         assertEquals(listOf("Stored game"), cache.load(listOf(afl), null, day, sydney, now, fetch = false).fixtures.map { it.title })
+        assertEquals(0, calls.get())
+    }
+
+    @Test fun peekingAtYesterdayAheadOfNewYorkNeedsBothDates() = withCache { cache, store, _, calls ->
+        val brisbane = ZoneId.of("Australia/Brisbane")
+        val at = Instant.parse("2026-10-11T23:30:00Z").toEpochMilli()
+        val yesterday = LocalDate.of(2026, 10, 11)
+        val late = SportsFixture("8", "afl", "australian-football", "Late game", null, null, Instant.parse("2026-10-11T09:00:00Z").toEpochMilli(), FixtureStatus.FINAL)
+        val early = late.copy(id = "9", title = "Early game", startMillis = Instant.parse("2026-10-10T23:00:00Z").toEpochMilli())
+        store.write(IptvSportsFixturesStore.key(SportsService.ESPN, afl, LocalDate.of(2026, 10, 11)), SportsCacheEntry(listOf(late), at - 60_000))
+        assertTrue(cache.load(listOf(afl), null, yesterday, brisbane, at, fetch = false).fixtures.isEmpty())
+        store.write(IptvSportsFixturesStore.key(SportsService.ESPN, afl, LocalDate.of(2026, 10, 10)), SportsCacheEntry(listOf(early), null, at - 60_000, 1))
+        assertTrue(cache.load(listOf(afl), null, yesterday, brisbane, at, fetch = false).fixtures.isEmpty())
+        store.write(IptvSportsFixturesStore.key(SportsService.ESPN, afl, LocalDate.of(2026, 10, 10)), SportsCacheEntry(listOf(early), at - 60_000))
+        assertEquals(listOf("Early game", "Late game"), cache.load(listOf(afl), null, yesterday, brisbane, at, fetch = false).fixtures.map { it.title }.sorted())
         assertEquals(0, calls.get())
     }
 

@@ -14,9 +14,7 @@
     <string name="iptv_sport7_key_subtitle">Valgfritt. Din egen nøkkel legger til ligaer ESPN ikke dekker, direkteresultater for dem, TV-kanaler for lag du følger og en reserve når ESPN svikter. Lagres kryptert på denne enheten.</string>
     <string name="iptv_sport7_key_hint">Din personlige API-nøkkel for TheSportsDB</string>
     <string name="iptv_sport7_source_espn">ESPN</string>
-    <string name="iptv_sport7_source_both">ESPN, med TheSportsDB som reserve</string>
     <string name="iptv_sport7_source_sportsdb">TheSportsDB</string>
-    <string name="iptv_sport7_source_needs_key">TheSportsDB · krever nøkkelen din</string>
     <string name="iptv_sport7_logos">Laglogoer</string>
     <string name="iptv_sport7_logos_subtitle">Monogrammer vises når logoer er av</string>
     <string name="iptv_sport7_logos_espn">Bare ESPN-logoer</string>

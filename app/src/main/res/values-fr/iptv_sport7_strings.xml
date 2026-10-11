@@ -14,9 +14,7 @@
     <string name="iptv_sport7_key_subtitle">Facultatif. Votre propre clé ajoute les ligues non couvertes par ESPN, leurs scores en direct, les chaînes TV des équipes suivies et une source de secours en cas de panne d\'ESPN. Stockée chiffrée sur cet appareil.</string>
     <string name="iptv_sport7_key_hint">Votre clé API TheSportsDB personnelle</string>
     <string name="iptv_sport7_source_espn">ESPN</string>
-    <string name="iptv_sport7_source_both">ESPN, avec TheSportsDB en secours</string>
     <string name="iptv_sport7_source_sportsdb">TheSportsDB</string>
-    <string name="iptv_sport7_source_needs_key">TheSportsDB · nécessite votre clé</string>
     <string name="iptv_sport7_logos">Logos des équipes</string>
     <string name="iptv_sport7_logos_subtitle">Des monogrammes s\'affichent quand les logos sont désactivés</string>
     <string name="iptv_sport7_logos_espn">Logos ESPN uniquement</string>

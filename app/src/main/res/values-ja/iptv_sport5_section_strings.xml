@@ -52,7 +52,4 @@
     <plurals name="iptv_sport5_section_outs">
         <item quantity="other">%1$d アウト</item>
     </plurals>
-    <plurals name="iptv_sport5_section_other_feeds">
-        <item quantity="other">他 %1$d 件の配信</item>
-    </plurals>
 </resources>

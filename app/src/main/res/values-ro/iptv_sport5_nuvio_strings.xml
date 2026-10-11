@@ -44,7 +44,6 @@
     <string name="iptv_sport5_nuvio_start_early">Începe mai devreme</string>
     <string name="iptv_sport5_nuvio_keep_going">Continuă după</string>
     <string name="iptv_sport5_nuvio_live_tv_minutes">%1$d min (setare TV live)</string>
-    <string name="iptv_sport5_nuvio_finals_minutes">%1$d min, +%2$d min în finale</string>
     <string name="iptv_sport5_nuvio_save_to">Salvează în</string>
     <string name="iptv_sport5_nuvio_live_tv_setting">Setare TV live</string>
     <string name="iptv_sport5_nuvio_no_channel_by">Niciun canal până la start</string>

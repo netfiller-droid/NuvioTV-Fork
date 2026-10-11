@@ -14,9 +14,7 @@
     <string name="iptv_sport7_key_subtitle">Необов\'язково. Ваш ключ додає ліги, яких немає в ESPN, рахунки наживо для них, ТВ-канали для відстежуваних команд і резервне джерело, коли ESPN не працює. Зберігається в зашифрованому вигляді на цьому пристрої.</string>
     <string name="iptv_sport7_key_hint">Ваш особистий API-ключ TheSportsDB</string>
     <string name="iptv_sport7_source_espn">ESPN</string>
-    <string name="iptv_sport7_source_both">ESPN, резерв — TheSportsDB</string>
     <string name="iptv_sport7_source_sportsdb">TheSportsDB</string>
-    <string name="iptv_sport7_source_needs_key">TheSportsDB · потрібен ваш ключ</string>
     <string name="iptv_sport7_logos">Логотипи команд</string>
     <string name="iptv_sport7_logos_subtitle">Коли логотипи вимкнено, показуються монограми</string>
     <string name="iptv_sport7_logos_espn">Лише логотипи ESPN</string>

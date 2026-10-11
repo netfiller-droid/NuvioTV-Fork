@@ -44,7 +44,6 @@
     <string name="iptv_sport5_nuvio_start_early">Bắt đầu sớm</string>
     <string name="iptv_sport5_nuvio_keep_going">Tiếp tục sau</string>
     <string name="iptv_sport5_nuvio_live_tv_minutes">%1$d phút (cài đặt TV trực tiếp)</string>
-    <string name="iptv_sport5_nuvio_finals_minutes">%1$d phút, +%2$d phút ở trận chung kết</string>
     <string name="iptv_sport5_nuvio_save_to">Lưu vào</string>
     <string name="iptv_sport5_nuvio_live_tv_setting">Cài đặt TV trực tiếp</string>
     <string name="iptv_sport5_nuvio_no_channel_by">Không có kênh trước giờ bóng lăn</string>

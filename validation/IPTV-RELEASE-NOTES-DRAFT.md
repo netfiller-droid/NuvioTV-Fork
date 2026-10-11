@@ -881,6 +881,26 @@ Recordings, guide and catch-up:
   full share now shows "upload paused" while recording and stops the recording at about 2 GB
   waiting, as for other shares.
 
+Sport data:
+- Golf stays on the Sport page, All scores and the guide for the whole tournament, and a
+  finished one shows under "Earlier today" with catch-up links.
+- TheSportsDB games stuck on an in-play status long after they should have ended no longer
+  show as live or keep refreshing.
+- After a TheSportsDB league you added yourself became built in, its "Record every game"
+  rules, team pages and games waiting for a recording keep working.
+- Following one team no longer marks games of another team from the same city (for example
+  the Jets and the Giants) as followed or records them.
+- All scores no longer shows a partial count for past days; the day shows "Loading
+  results…" until its results are in.
+- The game summary is no longer requested again for a game that has none or has finished.
+- The score bug shows two timeout marks in NFL overtime and one in college overtime.
+- Sport recordings keep going while a game runs into overtime (up to 90 minutes more for
+  NFL, NHL, MLB and tennis, 60 for NBA and cricket, 30 for football or 60 in knockout
+  games) and stop soon after the game ends while the app is open; the extra time only
+  counts against other recordings once the game actually runs over. The Record every game
+  panel says so.
+- Alert headlines on the sport pop-up are in sentence case.
+
 ## Reliability
 
 - A stream is replaced only after the previous decoder and HTTP connections have

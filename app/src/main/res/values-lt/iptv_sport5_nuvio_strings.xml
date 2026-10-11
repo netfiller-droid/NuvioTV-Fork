@@ -44,7 +44,6 @@
     <string name="iptv_sport5_nuvio_start_early">Pradėti anksčiau</string>
     <string name="iptv_sport5_nuvio_keep_going">Tęsti po pabaigos</string>
     <string name="iptv_sport5_nuvio_live_tv_minutes">%1$d min. (tiesioginės TV nustatymas)</string>
-    <string name="iptv_sport5_nuvio_finals_minutes">%1$d min., +%2$d min. finaluose</string>
     <string name="iptv_sport5_nuvio_save_to">Išsaugoti į</string>
     <string name="iptv_sport5_nuvio_live_tv_setting">Tiesioginės TV nustatymas</string>
     <string name="iptv_sport5_nuvio_no_channel_by">Iki pradžios nėra kanalo</string>

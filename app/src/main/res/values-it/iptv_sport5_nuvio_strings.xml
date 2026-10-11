@@ -44,7 +44,6 @@
     <string name="iptv_sport5_nuvio_start_early">Inizia prima</string>
     <string name="iptv_sport5_nuvio_keep_going">Continua dopo</string>
     <string name="iptv_sport5_nuvio_live_tv_minutes">%1$d min (impostazione TV in diretta)</string>
-    <string name="iptv_sport5_nuvio_finals_minutes">%1$d min, +%2$d min nelle finali</string>
     <string name="iptv_sport5_nuvio_save_to">Salva in</string>
     <string name="iptv_sport5_nuvio_live_tv_setting">Impostazione TV in diretta</string>
     <string name="iptv_sport5_nuvio_no_channel_by">Nessun canale al calcio d\'inizio</string>

@@ -14,9 +14,7 @@
     <string name="iptv_sport7_key_subtitle">אופציונלי. מפתח משלך מוסיף ליגות ש-ESPN לא מכסה, תוצאות חיות שלהן, ערוצי טלוויזיה לקבוצות שבמעקב וגיבוי כש-ESPN נכשל. נשמר מוצפן במכשיר הזה.</string>
     <string name="iptv_sport7_key_hint">מפתח ה-API האישי שלך ל-TheSportsDB</string>
     <string name="iptv_sport7_source_espn">ESPN</string>
-    <string name="iptv_sport7_source_both">ESPN, עם TheSportsDB כגיבוי</string>
     <string name="iptv_sport7_source_sportsdb">TheSportsDB</string>
-    <string name="iptv_sport7_source_needs_key">TheSportsDB · נדרש המפתח שלך</string>
     <string name="iptv_sport7_logos">סמלי קבוצות</string>
     <string name="iptv_sport7_logos_subtitle">כשהסמלים כבויים מוצגים ראשי תיבות</string>
     <string name="iptv_sport7_logos_espn">סמלי ESPN בלבד</string>

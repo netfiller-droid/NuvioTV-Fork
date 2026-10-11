@@ -249,7 +249,23 @@ object SportsCatchup {
         fixtures.filter { it.status == FixtureStatus.FINAL && it.startMillis <= nowMillis && nowMillis - minOf(end(it), nowMillis) <= WINDOW_MILLIS }
             .distinctBy { it.key }.sortedByDescending(::end).take(max)
 
-    fun end(fixture: SportsFixture): Long = (fixture.sportDetail as? SportsDetail.Golf)?.endMillis ?: (fixture.startMillis + SportsRefresh.durationMillis(fixture))
+    fun end(fixture: SportsFixture): Long = SportsFixtureTimes.end(fixture)
+}
+
+object SportsFixtureTimes {
+    const val GOLF_FINISH_MILLIS = 18L * 60 * 60 * 1000
+    private const val GOLF_DAYS_MILLIS = 3L * 24 * 60 * 60 * 1000
+
+    fun end(fixture: SportsFixture): Long = (fixture.sportDetail as? SportsDetail.Golf)?.let { (it.endMillis ?: (fixture.startMillis + GOLF_DAYS_MILLIS)) + GOLF_FINISH_MILLIS }
+        ?: (fixture.startMillis + SportsRefresh.durationMillis(fixture))
+
+    fun placed(fixture: SportsFixture, nowMillis: Long): Long =
+        if (fixture.sportDetail is SportsDetail.Golf) minOf(end(fixture), maxOf(fixture.startMillis, nowMillis)) else fixture.startMillis
+
+    fun day(fixture: SportsFixture, nowMillis: Long, zone: ZoneId): LocalDate = Instant.ofEpochMilli(placed(fixture, nowMillis)).atZone(zone).toLocalDate()
+
+    fun shown(fixture: SportsFixture, fromMillis: Long, untilMillis: Long, nowMillis: Long): Boolean =
+        fixture.startMillis < untilMillis && (fixture.status == FixtureStatus.LIVE || placed(fixture, nowMillis) >= fromMillis)
 }
 
 data class FixtureRow(val section: FixtureSection, val fixtures: List<SportsFixture>, val day: LocalDate? = null)
@@ -261,11 +277,11 @@ object SportsFixtureSections {
         val today = Instant.ofEpochMilli(nowMillis).atZone(zone).toLocalDate()
         val order = SportsLeagues.ALL.withIndex().associate { it.value.id to it.index }
         val placed = fixtures.distinctBy { it.league to it.id }.mapNotNull { fixture ->
-            val day = Instant.ofEpochMilli(fixture.startMillis).atZone(zone).toLocalDate()
+            val day = SportsFixtureTimes.day(fixture, nowMillis, zone)
             val section = when {
                 fixture.status == FixtureStatus.FINAL -> FixtureSection.FINISHED.takeIf { showScores && day == today }
                 fixture.status == FixtureStatus.LIVE -> FixtureSection.LIVE
-                fixture.startMillis + SportsRefresh.durationMillis(fixture) + STALE_MILLIS < nowMillis -> null
+                SportsFixtureTimes.end(fixture) + STALE_MILLIS < nowMillis -> null
                 day == today || (day.isBefore(today) && fixture.startMillis <= nowMillis) -> FixtureSection.TODAY
                 day == today.plusDays(1) -> FixtureSection.TOMORROW
                 day.isAfter(today.plusDays(1)) && day.isBefore(today.plusDays(SportsDays.DAYS.toLong())) -> FixtureSection.DAY
@@ -287,7 +303,7 @@ object SportsFixtureSections {
         }
         of(FixtureSection.FINISHED).takeIf { it.isNotEmpty() }?.let { finished ->
             rows += FixtureRow(FixtureSection.FINISHED, finished.sortedWith(compareBy<SportsFixture>({ !SportsFavourites.has(favourites, it) },
-                { -it.startMillis }, { order[it.league] ?: Int.MAX_VALUE }, { it.title })), today)
+                { -SportsFixtureTimes.placed(it, nowMillis) }, { order[it.league] ?: Int.MAX_VALUE }, { it.title })), today)
         }
         return rows
     }
@@ -329,12 +345,14 @@ object SportsFavourites {
         if (favourites.isEmpty()) return emptySet()
         val exact = key(league, team)
         if (exact in favourites) return setOf(exact)
-        val names = (listOf(team.name) + listOfNotNull(team.shortName) + team.alternatives).map(::words).filter { it.isNotEmpty() }
+        val main = (listOf(team.name) + listOfNotNull(team.shortName)).map(::words).filter { it.isNotEmpty() }
+        val names = main + team.alternatives.map(::words).filter { it.isNotEmpty() }
         return favourites.filterTo(HashSet()) { favourite ->
             val (favouriteLeague, name) = parse(favourite) ?: return@filterTo false
             if (favouriteLeague != league) return@filterTo false
             val wanted = words(name)
-            wanted.isNotEmpty() && names.any { it == wanted || (it.size > wanted.size && it.subList(0, wanted.size) == wanted) || (wanted.size > it.size && wanted.subList(0, it.size) == it) }
+            wanted.isNotEmpty() && (names.any { it == wanted || (it.size > wanted.size && it.subList(0, wanted.size) == wanted) } ||
+                main.any { wanted.size > it.size && wanted.subList(0, it.size) == it })
         }
     }
 

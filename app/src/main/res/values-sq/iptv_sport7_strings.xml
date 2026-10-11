@@ -14,9 +14,7 @@
     <string name="iptv_sport7_key_subtitle">Opsional. Çelësi yt shton liga që ESPN nuk i mbulon, rezultate live për to, kanale TV për ekipet që ndjek dhe një rezervë kur ESPN dështon. Ruhet i enkriptuar në këtë pajisje.</string>
     <string name="iptv_sport7_key_hint">Çelësi yt personal i API-së TheSportsDB</string>
     <string name="iptv_sport7_source_espn">ESPN</string>
-    <string name="iptv_sport7_source_both">ESPN, me TheSportsDB si rezervë</string>
     <string name="iptv_sport7_source_sportsdb">TheSportsDB</string>
-    <string name="iptv_sport7_source_needs_key">TheSportsDB · kërkon çelësin tënd</string>
     <string name="iptv_sport7_logos">Logot e ekipeve</string>
     <string name="iptv_sport7_logos_subtitle">Kur logot janë çaktivizuar, shfaqen monograme</string>
     <string name="iptv_sport7_logos_espn">Vetëm logot e ESPN</string>

@@ -14,9 +14,7 @@
     <string name="iptv_sport7_key_subtitle">Προαιρετικό. Με το δικό σας κλειδί προστίθενται πρωταθλήματα που δεν καλύπτει το ESPN, ζωντανά σκορ για αυτά, τηλεοπτικά κανάλια για τις ομάδες που ακολουθείτε και εφεδρική πηγή όταν το ESPN αποτυγχάνει. Αποθηκεύεται κρυπτογραφημένο σε αυτήν τη συσκευή.</string>
     <string name="iptv_sport7_key_hint">Το προσωπικό σας κλειδί API του TheSportsDB</string>
     <string name="iptv_sport7_source_espn">ESPN</string>
-    <string name="iptv_sport7_source_both">ESPN, με το TheSportsDB ως εφεδρικό</string>
     <string name="iptv_sport7_source_sportsdb">TheSportsDB</string>
-    <string name="iptv_sport7_source_needs_key">TheSportsDB · χρειάζεται το κλειδί σας</string>
     <string name="iptv_sport7_logos">Λογότυπα ομάδων</string>
     <string name="iptv_sport7_logos_subtitle">Όταν τα λογότυπα είναι απενεργοποιημένα, εμφανίζονται μονογράμματα</string>
     <string name="iptv_sport7_logos_espn">Μόνο λογότυπα ESPN</string>

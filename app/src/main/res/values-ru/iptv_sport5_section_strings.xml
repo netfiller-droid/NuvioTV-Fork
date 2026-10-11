@@ -61,10 +61,4 @@
         <item quantity="many">%1$d аутов</item>
         <item quantity="other">%1$d аута</item>
     </plurals>
-    <plurals name="iptv_sport5_section_other_feeds">
-        <item quantity="one">Ещё %1$d трансляция</item>
-        <item quantity="few">Ещё %1$d трансляции</item>
-        <item quantity="many">Ещё %1$d трансляций</item>
-        <item quantity="other">Ещё %1$d трансляции</item>
-    </plurals>
 </resources>

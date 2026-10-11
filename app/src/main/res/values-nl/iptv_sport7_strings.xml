@@ -14,9 +14,7 @@
     <string name="iptv_sport7_key_subtitle">Optioneel. Met je eigen sleutel krijg je competities die ESPN niet dekt, live-uitslagen daarvan, tv-zenders voor gevolgde teams en een reserve als ESPN faalt. Versleuteld opgeslagen op dit apparaat.</string>
     <string name="iptv_sport7_key_hint">Je persoonlijke TheSportsDB-API-sleutel</string>
     <string name="iptv_sport7_source_espn">ESPN</string>
-    <string name="iptv_sport7_source_both">ESPN, met TheSportsDB als reserve</string>
     <string name="iptv_sport7_source_sportsdb">TheSportsDB</string>
-    <string name="iptv_sport7_source_needs_key">TheSportsDB · vereist je sleutel</string>
     <string name="iptv_sport7_logos">Teamlogo\'s</string>
     <string name="iptv_sport7_logos_subtitle">Monogrammen worden getoond als logo\'s uit staan</string>
     <string name="iptv_sport7_logos_espn">Alleen ESPN-logo\'s</string>

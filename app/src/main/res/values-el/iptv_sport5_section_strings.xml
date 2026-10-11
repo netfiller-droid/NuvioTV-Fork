@@ -55,8 +55,4 @@
         <item quantity="one">%1$d άουτ</item>
         <item quantity="other">%1$d άουτ</item>
     </plurals>
-    <plurals name="iptv_sport5_section_other_feeds">
-        <item quantity="one">%1$d ακόμη ροή</item>
-        <item quantity="other">%1$d ακόμη ροές</item>
-    </plurals>
 </resources>

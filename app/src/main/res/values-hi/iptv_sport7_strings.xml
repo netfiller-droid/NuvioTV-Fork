@@ -14,9 +14,7 @@
     <string name="iptv_sport7_key_subtitle">वैकल्पिक। अपनी की से ऐसी लीग जुड़ती हैं जिन्हें ESPN कवर नहीं करता, उनके लाइव स्कोर, फ़ॉलो की गई टीमों के टीवी चैनल और ESPN के फ़ेल होने पर बैकअप। इस डिवाइस पर एन्क्रिप्ट करके सेव की जाती है।</string>
     <string name="iptv_sport7_key_hint">आपकी निजी TheSportsDB API की</string>
     <string name="iptv_sport7_source_espn">ESPN</string>
-    <string name="iptv_sport7_source_both">ESPN, बैकअप के तौर पर TheSportsDB</string>
     <string name="iptv_sport7_source_sportsdb">TheSportsDB</string>
-    <string name="iptv_sport7_source_needs_key">TheSportsDB · आपकी की ज़रूरी है</string>
     <string name="iptv_sport7_logos">टीम लोगो</string>
     <string name="iptv_sport7_logos_subtitle">लोगो बंद होने पर मोनोग्राम दिखाए जाते हैं</string>
     <string name="iptv_sport7_logos_espn">सिर्फ़ ESPN लोगो</string>

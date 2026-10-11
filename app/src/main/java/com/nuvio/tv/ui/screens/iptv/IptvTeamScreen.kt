@@ -195,7 +195,7 @@ fun IptvTeamScreen(viewModel: IptvTeamViewModel = hiltViewModel()) {
                         SettingsToggleRow(title = stringResource(R.string.iptv_sport5_nuvio_record_every_rule), subtitle = stringResource(R.string.iptv_sport5_nuvio_record_every_subtitle),
                             checked = state.rule, onToggle = viewModel::toggleRule)
                         InfoRow(stringResource(R.string.iptv_sport5_nuvio_start_early), stringResource(R.string.iptv_sport5_nuvio_live_tv_minutes, state.early))
-                        InfoRow(stringResource(R.string.iptv_sport5_nuvio_keep_going), stringResource(R.string.iptv_sport5_nuvio_finals_minutes, state.late,
+                        InfoRow(stringResource(R.string.iptv_sport5_nuvio_keep_going), stringResource(R.string.iptv_ui27_sport_keep_going, state.late,
                             (SportsRecordRules.FINAL_EXTRA_MILLIS / 60_000L).toInt()))
                         InfoRow(stringResource(R.string.iptv_sport5_nuvio_save_to), state.saveTo ?: stringResource(R.string.iptv_sport5_nuvio_live_tv_setting))
                         InfoRow(stringResource(R.string.iptv_sport5_nuvio_no_channel_by), stringResource(R.string.iptv_sport5_nuvio_tell_me))

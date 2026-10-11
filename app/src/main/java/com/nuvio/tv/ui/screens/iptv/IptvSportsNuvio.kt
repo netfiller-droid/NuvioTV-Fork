@@ -54,6 +54,7 @@ import androidx.tv.material3.Text
 import com.nuvio.tv.R
 import com.nuvio.tv.core.iptv.FixtureStatus
 import com.nuvio.tv.core.iptv.RecordingStatus
+import com.nuvio.tv.core.iptv.RecordingStop
 import com.nuvio.tv.core.iptv.SportsChange
 import com.nuvio.tv.core.iptv.SportsChangeKind
 import com.nuvio.tv.core.iptv.SportsFavourites
@@ -169,6 +170,7 @@ class IptvSportsNuvio @Inject constructor(@ApplicationContext private val contex
     private val recent = ArrayDeque<SportsChange>()
     private val muted = HashSet<String>()
     private val handled = HashSet<String>()
+    private val finals = HashMap<String, Long>()
     private var handle: IptvSportsLive.Handle? = null
     private val reminderSurfaces = java.util.concurrent.atomic.AtomicInteger()
     private var worker: Job? = null
@@ -358,6 +360,11 @@ class IptvSportsNuvio @Inject constructor(@ApplicationContext private val contex
             fixtures.forEach { next[it.key] = it }
             next.values.filter { it.startMillis + SportsRefresh.durationMillis(it) + KEEP_MILLIS > now }.sortedBy { it.startMillis }
         }
+        synchronized(finals) {
+            val shown = fixtureList.value.associateBy { it.key }
+            finals.keys.retainAll { shown[it]?.status == FixtureStatus.FINAL }
+            shown.values.filter { it.status == FixtureStatus.FINAL }.forEach { finals.putIfAbsent(it.key, now) }
+        }
         refreshSpoilers()
     }
 
@@ -368,9 +375,11 @@ class IptvSportsNuvio @Inject constructor(@ApplicationContext private val contex
             val now = System.currentTimeMillis()
             val profile = profiles.activeProfileId.value
             val waiting = SportsPendingRecords.prune(pendingList.value, now).filter { it.profileId == profile }
-            if (favourites.isEmpty() && waiting.isEmpty()) return@withLock
+            val running = recorder.all.value.filter { it.status == RecordingStatus.RECORDING && it.fixtureKey != null }
+            if (favourites.isEmpty() && waiting.isEmpty() && running.isEmpty()) return@withLock
             if (force || now - loadedAt >= LOAD_MILLIS || now < loadedAt) {
-                val result = repository.load(now, ZoneId.systemDefault(), true, favourites, followedOnly = true, alsoLeagues = SportsPendingRecords.leagues(waiting))
+                val result = repository.load(now, ZoneId.systemDefault(), true, favourites, followedOnly = true,
+                    alsoLeagues = SportsPendingRecords.leagues(waiting) + running.mapNotNull { it.fixtureKey?.substringBefore(':') })
                 loadedAt = now
                 if (result.enabled) merge(result.fixtures)
             }
@@ -386,6 +395,7 @@ class IptvSportsNuvio @Inject constructor(@ApplicationContext private val contex
             }
             applyRules(followed, favourites, profile, now)
             applyPending(awaited, profile)
+            finishRecordings(running, now)
         } catch (cancel: CancellationException) { throw cancel }
         catch (error: Exception) { IptvLog.failure("sports nuvio", error) }
     }
@@ -420,6 +430,17 @@ class IptvSportsNuvio @Inject constructor(@ApplicationContext private val contex
         }
     }
 
+    private fun finishRecordings(running: List<IptvRecording>, now: Long) {
+        if (running.isEmpty()) return
+        val known = fixtureList.value.associateBy { it.key }
+        val since = synchronized(finals) { HashMap(finals) }
+        for (entry in running) {
+            val key = entry.fixtureKey ?: continue
+            if (SportsRecordRules.ended(known[key], entry.stopMillis, entry.programmeStopMillis, lateMinutes * 60_000L, since[key], now) &&
+                recorder.stop(entry.id, RecordingStop.ENDED)) IptvLog.info("sports recording ended with the game")
+        }
+    }
+
     private suspend fun schedule(fixture: SportsFixture, link: IptvFixtureLink): IptvRecordResult? {
         val now = System.currentTimeMillis()
         val target = target(link)
@@ -427,7 +448,7 @@ class IptvSportsNuvio @Inject constructor(@ApplicationContext private val contex
         val profile = profiles.activeProfileId.value
         return try {
             recorder.scheduleSport(access.open(profile), IptvSourceRef(profile, target.sourceId), target.channelId, link.programme, plainTitle(fixture).take(500),
-                window, fixture.key)
+                window, fixture.key, coreStopMillis = SportsRecordRules.end(fixture, target.programmeStopMillis, target.programmeTitle, lateMinutes * 60_000L))
         } catch (cancel: CancellationException) { throw cancel }
         catch (error: Exception) { IptvLog.failure("sports record", error); null }
     }
@@ -435,12 +456,11 @@ class IptvSportsNuvio @Inject constructor(@ApplicationContext private val contex
     private fun target(link: IptvFixtureLink) = SportsRecordTarget(link.row.item.channel.sourceId, link.row.item.channel.id,
         link.programme?.start?.epochMillis, link.programme?.stop?.epochMillis, link.programme?.titles?.firstOrNull()?.text)
 
-    private fun readRules(): Set<String> = store.getStringSet(RULES_KEY, null).orEmpty().filter { SportsFavourites.parse(it) != null && it.length <= 200 }
-        .take(SportsRecordRules.MAX_RULES).toSet()
+    private fun readRules(): Set<String> = SportsRecordRules.read(store.getStringSet(RULES_KEY, null).orEmpty())
 
     private fun readPending(): List<SportsPendingRecord> = try {
         SportsPendingRecords.prune(store.getStringSet(PENDING_KEY, null).orEmpty().take(SportsPendingRecords.MAX * 2)
-            .mapNotNull(SportsPendingRecords::decode), System.currentTimeMillis())
+            .mapNotNull(SportsPendingRecords::decode).map(SportsPendingRecords::migrate), System.currentTimeMillis())
     } catch (error: Exception) { IptvLog.failure("sports pending read", error); emptyList() }
 
     private companion object {
@@ -625,7 +645,7 @@ private fun AlertCard(alert: IptvPlayerAlert, nuvio: IptvSportsNuvio, focus: Boo
     Column(modifier.width(430.dp).clip(RoundedCornerShape(16.dp)).background(NuvioTheme.colors.Background.copy(alpha = .95f))) {
         Row(Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, top = 14.dp, bottom = 8.dp), verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            Text(alertHeadline(alert).uppercase(), style = SportCaps, color = NuvioTheme.colors.TextPrimary, maxLines = 1,
+            Text(alertHeadline(alert), style = SportCaps, color = NuvioTheme.colors.TextPrimary, maxLines = 1,
                 overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
             CardState(fixture, fixture.sportDetail, hidden)
         }

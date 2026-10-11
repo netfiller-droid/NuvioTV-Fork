@@ -14,9 +14,7 @@
     <string name="iptv_sport7_key_subtitle">Volitelné. Vlastní klíč přidá ligy, které ESPN nepokrývá, jejich živé výsledky, TV kanály sledovaných týmů a záložní zdroj, když ESPN selže. Uložen šifrovaně v tomto zařízení.</string>
     <string name="iptv_sport7_key_hint">Váš osobní API klíč TheSportsDB</string>
     <string name="iptv_sport7_source_espn">ESPN</string>
-    <string name="iptv_sport7_source_both">ESPN, se záložním TheSportsDB</string>
     <string name="iptv_sport7_source_sportsdb">TheSportsDB</string>
-    <string name="iptv_sport7_source_needs_key">TheSportsDB · vyžaduje váš klíč</string>
     <string name="iptv_sport7_logos">Loga týmů</string>
     <string name="iptv_sport7_logos_subtitle">Když jsou loga vypnutá, zobrazují se monogramy</string>
     <string name="iptv_sport7_logos_espn">Jen loga ESPN</string>

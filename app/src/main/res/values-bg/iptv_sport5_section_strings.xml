@@ -55,8 +55,4 @@
         <item quantity="one">%1$d аут</item>
         <item quantity="other">%1$d аута</item>
     </plurals>
-    <plurals name="iptv_sport5_section_other_feeds">
-        <item quantity="one">%1$d друг поток</item>
-        <item quantity="other">%1$d други потока</item>
-    </plurals>
 </resources>

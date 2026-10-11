@@ -52,7 +52,4 @@
     <plurals name="iptv_sport5_section_outs">
         <item quantity="other">%1$d out</item>
     </plurals>
-    <plurals name="iptv_sport5_section_other_feeds">
-        <item quantity="other">%1$d luồng khác</item>
-    </plurals>
 </resources>

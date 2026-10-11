@@ -14,9 +14,7 @@
     <string name="iptv_sport7_key_subtitle">Optional. Your own key adds leagues ESPN doesn\'t cover, live scores for them, TV channels for followed teams and a backup when ESPN fails. Stored encrypted on this device.</string>
     <string name="iptv_sport7_key_hint">Your personal TheSportsDB API key</string>
     <string name="iptv_sport7_source_espn">ESPN</string>
-    <string name="iptv_sport7_source_both">ESPN, with TheSportsDB as backup</string>
     <string name="iptv_sport7_source_sportsdb">TheSportsDB</string>
-    <string name="iptv_sport7_source_needs_key">TheSportsDB · needs your key</string>
     <string name="iptv_sport7_logos">Team logos</string>
     <string name="iptv_sport7_logos_subtitle">Monograms are shown when logos are off</string>
     <string name="iptv_sport7_logos_espn">ESPN logos only</string>

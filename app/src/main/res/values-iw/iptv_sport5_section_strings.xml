@@ -61,10 +61,4 @@
         <item quantity="many">%1$d אאוטים</item>
         <item quantity="other">%1$d אאוטים</item>
     </plurals>
-    <plurals name="iptv_sport5_section_other_feeds">
-        <item quantity="one">%1$d שידור נוסף</item>
-        <item quantity="two">%1$d שידורים נוספים</item>
-        <item quantity="many">%1$d שידורים נוספים</item>
-        <item quantity="other">%1$d שידורים נוספים</item>
-    </plurals>
 </resources>

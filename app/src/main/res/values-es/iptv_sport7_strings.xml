@@ -14,9 +14,7 @@
     <string name="iptv_sport7_key_subtitle">Opcional. Tu propia clave añade ligas que ESPN no cubre, sus resultados en directo, canales de TV para los equipos que sigues y una alternativa cuando ESPN falla. Se guarda cifrada en este dispositivo.</string>
     <string name="iptv_sport7_key_hint">Tu clave personal de la API de TheSportsDB</string>
     <string name="iptv_sport7_source_espn">ESPN</string>
-    <string name="iptv_sport7_source_both">ESPN, con TheSportsDB como alternativa</string>
     <string name="iptv_sport7_source_sportsdb">TheSportsDB</string>
-    <string name="iptv_sport7_source_needs_key">TheSportsDB · necesita tu clave</string>
     <string name="iptv_sport7_logos">Logos de equipos</string>
     <string name="iptv_sport7_logos_subtitle">Se muestran monogramas cuando los logos están desactivados</string>
     <string name="iptv_sport7_logos_espn">Solo logos de ESPN</string>

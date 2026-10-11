@@ -14,9 +14,7 @@
     <string name="iptv_sport7_key_subtitle">Izbirno. Z lastnim ključem dobite lige, ki jih ESPN ne pokriva, njihove rezultate v živo, TV-kanale za ekipe, ki jim sledite, in rezervni vir, ko ESPN odpove. Shranjen šifriran v tej napravi.</string>
     <string name="iptv_sport7_key_hint">Vaš osebni API-ključ TheSportsDB</string>
     <string name="iptv_sport7_source_espn">ESPN</string>
-    <string name="iptv_sport7_source_both">ESPN, s TheSportsDB kot rezervo</string>
     <string name="iptv_sport7_source_sportsdb">TheSportsDB</string>
-    <string name="iptv_sport7_source_needs_key">TheSportsDB · potrebuje vaš ključ</string>
     <string name="iptv_sport7_logos">Logotipi ekip</string>
     <string name="iptv_sport7_logos_subtitle">Ko so logotipi izklopljeni, so prikazani monogrami</string>
     <string name="iptv_sport7_logos_espn">Samo logotipi ESPN</string>

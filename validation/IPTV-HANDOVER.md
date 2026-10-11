@@ -70,9 +70,13 @@ under "Earlier session notes" and the dated sections is history kept for referen
      fixture title in `SportsFixturesParsers.kt`); the screens use
      `iptv_ui25_sep_versus`/`iptv_ui25_sep_at`. A custom league can only be removed by
      unticking it and leaving the picker.
-   - Unused strings: `iptv_sport5_section_other_feeds`, `iptv_sport7_source_both`,
-     `iptv_sport7_source_needs_key` (search `R.string.` and `R.plurals.` before removing;
-     remove from all 41 values folders).
+   - Sport recordings are scheduled with an overtime allowance and stopped early once the
+     game is final only while the app runs (`IptvSportsNuvio.maintain`); in the background
+     they run to the full allowance. Older pending sport recordings without stored team
+     names re-key after a league move only when one game fits. Golf is assumed to finish
+     about 18:00 Eastern on its final day (`SportsFixtureTimes`). `array.getString(i)` on
+     app-written JSON in `core/iptv/CatalogueReview.kt` and `SetupMerge.kt` would read
+     "null" on Android if an entry were ever null.
    - Tennis results from earlier days are dropped by the parser's 12-hour rule.
    - NBA team fouls and timeouts are not stored.
    - Recordings in the Movies folder store the MediaStore id rather than the file name.

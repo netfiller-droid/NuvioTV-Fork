@@ -44,7 +44,6 @@
     <string name="iptv_sport5_nuvio_start_early">Fillo më herët</string>
     <string name="iptv_sport5_nuvio_keep_going">Vazhdo më pas</string>
     <string name="iptv_sport5_nuvio_live_tv_minutes">%1$d min (cilësimi i TV-së live)</string>
-    <string name="iptv_sport5_nuvio_finals_minutes">%1$d min, +%2$d min në finale</string>
     <string name="iptv_sport5_nuvio_save_to">Ruaj te</string>
     <string name="iptv_sport5_nuvio_live_tv_setting">Cilësimi i TV-së live</string>
     <string name="iptv_sport5_nuvio_no_channel_by">Pa kanal deri në fillim</string>

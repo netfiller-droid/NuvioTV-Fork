@@ -117,6 +117,24 @@ logcat (`adb logcat -s NuvioIptv:V *:E`). Do not share logs that contain address
     uploads): no leftover files on the box or the share.
 15. Guide catch-up: OK on a programme right at the edge of the archive does not stop the
     channel that is playing.
+16. A golf tournament on day 3 or 4: still on the Sport page and in All scores as live. The
+    morning after it finishes it shows under "Earlier today", with a catch-up link where
+    your provider has catch-up.
+17. A TheSportsDB hockey or football game shown live hours after it should have ended now
+    shows the final score.
+18. A TheSportsDB league you added that is now built in (e.g. Top 14), with "Record every
+    game" on for a team: the rule is still on, the team page shows its games, and the next
+    game is recorded.
+19. Follow the New York Jets only: Giants games are not marked as followed or recorded.
+20. All scores: past days show no count until opened, then "Loading results…", then the
+    results.
+21. Open a tennis or golf game in Game Centre and bring the controls up several times:
+    nothing goes wrong.
+22. NFL game in overtime: the score bug shows two timeout marks per team; college overtime
+    shows one.
+23. Record an NFL game that goes to overtime: the recording carries on until the game ends;
+    with the app open it stops your "keep going" time after the final. The Record every
+    game panel reads "…, and on while a game runs over".
 
 ## 7m. Live NFL and NASCAR from the 12 October capture (build `85fe99dce`)
 1. Live NFL game, score over the video: three small bars beside each team logo show the

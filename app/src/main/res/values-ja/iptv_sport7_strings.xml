@@ -14,9 +14,7 @@
     <string name="iptv_sport7_key_subtitle">任意。ご自身のキーを使うと、ESPN が対応していないリーグ、そのライブスコア、フォロー中のチームのテレビチャンネル、ESPN に障害が起きたときのバックアップが追加されます。このデバイスに暗号化して保存されます。</string>
     <string name="iptv_sport7_key_hint">個人用の TheSportsDB API キー</string>
     <string name="iptv_sport7_source_espn">ESPN</string>
-    <string name="iptv_sport7_source_both">ESPN（バックアップ: TheSportsDB）</string>
     <string name="iptv_sport7_source_sportsdb">TheSportsDB</string>
-    <string name="iptv_sport7_source_needs_key">TheSportsDB · キーが必要</string>
     <string name="iptv_sport7_logos">チームロゴ</string>
     <string name="iptv_sport7_logos_subtitle">ロゴがオフのときはモノグラムを表示します</string>
     <string name="iptv_sport7_logos_espn">ESPN のロゴのみ</string>

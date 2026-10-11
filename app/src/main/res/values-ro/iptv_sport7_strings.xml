@@ -14,9 +14,7 @@
     <string name="iptv_sport7_key_subtitle">Opțional. Propria cheie adaugă ligi pe care ESPN nu le acoperă, scoruri live pentru ele, canale TV pentru echipele urmărite și o rezervă când ESPN nu funcționează. Stocată criptat pe acest dispozitiv.</string>
     <string name="iptv_sport7_key_hint">Cheia ta personală de API TheSportsDB</string>
     <string name="iptv_sport7_source_espn">ESPN</string>
-    <string name="iptv_sport7_source_both">ESPN, cu TheSportsDB ca rezervă</string>
     <string name="iptv_sport7_source_sportsdb">TheSportsDB</string>
-    <string name="iptv_sport7_source_needs_key">TheSportsDB · necesită cheia ta</string>
     <string name="iptv_sport7_logos">Logouri echipe</string>
     <string name="iptv_sport7_logos_subtitle">Monogramele sunt afișate când logourile sunt dezactivate</string>
     <string name="iptv_sport7_logos_espn">Doar logouri ESPN</string>

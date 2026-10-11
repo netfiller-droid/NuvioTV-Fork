@@ -61,10 +61,4 @@
         <item quantity="many">%1$d auto</item>
         <item quantity="other">%1$d autų</item>
     </plurals>
-    <plurals name="iptv_sport5_section_other_feeds">
-        <item quantity="one">%1$d kitas srautas</item>
-        <item quantity="few">%1$d kiti srautai</item>
-        <item quantity="many">%1$d kito srauto</item>
-        <item quantity="other">%1$d kitų srautų</item>
-    </plurals>
 </resources>

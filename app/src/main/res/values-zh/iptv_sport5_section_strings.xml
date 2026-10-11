@@ -52,7 +52,4 @@
     <plurals name="iptv_sport5_section_outs">
         <item quantity="other">%1$d 出局</item>
     </plurals>
-    <plurals name="iptv_sport5_section_other_feeds">
-        <item quantity="other">另有 %1$d 个信号源</item>
-    </plurals>
 </resources>

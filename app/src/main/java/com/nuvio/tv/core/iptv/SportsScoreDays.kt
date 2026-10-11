@@ -32,7 +32,7 @@ object SportsScoreDays {
 
     fun dayOf(fixture: SportsFixture, nowMillis: Long, zone: ZoneId): LocalDate {
         val today = dateOf(nowMillis, zone)
-        val day = Instant.ofEpochMilli(fixture.startMillis).atZone(zone).toLocalDate()
+        val day = SportsFixtureTimes.day(fixture, nowMillis, zone)
         return if (fixture.status == FixtureStatus.LIVE || (fixture.status == FixtureStatus.SCHEDULED && day.isBefore(today) && fixture.startMillis <= nowMillis)) today else day
     }
 

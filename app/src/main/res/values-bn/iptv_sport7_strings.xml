@@ -14,9 +14,7 @@
     <string name="iptv_sport7_key_subtitle">ঐচ্ছিক। নিজের কী দিলে ESPN যেসব লিগ কভার করে না সেগুলো, সেগুলোর লাইভ স্কোর, ফলো করা দলের টিভি চ্যানেল এবং ESPN ব্যর্থ হলে ব্যাকআপ যোগ হয়। এই ডিভাইসে এনক্রিপ্ট করে সংরক্ষিত থাকে।</string>
     <string name="iptv_sport7_key_hint">আপনার ব্যক্তিগত TheSportsDB API কী</string>
     <string name="iptv_sport7_source_espn">ESPN</string>
-    <string name="iptv_sport7_source_both">ESPN, ব্যাকআপ হিসেবে TheSportsDB</string>
     <string name="iptv_sport7_source_sportsdb">TheSportsDB</string>
-    <string name="iptv_sport7_source_needs_key">TheSportsDB · আপনার কী লাগবে</string>
     <string name="iptv_sport7_logos">দলের লোগো</string>
     <string name="iptv_sport7_logos_subtitle">লোগো বন্ধ থাকলে মনোগ্রাম দেখানো হয়</string>
     <string name="iptv_sport7_logos_espn">শুধু ESPN লোগো</string>

@@ -55,8 +55,4 @@
         <item quantity="one">%1$d aut</item>
         <item quantity="other">%1$d aute</item>
     </plurals>
-    <plurals name="iptv_sport5_section_other_feeds">
-        <item quantity="one">%1$d transmetim tjetër</item>
-        <item quantity="other">%1$d transmetime të tjera</item>
-    </plurals>
 </resources>

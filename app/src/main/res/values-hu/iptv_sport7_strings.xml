@@ -14,9 +14,7 @@
     <string name="iptv_sport7_key_subtitle">Nem kötelező. A saját kulcsoddal olyan bajnokságok is elérhetők, amelyeket az ESPN nem fed le, azok élő eredményei, a követett csapatok TV-csatornái, és tartalékforrás, ha az ESPN nem működik. Titkosítva tárolódik ezen az eszközön.</string>
     <string name="iptv_sport7_key_hint">Saját TheSportsDB API-kulcsod</string>
     <string name="iptv_sport7_source_espn">ESPN</string>
-    <string name="iptv_sport7_source_both">ESPN, a TheSportsDB-vel tartalékként</string>
     <string name="iptv_sport7_source_sportsdb">TheSportsDB</string>
-    <string name="iptv_sport7_source_needs_key">TheSportsDB · a kulcsod szükséges</string>
     <string name="iptv_sport7_logos">Csapatlogók</string>
     <string name="iptv_sport7_logos_subtitle">Ha a logók ki vannak kapcsolva, monogramok jelennek meg</string>
     <string name="iptv_sport7_logos_espn">Csak ESPN-logók</string>

@@ -14,9 +14,7 @@
     <string name="iptv_sport7_key_subtitle">Valgfri. Din egen nøgle tilføjer ligaer, som ESPN ikke dækker, livescorer for dem, tv-kanaler for fulgte hold og en reserve, når ESPN fejler. Gemmes krypteret på denne enhed.</string>
     <string name="iptv_sport7_key_hint">Din personlige TheSportsDB-API-nøgle</string>
     <string name="iptv_sport7_source_espn">ESPN</string>
-    <string name="iptv_sport7_source_both">ESPN med TheSportsDB som reserve</string>
     <string name="iptv_sport7_source_sportsdb">TheSportsDB</string>
-    <string name="iptv_sport7_source_needs_key">TheSportsDB · kræver din nøgle</string>
     <string name="iptv_sport7_logos">Holdlogoer</string>
     <string name="iptv_sport7_logos_subtitle">Monogrammer vises, når logoer er slået fra</string>
     <string name="iptv_sport7_logos_espn">Kun ESPN-logoer</string>

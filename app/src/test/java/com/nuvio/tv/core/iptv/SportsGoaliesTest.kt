@@ -1,5 +1,6 @@
 package com.nuvio.tv.core.iptv
 
+import org.json.JSONObject
 import org.junit.Assert.*
 import org.junit.Test
 
@@ -17,6 +18,26 @@ class SportsGoaliesTest {
         assertEquals(18, grubauer.shotsAgainst)
         assertEquals(".944", SportsGoalies.savePct(grubauer.savePct))
         assertEquals("Grubauer", SportsGoalies.surname(grubauer.name))
+    }
+
+    @Test fun nullStatsAreReadAsMissing() {
+        val root = JSONObject(sample("espn-nhl-summary-real-20261010.json"))
+        val players = root.getJSONObject("boxscore").getJSONArray("players")
+        for (team in 0 until players.length()) {
+            val groups = players.getJSONObject(team).getJSONArray("statistics")
+            for (index in 0 until groups.length()) {
+                val group = groups.getJSONObject(index).takeIf { it.optString("name") == "goalies" } ?: continue
+                val keys = group.getJSONArray("keys")
+                val saves = (0 until keys.length()).first { keys.optString(it) == "saves" }
+                keys.put((0 until keys.length()).first { keys.optString(it) == "savePct" }, JSONObject.NULL)
+                val athletes = group.getJSONArray("athletes")
+                for (athlete in 0 until athletes.length()) athletes.getJSONObject(athlete).getJSONArray("stats").put(saves, JSONObject.NULL)
+            }
+        }
+        val goalies = EspnSummary.parse(root.toString(), SportsLeagues.byId("nhl")!!).goalies
+        assertTrue(goalies.isNotEmpty())
+        assertTrue(goalies.all { it.saves == null && it.savePct == null })
+        assertEquals(18, goalies.first { it.name == "Philipp Grubauer" }.shotsAgainst)
     }
 
     @Test fun pulledGoalieGivesWayToTheOneFacingMoreShots() {

@@ -54,6 +54,40 @@ class IptvSportsSummaryClientTest {
         }
     }
 
+    @Test fun aStoppedWatchIsNotStartedAgainForTheSameGame() {
+        MockWebServer().use { server ->
+            server.enqueue(MockResponse().setResponseCode(410))
+            server.enqueue(MockResponse().setBody(body("post")))
+            repeat(3) { server.enqueue(MockResponse().setBody(body("in"))) }
+            val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+            try {
+                val watch = IptvSportsSummaryWatch(IptvSportsSummaryClient(espnBase = server.url("/sports/")), scope, liveMillis = 20, waitingMillis = 20)
+                val live = fixture(FixtureStatus.LIVE)
+                watch.start(live)
+                waitFor { server.requestCount >= 1 }
+                Thread.sleep(150)
+                repeat(3) { watch.start(live); Thread.sleep(50) }
+                assertEquals(1, server.requestCount)
+                val other = live.copy(id = "8")
+                watch.start(other)
+                waitFor { watch.summary.value != null }
+                Thread.sleep(150)
+                assertEquals(2, server.requestCount)
+                watch.stop()
+                watch.start(other)
+                Thread.sleep(150)
+                assertEquals(2, server.requestCount)
+                watch.start(live.copy(id = "9"))
+                waitFor { server.requestCount >= 3 }
+                watch.stop()
+                watch.start(live.copy(id = "9"))
+                waitFor { server.requestCount >= 4 }
+                watch.stop()
+                assertTrue(server.requestCount >= 4)
+            } finally { scope.cancel() }
+        }
+    }
+
     @Test fun fetchesParsesAndCapsTheBody() = runBlocking {
         MockWebServer().use { server ->
             server.enqueue(MockResponse().setBody(body("in")))

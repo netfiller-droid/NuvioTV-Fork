@@ -27,7 +27,7 @@ class SportsRecordRulesTest {
         val plan = outcome.plans.single()
         assertEquals(linked.key, plan.fixture.key)
         assertEquals(linked.startMillis - early, plan.window.startMillis)
-        assertEquals(linked.startMillis + 135 * minute + late, plan.window.stopMillis)
+        assertEquals(linked.startMillis + 135 * minute + late + 30 * minute, plan.window.stopMillis)
         assertFalse(plan.final)
         assertEquals(listOf(unlinked.key), outcome.waiting.map { it.key })
         assertTrue(outcome.missed.isEmpty())
@@ -53,7 +53,7 @@ class SportsRecordRulesTest {
         assertTrue(SportsRecordRules.final(final))
         val plan = SportsRecordRules.plan(rules, listOf(final), mapOf(final.key to target()), emptySet(), early, late, now).plans.single()
         assertTrue(plan.final)
-        assertEquals(final.startMillis + 135 * minute + late + SportsRecordRules.FINAL_EXTRA_MILLIS, plan.window.stopMillis)
+        assertEquals(final.startMillis + 135 * minute + late + SportsRecordRules.FINAL_EXTRA_MILLIS + 60 * minute, plan.window.stopMillis)
         assertTrue(SportsRecordRules.final(game("3", now), "Semi-Final: Sydney FC v Western Sydney Wanderers"))
         assertFalse(SportsRecordRules.final(game("4", now), "A-League Men: Sydney FC v Western Sydney Wanderers"))
         assertFalse(SportsRecordRules.final(game("5", now, FixtureStatus.LIVE).copy(detail = "Final")))
@@ -62,9 +62,9 @@ class SportsRecordRulesTest {
     @Test fun broadcastEndExtendsOnlyWithinReason() {
         val fixture = game("1", now + 60 * minute)
         val longer = SportsRecordRules.window(fixture, target(stop = fixture.startMillis + 150 * minute), early, late, now)!!
-        assertEquals(fixture.startMillis + 150 * minute + late, longer.stopMillis)
+        assertEquals(fixture.startMillis + 150 * minute + late + 30 * minute, longer.stopMillis)
         val silly = SportsRecordRules.window(fixture, target(stop = fixture.startMillis + 600 * minute), early, late, now)!!
-        assertEquals(fixture.startMillis + 135 * minute + late, silly.stopMillis)
+        assertEquals(fixture.startMillis + 135 * minute + late + 30 * minute, silly.stopMillis)
         val ended = game("2", now - 200 * minute, FixtureStatus.LIVE)
         assertNull(SportsRecordRules.window(ended, target(), 0, 0, now))
     }
@@ -86,5 +86,66 @@ class SportsRecordRulesTest {
         assertEquals(listOf(next.key), SportsTeams.games("a-league-men:Sydney FC", listOf(next, live), now)!!.upcoming.map { it.key })
         assertNull(SportsTeams.games("Sydney FC", listOf(next), now))
         assertNull(SportsTeams.games("nrl:Sydney Roosters", listOf(next), now)!!.current)
+    }
+
+    @Test fun recordingsCarryOnThroughOvertimeAndStopOnceTheGameIsOver() {
+        val nfl = SportsFixture("401872988", "nfl", "american-football", "New York Giants at Washington Commanders", FixtureTeam("Washington Commanders"),
+            FixtureTeam("New York Giants"), now - 222 * minute, FixtureStatus.LIVE, period = 5)
+        val target = target()
+        val scheduled = SportsRecordRules.window(nfl.copy(startMillis = now + 60 * minute, status = FixtureStatus.SCHEDULED, period = null), target, early, late, now)!!
+        assertEquals(now + 60 * minute + 210 * minute + late + 90 * minute, scheduled.stopMillis)
+        val overtime = SportsRecordRules.window(nfl, target, early, late, now)!!
+        assertEquals(now, overtime.startMillis)
+        assertEquals(nfl.startMillis + 300 * minute + late, overtime.stopMillis)
+        assertNull(SportsRecordRules.window(nfl.copy(status = FixtureStatus.FINAL), target, early, late, now))
+        val stop = nfl.startMillis + 300 * minute + late
+        val planned = nfl.startMillis + 210 * minute + late
+        assertFalse(SportsRecordRules.ended(nfl, stop, null, late, null, now))
+        assertFalse(SportsRecordRules.ended(null, stop, null, late, null, now))
+        val over = nfl.copy(status = FixtureStatus.FINAL)
+        assertFalse(SportsRecordRules.ended(over, stop, null, late, now, now))
+        assertTrue(SportsRecordRules.ended(over, stop, null, late, now - late, now))
+        assertFalse(SportsRecordRules.ended(over, stop, null, late, now - late, stop))
+        assertFalse(SportsRecordRules.ended(over, stop, null, late, planned - 60 * minute, planned - minute))
+        assertTrue(SportsRecordRules.ended(over, stop, null, late, planned - 60 * minute, planned))
+        assertFalse(SportsRecordRules.ended(over, stop, nfl.startMillis + 240 * minute, late, planned - 60 * minute, planned))
+        val notStarted = nfl.copy(status = FixtureStatus.SCHEDULED)
+        assertFalse(SportsRecordRules.ended(notStarted, stop, null, late, null, planned - minute))
+        assertTrue(SportsRecordRules.ended(notStarted, stop, null, late, null, planned))
+        assertFalse(SportsRecordRules.ended(over, planned, null, late, planned - 60 * minute, planned - minute))
+        assertEquals(30 * minute, SportsRecordRules.overtimeMillis(game("1", now)))
+        assertEquals(60 * minute, SportsRecordRules.overtimeMillis(game("1", now), "FA Cup Final"))
+        assertEquals(90 * minute, SportsRecordRules.overtimeMillis(nfl.copy(sport = "ice-hockey", league = "nhl")))
+        assertEquals(60 * minute, SportsRecordRules.overtimeMillis(nfl.copy(sport = "basketball", league = "nba")))
+    }
+
+    @Test fun rulesFromALeagueThatIsNowBuiltInStillMatch() {
+        val saved = setOf("sdb-4430:Bordeaux", "sdb-4540:Firebirds", "nfl:Seattle Seahawks", "bad", "nrl:" + "x".repeat(300))
+        val read = SportsRecordRules.read(saved)
+        assertEquals(setOf("top-14:Bordeaux", "sdb-4540:Firebirds", "nfl:Seattle Seahawks"), read)
+        val espn = SportsFixture("1", "top-14", "rugby", "Bordeaux Bègles v Toulon", FixtureTeam("Bordeaux Bègles", "Bordeaux"), FixtureTeam("Toulon"), now + 60 * minute,
+            FixtureStatus.SCHEDULED)
+        assertTrue(SportsRecordRules.wanted(read, espn))
+        assertEquals(listOf(espn.key), SportsRecordRules.plan(read, listOf(espn), mapOf(espn.key to target()), emptySet(), early, late, now).plans.map { it.fixture.key })
+        val games = SportsTeams.games("top-14:Bordeaux", listOf(espn), now)!!
+        assertEquals(espn.key, games.current?.key)
+        assertEquals("Bordeaux Bègles", games.team?.name)
+        assertEquals(true, SportsTeams.home(games, espn))
+        assertEquals(false, SportsTeams.home(games, espn.copy(home = FixtureTeam("Toulon"), away = FixtureTeam("Bordeaux Bègles"))))
+        assertNull(SportsTeams.home(games, espn.copy(home = FixtureTeam("Toulon"), away = FixtureTeam("Clermont"))))
+    }
+
+    @Test fun teamsSharingACityAreNotMixedUp() {
+        val giants = FixtureTeam("New York Giants", "Giants", "NYG", listOf("New York"))
+        val jets = FixtureTeam("New York Jets", "Jets", "NYJ", listOf("New York"))
+        val game = SportsFixture("2", "nfl", "american-football", "Giants at Commanders", FixtureTeam("Washington Commanders", "Commanders", "WSH", listOf("Washington")),
+            giants, now + 60 * minute, FixtureStatus.SCHEDULED)
+        val rules = setOf("nfl:New York Jets")
+        assertFalse(SportsRecordRules.wanted(rules, game))
+        assertFalse(SportsFavourites.has(rules, game))
+        assertTrue(SportsRecordRules.wanted(rules, game.copy(away = jets)))
+        assertNull(SportsTeams.games("nfl:New York Jets", listOf(game), now)!!.current)
+        assertTrue(SportsFavourites.has(setOf("nfl:Giants"), game))
+        assertTrue(SportsFavourites.has(setOf("nfl:New York Giants FC"), game))
     }
 }
