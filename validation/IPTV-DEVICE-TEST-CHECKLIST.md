@@ -1,6 +1,6 @@
-# Nuvio IPTV — device test checklist (build `4d0c61b39`, run 38095469187)
+# Nuvio IPTV — device test checklist (build `1cafb6dab`, run 38100231762)
 
-For this build start with section 7i, then 7h, 7g, 7f, 7e, 7d, 7c (fixes from the second 9 October pass), then 7b, 7 (Sport) and the rest.
+For this build start with section 7j, then 7i, 7h, 7g, 7f, 7e, 7d, 7c (fixes from the second 9 October pass), then 7b, 7 (Sport) and the rest.
 
 Mark each item pass / fail / not tested. For failures, note what happened and keep a
 logcat (`adb logcat -s NuvioIptv:V *:E`). Do not share logs that contain addresses.
@@ -83,6 +83,20 @@ logcat (`adb logcat -s NuvioIptv:V *:E`). Do not share logs that contain address
 11. Press Home on the remote with Game Centre open: logcat should show sports requests
    stop (`sports fetch` lines cease).
 12. Useful logs: `sports fetch service=`, `sports links`, `sports fixtures`.
+
+## 7j. Second 11 October sport capture (build `1cafb6dab`)
+1. Live baseball (Game Centre and multiview score tile): count, outs and bases show during
+   an at-bat; between innings ("End"/"Mid") the score shows no "0 outs · 0–0" and the
+   multiview tile hides the empty bases; last plays list at-bat results, not every pitch;
+   pitcher and batter are named.
+2. NHL: after offsetting penalties (same number of minors each side) no power play shows;
+   with an extra minor on one side, the other side shows the power play.
+3. College football at midfield reads "4th & 10 at 50".
+4. TV channel lists (TheSportsDB key on): worldwide services such as NBA League Pass appear
+   after your country's channels.
+5. New competitions (e.g. J1 League, Brasileirão, Copa Libertadores, Copa del Rey, League
+   One): turn one or two on; their games appear (ids checked against both providers'
+   lists in the capture).
 
 ## 7i. Recording playback and guide catch-up (build `4d0c61b39`)
 Recordings (use last night's NAS recording and a new one):

@@ -988,6 +988,9 @@ Phone setup (security review)
 
 ## Validation
 
+- Second 11 October sport capture (live baseball, NBA, NHL, college football) and 14 more
+  football competitions: CI debug green at `1cafb6dab` (run 38100231762); 890 core and 293
+  data-layer JVM tests on the host. Not device-tested.
 - Recording playback (indexed playlist, real length, quick seeks, resume, no watch party for
   recordings) and guide catch-up browsing: CI debug green at `4d0c61b39` (run 38095469187);
   the run before (38093717421, `b8e315583`) compiled and built but stopped on a timing race
