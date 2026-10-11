@@ -33,6 +33,25 @@ class IptvSportsSummaryClientTest {
         assertEquals("https://site.api.espn.com/apis/site/v2/sports/australian-football/afl/summary?event=401850001", client.url(afl, "401850001").toString())
         assertNull(client.url(afl, "../x"))
         assertNull(client.url(bigBash, "1"))
+        listOf("atp", "pga", "f1", "nascar-cup", "ufc").forEach { assertNull(it, client.url(SportsLeagues.byId(it)!!, "401850001")) }
+    }
+
+    @Test fun watchStopsWhenTheSummaryDoesNotExist() {
+        MockWebServer().use { server ->
+            repeat(3) { server.enqueue(MockResponse().setResponseCode(404)) }
+            val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+            try {
+                val watch = IptvSportsSummaryWatch(IptvSportsSummaryClient(espnBase = server.url("/sports/")), scope, liveMillis = 20, waitingMillis = 20)
+                watch.start(fixture(FixtureStatus.LIVE))
+                waitFor { server.requestCount >= 1 }
+                Thread.sleep(300)
+                assertEquals(1, server.requestCount)
+                watch.start(SportsFixture("9", "atp", "tennis", "A v B", null, null, 0L, FixtureStatus.LIVE))
+                Thread.sleep(200)
+                assertEquals(1, server.requestCount)
+                assertNull(watch.summary.value)
+            } finally { scope.cancel() }
+        }
     }
 
     @Test fun fetchesParsesAndCapsTheBody() = runBlocking {

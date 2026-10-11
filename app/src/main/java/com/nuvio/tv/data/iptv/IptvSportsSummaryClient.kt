@@ -41,7 +41,7 @@ class IptvSportsSummaryClient(private val http: OkHttpClient = IptvSportsFixture
 
     internal fun url(league: SportsLeague, eventId: String): HttpUrl? {
         val path = league.espn ?: return null
-        if (!eventId.matches(EVENT)) return null
+        if (!supported(league.sport) || !eventId.matches(EVENT)) return null
         return espnBase.newBuilder().apply { path.split('/').forEach(::addPathSegment) }.addPathSegment("summary").addQueryParameter("event", eventId).build()
     }
 
@@ -76,6 +76,9 @@ class IptvSportsSummaryClient(private val http: OkHttpClient = IptvSportsFixture
         private const val USER_AGENT = "Nuvio-Live/1"
         private const val ESPN_BASE = "https://site.api.espn.com/apis/site/v2/sports/"
         private val EVENT = Regex("[0-9]{1,20}")
+        private val NO_SUMMARY = setOf("tennis", "golf", "motorsport", "mma")
+
+        fun supported(sport: String): Boolean = sport !in NO_SUMMARY
     }
 }
 
@@ -87,7 +90,7 @@ class IptvSportsSummaryWatch(private val client: IptvSportsSummaryClient, privat
     private var key: String? = null
 
     @Synchronized fun start(fixture: SportsFixture) {
-        val league = SportsLeagues.byId(fixture.league)?.takeIf { fixture.source == SportsService.ESPN && it.espn != null }
+        val league = SportsLeagues.byId(fixture.league)?.takeIf { fixture.source == SportsService.ESPN && it.espn != null && IptvSportsSummaryClient.supported(it.sport) }
         if (key == fixture.key && job?.isActive == true) return
         job?.cancel()
         if (key != fixture.key) state.value = null
@@ -106,6 +109,7 @@ class IptvSportsSummaryWatch(private val client: IptvSportsSummaryClient, privat
                         else -> waitingMillis
                     }
                 } catch (cancel: CancellationException) { throw cancel } catch (error: Exception) {
+                    if (error is SportsFetchException && error.status in GONE) return@launch
                     failures = minOf(failures + 1, 20)
                     if (error !is SportsFetchException) IptvLog.failure("sports summary", error)
                     backoff(failures)
@@ -126,5 +130,6 @@ class IptvSportsSummaryWatch(private val client: IptvSportsSummaryClient, privat
         const val LIVE_MILLIS = 30_000L
         const val WAITING_MILLIS = 2L * 60 * 1000
         const val MAX_BACKOFF_MILLIS = 10L * 60 * 1000
+        private val GONE = setOf(400, 404, 410)
     }
 }

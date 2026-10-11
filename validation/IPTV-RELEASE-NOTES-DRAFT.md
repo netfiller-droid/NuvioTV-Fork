@@ -819,6 +819,9 @@ Sport data (fifth capture of 11 October, 22:46; first live Formula 1 race):
 - The football score bug shows HT during the half-time break, not the stoppage minute.
 - Games from TheSportsDB that have no status no longer stay live after they should have
   finished; overtime reads "OT" with the minute.
+- Tennis, golf, motor racing and UFC no longer request a game summary that ESPN does not
+  provide (these use the scoreboard data), and a summary that does not exist (400/404) is
+  not requested again for that game.
 
 ## Ready below the UI (screens pending)
 
