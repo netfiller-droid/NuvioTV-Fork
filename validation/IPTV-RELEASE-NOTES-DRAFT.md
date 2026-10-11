@@ -803,6 +803,16 @@ Sport page and multiview look (11 October; sized for 1080p and 4K screens):
 - Leagues open as a full screen: sports down the side, leagues as badge tiles with a tick,
   and a note that the app isn't linked to any league or broadcaster.
 
+Sport data (fourth capture of 11 October, 18:36; first live tennis and many finished games):
+- Finished UFC cards show how the main event ended (KO/TKO, submission, decision or draw)
+  with the round and time.
+- Cricket results read like "Australia won by 112 runs" once a match is over.
+- Game Centre shows the result and awards after a game: player of the match, winning and
+  losing pitcher, save, winning goalie and first star.
+- Hockey line scores mark a shootout "SO", and extra overtimes are numbered (2OT, 3OT).
+- Half-time scores the source got wrong are hidden instead of showing 0–0.
+- Lower-league hockey games stuck on the third period no longer show as live.
+
 ## Ready below the UI (screens pending)
 
 - Provider account groups shared by several sources (each source has its own

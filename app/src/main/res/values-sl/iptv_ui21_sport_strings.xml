@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui21_fight_ko">KO/TKO</string>
+    <string name="iptv_ui21_fight_submission">Predaja</string>
+    <string name="iptv_ui21_fight_decision">Sodniška odločitev</string>
+    <string name="iptv_ui21_fight_draw">Neodločeno</string>
+    <string name="iptv_ui21_fight_won">Zmagal %1$s · %2$s</string>
+    <string name="iptv_ui21_fight_ended">Runda %1$d, %2$s</string>
+    <string name="iptv_ui21_award_player_of_match">Igralec tekme</string>
+    <string name="iptv_ui21_award_winning_pitcher">Zmagovalni metalec</string>
+    <string name="iptv_ui21_award_losing_pitcher">Poraženi metalec</string>
+    <string name="iptv_ui21_award_save">Rešitev</string>
+    <string name="iptv_ui21_award_winning_goalie">Zmagovalni vratar</string>
+    <string name="iptv_ui21_award_first_star">Prva zvezda</string>
+</resources>

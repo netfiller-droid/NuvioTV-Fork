@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui21_fight_ko">Nakavt</string>
+    <string name="iptv_ui21_fight_submission">Teslim</string>
+    <string name="iptv_ui21_fight_decision">Hakem kararı</string>
+    <string name="iptv_ui21_fight_draw">Beraberlik</string>
+    <string name="iptv_ui21_fight_won">%1$s kazandı · %2$s</string>
+    <string name="iptv_ui21_fight_ended">%1$d. raunt, %2$s</string>
+    <string name="iptv_ui21_award_player_of_match">Maçın oyuncusu</string>
+    <string name="iptv_ui21_award_winning_pitcher">Kazanan atıcı</string>
+    <string name="iptv_ui21_award_losing_pitcher">Kaybeden atıcı</string>
+    <string name="iptv_ui21_award_save">Kurtarış</string>
+    <string name="iptv_ui21_award_winning_goalie">Kazanan kaleci</string>
+    <string name="iptv_ui21_award_first_star">Birinci yıldız</string>
+</resources>

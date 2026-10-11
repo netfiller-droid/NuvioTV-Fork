@@ -65,18 +65,29 @@ object EspnScoreboard {
         val clock = shownClock.takeIf { !stale }
         val homePeriods = periods(home, homeScore)
         val awayPeriods = periods(away, awayScore)
-        val unfilled = listOf(home to homePeriods, away to awayPeriods).any { (competitor, lines) -> lines.isEmpty() && (competitor?.optJSONArray("linescores")?.length() ?: 0) > 0 }
+        val unfilled = listOf(home to homePeriods, away to awayPeriods).any { (competitor, lines) -> lines.isEmpty() && (competitor?.optJSONArray("linescores")?.length() ?: 0) > 0 } ||
+            blankHalf(league.sport, homePeriods, awayPeriods, events)
         val homeLine = if (started) FixtureLine(homeScore, if (unfilled) emptyList() else homePeriods) else null
         val awayLine = if (started) FixtureLine(awayScore, if (unfilled) emptyList() else awayPeriods) else null
         val situation = if (paired && status == FixtureStatus.LIVE) competition?.optJSONObject("situation")?.let { situation(it, home!!, away!!) } else null
         val extra = when {
             !started -> null
-            league.sport == "cricket" -> cricket(listOf(home!! to homeTeam!!, away!! to awayTeam!!))
+            league.sport == "cricket" -> cricket(listOf(home!! to homeTeam!!, away!! to awayTeam!!),
+                statusJson?.text("summary")?.takeIf { status == FixtureStatus.FINAL }?.take(MAX_TEXT))
             league.sport == "baseball" && status == FixtureStatus.LIVE -> baseball(statusJson, type, competition?.optJSONObject("situation"))
             else -> null
         }
         return SportsFixture(id, league.id, league.sport, title, homeTeam.takeIf { paired }, awayTeam.takeIf { paired }, start, status, score,
             (if (stale) type?.text("description") else null) ?: type?.text("shortDetail") ?: type?.text("detail"), broadcasters, venue, round, period, clock, homeLine, awayLine, situation, leagueLogo, extra, events)
+    }
+
+    private fun blankHalf(sport: String, home: List<String>, away: List<String>, events: List<FixtureEvent>): Boolean {
+        if (home.size < 2 || home[0] != "0" || away.getOrNull(0) != "0") return false
+        val half = if (sport == "soccer") 45 else 40
+        return events.any { event ->
+            event.kind != FixtureEventKind.YELLOW && event.kind != FixtureEventKind.RED &&
+                (event.period == 1 || event.period == null && (event.clock?.let { LEADING.find(it) }?.value?.toIntOrNull() ?: half) < half)
+        }
     }
 
     private fun events(competition: JSONObject?, sport: String, home: JSONObject, away: JSONObject): List<FixtureEvent> {
@@ -345,9 +356,13 @@ object EspnScoreboard {
                 pair[1].optBoolean("winner") -> 2
                 else -> null
             }
-            val bout = FightBout(competition.optJSONObject("type")?.let { it.text("abbreviation") ?: it.text("text") }?.take(40),
-                competition.optJSONObject("format")?.optJSONObject("regulation")?.optIntOrNull("periods")?.takeIf { it in 1..12 }, first, second, winner, start, state,
-                statusJson?.optIntOrNull("period")?.takeIf { state == FixtureStatus.LIVE && it in 1..12 })
+            val rounds = competition.optJSONObject("format")?.optJSONObject("regulation")?.optIntOrNull("periods")?.takeIf { it in 1..12 }
+            val finished = state == FixtureStatus.FINAL
+            val endRound = statusJson?.optIntOrNull("period")?.takeIf { finished && it in 1..12 }
+            val method = if (finished) finish(competition) ?: FightMethod.DRAW.takeIf { winner == null && endRound != null && endRound == rounds } else null
+            val bout = FightBout(competition.optJSONObject("type")?.let { it.text("abbreviation") ?: it.text("text") }?.take(40), rounds, first, second, winner, start, state,
+                statusJson?.optIntOrNull("period")?.takeIf { state == FixtureStatus.LIVE && it in 1..12 }, method = method, endRound = endRound,
+                endClock = statusJson?.text("displayClock")?.takeIf { endRound != null && FIGHT_CLOCK.matches(it) })
             Triple(competition, type, bout)
         }
         val bouts = raw.map { it.third }
@@ -370,6 +385,18 @@ object EspnScoreboard {
             broadcasters, venue, null, null, null, null, null, null, leagueLogo, detail.takeIf { bouts.isNotEmpty() })
     }
 
+    private fun finish(competition: JSONObject): FightMethod? = competition.optJSONArray("details")?.let(::objects).orEmpty().firstNotNullOfOrNull { item ->
+        val type = item.optJSONObject("type")
+        val text = type?.text("text").orEmpty().lowercase()
+        val called = text.startsWith("unofficial winner")
+        when {
+            type?.text("id") == "20" || called && "submission" in text -> FightMethod.SUBMISSION
+            type?.text("id") == "21" || called && "ko" in text -> FightMethod.KO
+            type?.text("id") == "22" || called && "decision" in text -> FightMethod.DECISION
+            else -> null
+        }
+    }
+
     private fun fighter(competitor: JSONObject): Fighter? {
         val athlete = competitor.optJSONObject("athlete") ?: return null
         val name = athlete.text("displayName")?.take(MAX_TEXT) ?: return null
@@ -377,7 +404,7 @@ object EspnScoreboard {
         return Fighter(name, athlete.text("shortName")?.takeIf { it != name }, record, flag(competitor)?.text("href")?.let(::sportsImage))
     }
 
-    private fun cricket(sides: List<Pair<JSONObject, FixtureTeam>>): SportsDetail.Cricket? {
+    private fun cricket(sides: List<Pair<JSONObject, FixtureTeam>>, result: String?): SportsDetail.Cricket? {
         val innings = sides.flatMap { (competitor, team) ->
             val name = team.abbreviation ?: team.shortName ?: team.name
             val summary = CRICKET.find(competitor.text("score").orEmpty())
@@ -394,7 +421,7 @@ object EspnScoreboard {
                     summary?.groupValues?.get(3)?.toIntOrNull()?.takeIf { latest }, line.optBoolean("isBatting") && line.optIntOrNull("isCurrent") != 0)
             }
         }.sortedBy { it.first }.map { it.second }
-        return if (innings.isEmpty()) null else SportsDetail.Cricket(innings.take(4))
+        return if (innings.isEmpty()) null else SportsDetail.Cricket(innings.take(4), result)
     }
 
     private fun baseball(status: JSONObject?, type: JSONObject?, situation: JSONObject?): SportsDetail.Baseball? {
@@ -503,6 +530,8 @@ object EspnScoreboard {
     private val SPACES = Regex("\\s+")
     private val SNAP = Regex("^\\(\\d{1,2}:\\d{2}\\)\\s+")
     private val RECORD = Regex("\\d{1,3}(-\\d{1,3}){1,3}")
+    private val FIGHT_CLOCK = Regex("\\d{1,2}:\\d{2}")
+    private val LEADING = Regex("^\\d{1,3}")
     private val INITIAL = Regex("""[\p{L}.\-]{1,6}\.\s+(.+)""")
     private val TEE = Regex("""^\w{3} (\w{3}) (\d{1,2}) (\d{1,2}):(\d{2}):\d{2} \w+ (\d{4})$""")
     private val COUNTRY = Regex("""/countries/\d+/([a-z]{3})\.png""", RegexOption.IGNORE_CASE)

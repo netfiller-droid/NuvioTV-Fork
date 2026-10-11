@@ -28,7 +28,7 @@ class SportsRealDataSundayTest {
         assertEquals(FixtureStatus.LIVE, summary.status)
         assertEquals("End 2nd", summary.detail)
         assertEquals(SummaryCount(null, null, null, false, false, false, 2, true, null, null), summary.count)
-        assertEquals(listOf("End of the 2nd inning", "Bazzana struck out swinging.", "Sean Burke pitches to Travis Bazzana"), summary.lastPlays.map { it.text })
+        assertEquals(listOf("End of the 2nd inning", "Bazzana struck out swinging.", "Lowe grounded out to second."), summary.lastPlays.map { it.text })
         assertEquals(listOf(0.549f, 0.535f, 0.527f), summary.winProbability)
         assertTrue(summary.moments.isEmpty())
         val plays = root.getJSONArray("plays")

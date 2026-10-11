@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui21_fight_ko">Nokautas</string>
+    <string name="iptv_ui21_fight_submission">Pasidavimas</string>
+    <string name="iptv_ui21_fight_decision">Teisėjų sprendimas</string>
+    <string name="iptv_ui21_fight_draw">Lygiosios</string>
+    <string name="iptv_ui21_fight_won">Laimėjo %1$s · %2$s</string>
+    <string name="iptv_ui21_fight_ended">%1$d raundas, %2$s</string>
+    <string name="iptv_ui21_award_player_of_match">Rungtynių žaidėjas</string>
+    <string name="iptv_ui21_award_winning_pitcher">Laimėjęs metikas</string>
+    <string name="iptv_ui21_award_losing_pitcher">Pralaimėjęs metikas</string>
+    <string name="iptv_ui21_award_save">Išgelbėjimas</string>
+    <string name="iptv_ui21_award_winning_goalie">Laimėjęs vartininkas</string>
+    <string name="iptv_ui21_award_first_star">Pirmoji žvaigždė</string>
+</resources>

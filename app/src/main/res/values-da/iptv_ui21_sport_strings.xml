@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui21_fight_ko">KO/TKO</string>
+    <string name="iptv_ui21_fight_submission">Submission</string>
+    <string name="iptv_ui21_fight_decision">Dommerafgørelse</string>
+    <string name="iptv_ui21_fight_draw">Uafgjort</string>
+    <string name="iptv_ui21_fight_won">%1$s vandt · %2$s</string>
+    <string name="iptv_ui21_fight_ended">Omgang %1$d, %2$s</string>
+    <string name="iptv_ui21_award_player_of_match">Kampens spiller</string>
+    <string name="iptv_ui21_award_winning_pitcher">Vindende pitcher</string>
+    <string name="iptv_ui21_award_losing_pitcher">Tabende pitcher</string>
+    <string name="iptv_ui21_award_save">Save</string>
+    <string name="iptv_ui21_award_winning_goalie">Vindende målmand</string>
+    <string name="iptv_ui21_award_first_star">Første stjerne</string>
+</resources>

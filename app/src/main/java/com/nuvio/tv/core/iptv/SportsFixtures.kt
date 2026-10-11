@@ -370,11 +370,20 @@ object SportsFixtureText {
     }
 
     fun periodLabel(sport: String, period: Int): String? = when (sport) {
-        "american-football", "basketball", "australian-football" -> if (period <= 4) "Q$period" else "OT"
-        "ice-hockey" -> if (period <= 3) "P$period" else "OT"
+        "american-football", "basketball", "australian-football" -> if (period <= 4) "Q$period" else overtime(period - 4)
+        "ice-hockey" -> if (period <= 3) "P$period" else overtime(period - 3)
         "soccer", "rugby", "rugby-league" -> if (period <= 2) "${period}H" else "ET"
         else -> null
     }
+
+    fun periodLabel(fixture: SportsFixture, period: Int): String? {
+        val last = maxOf(fixture.homeLine?.periods?.size ?: 0, fixture.awayLine?.periods?.size ?: 0)
+        val shootout = fixture.sport == "ice-hockey" && period == last && period > 4 && fixture.status == FixtureStatus.FINAL &&
+            fixture.detail?.substringAfter('/', "")?.trim()?.equals("SO", ignoreCase = true) == true
+        return if (shootout) "SO" else periodLabel(fixture.sport, period)
+    }
+
+    private fun overtime(number: Int): String = if (number <= 1) "OT" else "${number}OT"
 
     fun bug(fixture: SportsFixture): SportsBugText = when (val detail = fixture.sportDetail) {
         is SportsDetail.Tennis -> tennis(fixture, detail)
@@ -469,9 +478,18 @@ object SportsFixtureText {
         return when {
             bout.state == FixtureStatus.LIVE -> SportsBugText(primary, (if (bout.round == null) fixture.detail else null)
                 ?: ("Round ${bout.round ?: 1}" + (bout.rounds?.let { " of $it" } ?: "")), bout.weightClass)
-            fixture.status == FixtureStatus.FINAL -> SportsBugText(primary, fixture.detail ?: "Final", bout.weightClass)
+            fixture.status == FixtureStatus.FINAL -> SportsBugText(primary, fixture.detail ?: "Final", finish(bout) ?: bout.weightClass)
             else -> SportsBugText(primary, bout.weightClass, bout.rounds?.let { "$it rounds" })
         }
+    }
+
+    fun finish(bout: FightBout): String? {
+        val method = bout.method ?: return null
+        if (method == FightMethod.DRAW) return "Draw"
+        val winner = when (bout.winner) { 1 -> bout.first; 2 -> bout.second; else -> null }?.let(::fighter)
+        val how = when (method) { FightMethod.KO -> "KO/TKO"; FightMethod.SUBMISSION -> "Submission"; else -> "Decision" }
+        val time = bout.endRound?.takeIf { method != FightMethod.DECISION }?.let { round -> "R$round" + (bout.endClock?.let { " $it" } ?: "") }
+        return listOfNotNull(winner, how, time).joinToString(" · ")
     }
 
     private fun fighter(fighter: Fighter): String = fighter.shortName ?: fighter.name.substringAfterLast(' ')
@@ -485,7 +503,7 @@ object SportsFixtureText {
             else -> fixture.detail
         }
         val chase = detail.chase?.takeIf { fixture.status == FixtureStatus.LIVE }
-        return SportsBugText(latest.joinToString(" · "), state, chase?.let { "Need ${it.runs} from ${it.balls}" })
+        return SportsBugText(latest.joinToString(" · "), state, chase?.let { "Need ${it.runs} from ${it.balls}" } ?: detail.result?.takeIf { fixture.status == FixtureStatus.FINAL })
     }
 }
 

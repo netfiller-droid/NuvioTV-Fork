@@ -680,3 +680,67 @@ basketball (not in the capture); NFL live `situation`; tennis serve in a match t
 F1/NASCAR live order and gaps; UFC round in progress; cricket live innings; AFL/NRL live
 clock; golf after a cut; football own goals, penalties, second yellows and the half-time
 and second-half status names on the scoreboard.
+
+## Tenth pass (11 October, 18:36)
+
+ESPN and TheSportsDB responses captured at 18:36 Brisbane time on 11 October (08:36Z). In
+play: five tennis matches, the first real live tennis seen (the WTA Suzhou final in the 2nd
+set, two Mallorca qualifying matches, and a singles and a doubles match in Shanghai). Nothing
+else was live: the `*-LIVE.json` summaries are byte-for-byte the ninth pass. Finished: the
+UFC card, the PGA final round, Thursday's NFL game, 19 college football games, 14 NHL games
+(three in a shootout, one in overtime), the MLB game, six URC games, two NBL games, the AFL
+and NRL games and the cricket match. Before the start: 14 NFL games, the F1 race, NASCAR,
+the NBA, A-League, Premier League and Champions League. Trimmed copies are in
+`app/src/test/resources/sports/*-real-20261011d.json` (`SportsRealDataSundayEveningTest`).
+
+| Shape | What the real response showed | Parser change |
+|---|---|---|
+| Tennis scoreboard (live) | `STATUS_IN_PROGRESS`, `period` the set number, `detail` `2nd Set`, `shortDetail` `2nd`. The open set's linescore has `value` and no `winner`; a new set reads `0` until a game is won. `possession` true on the server; one match had no `possession` at all. No point score and no live tiebreak; a finished tiebreak set carries `tiebreak` on both sides (7 and 2). The `notes` line is written from the first-listed player's side and is often wrong (`Shinikova leads Kucmova 1-6 0-0`). Doubles have `roster` names and no flags. | none (sets, games, server and tiebreaks already read as expected; `notes` is not used) |
+| UFC (card finished) | Card and every bout `STATUS_FINAL`. Each bout keeps the finishing round in `status.period` and the time in `displayClock` (`5`, `2:46`; a decision `3`, `5:00`). The method is a `details` row `Unofficial Winner Submission` (type 20), `Unofficial Winner Kotko` (21, KO/TKO) or `Unofficial Winner Decision` (22), not always the first row. The draw has no winner and no such row. | Method, finishing round and time are stored per bout (draw when no winner after the full distance); the bug reads `B. Allen · Submission · R5 2:46` |
+| Golf (final round finished) | Competition `STATUS_FINAL`, `detail` `Final`, `shortDetail` `Complete`; the event status has no detail. Still no per-player `status`; winner one shot clear (no playoff), ties only by equal scores. | none |
+| F1 | Event status `STATUS_FINAL` (`period` 28) while the race session is `STATUS_SCHEDULED` for 12:00Z; race competitors have no `order` before the start. | none (the parser follows the sessions); covered by a test |
+| NFL (before kick-off) | `shortDetail` `10/11 - 9:30 AM EDT`; `score` `0` on both sides before the start; records `total`, `home` and `road`; odds rows (not used). The London game is `neutralSite` with a `NFL London Games` note and the Jaguars as home. Thursday's final as before. | none |
+| NHL (finals) | `Final/SO` with `altDetail` `SO`: five linescores, the shootout as period 5 worth one goal to the winner. `Final/OT` with four. `featuredAthletes` names the winning and losing goalie and the three stars. | The line-score column after overtime is `SO` for a shootout final (`periodLabel(fixture, period)`); later overtimes are numbered (`2OT`, `3OT`) for every sport |
+| College football | One `Final/OT` with five periods. | none |
+| URC (finals) | Leinster v Cardiff has linescore period 1 at `0` for both sides (the 20'/60' rows too) although Leinster scored tries at 9', 17' and 19', so the halves read 0/29 and 0/5. Other games as in the eighth pass. | A 0–0 first half is dropped when a score is listed before 40' (45' in football); only totals show |
+| Cricket | Still the 2015 match. The scoreboard and summary status carry `summary` `Australia won by 112 runs` and `featuredAthletes` (player of the match and of the series). | The result is kept (`SportsDetail.Cricket.result`, `SportsSummary.result`) and becomes the bug's extra line after the match; summary awards are read |
+| MLB summary (final) | Header `featuredAthletes`: winning, losing and saving pitcher. The root `situation` still holds the last count (3 outs, pitcher) after the final out; plays end with `pitches to` rows between the results. | No count once the game is over; `pitches to` rows are kept only as the newest play; awards are read |
+| NHL, NBL, AFL, NRL, college football summaries (finals) | Same shapes as earlier passes (NRL 19–18 with a field goal in regulation time). NHL summary `featuredAthletes` as on the scoreboard. | Awards read |
+
+TheSportsDB at 08:36Z: livescore returned Soccer (31), Basketball (104), Ice Hockey (77) and
+Baseball (4, all KBO and NPB finished); every other sport, including tennis, rugby, cricket,
+Australian rules and American football, answered `{"Message":"No data found"}`. `updated` is
+London time (09:36 = 08:36Z). The NBL `FT` row agrees with ESPN (100–110); finished
+basketball rows keep `strProgress` `10`; one NPB final has `intHomeScore` null; a Taiwanese
+match sat at `HT` `45+4`. The WHL and AHL rows stuck since 9 October are still there and
+skipped. New: an AHL and a USHL game that started at 22:00Z were still `P3` `20` and `P3`
+`19` with `updated` refreshed every minute (the USHL row read `P3 20` at 00:35Z), so the
+staleness check let them through. Parser change: a live row is ignored once the game started
+more than three game lengths ago (at least three hours). `lookuptv` returned channels for 6
+of 36 events; every country named resolved (United Kingdom, United States, Bosnia and
+Herzegovina, Czechia, The Netherlands, Turkey); Thursday's NFL game lists five state feeds of
+7mate for Australia, all shown.
+
+ESPN league lists are unchanged from the eighth pass. Leagues the current parsers can read
+but the app does not offer: second divisions in Germany, Spain, Italy and France, the
+Austrian, Greek, Russian and Chinese top flights, Liga de Expansión MX, USL Championship and
+League One, CONCACAF Champions Cup and Leagues Cup, the UEFA Super Cup, international
+friendlies, World Cup and continental qualifiers, the Euros and Copa América, Liga F,
+Première Ligue, Liga MX Femenil, the UEFA Women's Nations League and the women's FA Cup
+(football parser); the Champions Tour (golf leaderboard); and the MMA promotions on the card
+parser (Bellator, KSW, Cage Warriors and others). Men's college basketball still needs halves
+on screen; lacrosse, volleyball, water polo and field hockey have no parser.
+
+Checked again on this data: tennis retirements and walkovers, doubles match tiebreaks, the UFC
+card once every bout is over, stale TheSportsDB rows by `updated`, worldwide TV channels.
+
+Confirmed now: live tennis sets, games and server; finished UFC cards with method, round and
+time; a finished golf final round; NHL shootout and overtime finals; college football
+overtime final; NFL before kick-off; cricket result text and player of the match.
+
+Still unconfirmed: tennis point score and a live tiebreak (not in ESPN's scoreboard at all
+so far); MLB pitching change, runners on second or third and a full count; NBA overtime;
+college football red zone; NHL empty net; NFL live `situation`; F1/NASCAR live order and
+gaps; UFC round in progress; cricket live innings; AFL/NRL live clock; golf after a cut or a
+playoff; football own goals, penalties, second yellows and the half-time and second-half
+status names on the scoreboard.

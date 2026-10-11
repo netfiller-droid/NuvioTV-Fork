@@ -117,7 +117,7 @@ class SportsRealDataEveningTest {
         assertEquals("278/8–166", game.score)
         assertEquals(listOf(CricketInnings("AUS", 278, 8, "50.0", null, null, false), CricketInnings("ENG", 166, 10, "39.1", 50, 279, true)),
             (game.sportDetail as SportsDetail.Cricket).innings)
-        assertEquals(SportsBugText("AUS 278/8 · ENG 166", "Final", null), SportsFixtureText.bug(game))
+        assertEquals(SportsBugText("AUS 278/8 · ENG 166", "Final", "Australia won by 112 runs"), SportsFixtureText.bug(game))
         val summary = EspnSummary.parse(sample("cricket-summary"), cricket)
         assertEquals(listOf(SummaryInnings(FixtureSide.HOME, 1, 278, 8, "50", null), SummaryInnings(FixtureSide.AWAY, 2, 166, 10, "39.1", 279)), summary.innings)
         val table = summary.tables.single()

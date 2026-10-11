@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui21_fight_ko">KO/TKO</string>
+    <string name="iptv_ui21_fight_submission">Submisi</string>
+    <string name="iptv_ui21_fight_decision">Keputusan juri</string>
+    <string name="iptv_ui21_fight_draw">Seri</string>
+    <string name="iptv_ui21_fight_won">%1$s menang · %2$s</string>
+    <string name="iptv_ui21_fight_ended">Ronde %1$d, %2$s</string>
+    <string name="iptv_ui21_award_player_of_match">Pemain terbaik</string>
+    <string name="iptv_ui21_award_winning_pitcher">Pitcher pemenang</string>
+    <string name="iptv_ui21_award_losing_pitcher">Pitcher kalah</string>
+    <string name="iptv_ui21_award_save">Save</string>
+    <string name="iptv_ui21_award_winning_goalie">Kiper pemenang</string>
+    <string name="iptv_ui21_award_first_star">Bintang pertama</string>
+</resources>

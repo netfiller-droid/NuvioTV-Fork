@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui21_fight_ko">KO/TKO</string>
+    <string name="iptv_ui21_fight_submission">Vzdání</string>
+    <string name="iptv_ui21_fight_decision">Rozhodnutí</string>
+    <string name="iptv_ui21_fight_draw">Remíza</string>
+    <string name="iptv_ui21_fight_won">Vyhrál %1$s · %2$s</string>
+    <string name="iptv_ui21_fight_ended">Kolo %1$d, %2$s</string>
+    <string name="iptv_ui21_award_player_of_match">Hráč zápasu</string>
+    <string name="iptv_ui21_award_winning_pitcher">Vítězný nadhazovač</string>
+    <string name="iptv_ui21_award_losing_pitcher">Poražený nadhazovač</string>
+    <string name="iptv_ui21_award_save">Uložení</string>
+    <string name="iptv_ui21_award_winning_goalie">Vítězný brankář</string>
+    <string name="iptv_ui21_award_first_star">První hvězda</string>
+</resources>

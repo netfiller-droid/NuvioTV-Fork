@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui21_fight_ko">KO/TKO</string>
+    <string name="iptv_ui21_fight_submission">Abandon</string>
+    <string name="iptv_ui21_fight_decision">Decizie</string>
+    <string name="iptv_ui21_fight_draw">Egal</string>
+    <string name="iptv_ui21_fight_won">A câștigat %1$s · %2$s</string>
+    <string name="iptv_ui21_fight_ended">Runda %1$d, %2$s</string>
+    <string name="iptv_ui21_award_player_of_match">Jucătorul meciului</string>
+    <string name="iptv_ui21_award_winning_pitcher">Aruncător câștigător</string>
+    <string name="iptv_ui21_award_losing_pitcher">Aruncător învins</string>
+    <string name="iptv_ui21_award_save">Salvare</string>
+    <string name="iptv_ui21_award_winning_goalie">Portar câștigător</string>
+    <string name="iptv_ui21_award_first_star">Prima stea</string>
+</resources>

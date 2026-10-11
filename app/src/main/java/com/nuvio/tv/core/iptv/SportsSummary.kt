@@ -41,13 +41,15 @@ data class SummaryRun(val side: FixtureSide, val points: Int) {
 
 data class SummaryInnings(val side: FixtureSide?, val number: Int, val runs: Int?, val wickets: Int?, val overs: String?, val target: Int?)
 
+data class SummaryAward(val key: String, val label: String, val name: String, val side: FixtureSide?)
+
 data class SportsSummary(val eventId: String?, val sport: String, val status: FixtureStatus, val period: Int? = null, val clock: String? = null,
     val detail: String? = null, val homeName: String? = null, val awayName: String? = null, val homeLine: SummaryLine? = null, val awayLine: SummaryLine? = null,
     val moments: List<SummaryMoment> = emptyList(), val stats: List<SummaryStat> = emptyList(), val leaders: List<SummaryLeader> = emptyList(),
     val rosters: List<SummaryRoster> = emptyList(), val tables: List<SummaryTable> = emptyList(), val headToHead: List<SummaryMeeting> = emptyList(),
     val winProbability: List<Float> = emptyList(), val count: SummaryCount? = null, val strength: SummaryStrength? = null,
     val lastPlays: List<SummaryPlay> = emptyList(), val run: SummaryRun? = null, val innings: List<SummaryInnings> = emptyList(),
-    val goalies: List<SummaryGoalie> = emptyList())
+    val goalies: List<SummaryGoalie> = emptyList(), val result: String? = null, val awards: List<SummaryAward> = emptyList())
 
 object EspnSummary {
     const val MAX_MOMENTS = 80
@@ -58,6 +60,7 @@ object EspnSummary {
     private const val MAX_TABLES = 8
     private const val MAX_ROWS = 40
     private const val MAX_TEXT = 240
+    private const val MAX_AWARDS = 6
 
     private class Sides(val home: Set<String>, val away: Set<String>, val homeNames: Set<String>, val awayNames: Set<String>) {
         fun of(json: JSONObject?): FixtureSide? {
@@ -107,10 +110,24 @@ object EspnSummary {
         return SportsSummary(header?.str("id") ?: competition?.str("id"), sport, status, period, shownClock.takeIf { !stale },
             ((if (stale) type?.str("description") else null) ?: type?.str("shortDetail") ?: type?.str("detail"))?.take(80), team(home), team(away), homeLine, awayLine,
             moments, stats(teamStats, sport), leaders(root, sides, sport), rosters(root, sides, sport),
-            tables(root, sides), headToHead(root, sides), probability(root), if (sport == "baseball") count(root, plays, names, statusJson?.str("periodPrefix")) else null,
-            if (sport == "ice-hockey") strength(plays, sides) else null, lastPlays(root, if (sport == "baseball") plays.filter { it.str("summaryType") != "P" } else plays), if (sport == "basketball") run(plays) else null,
-            if (cricket) innings(competitors, sides) else emptyList(), if (sport == "ice-hockey") goalies(root, sides) else emptyList())
+            tables(root, sides), headToHead(root, sides), probability(root),
+            if (sport == "baseball" && status == FixtureStatus.LIVE) count(root, plays, names, statusJson?.str("periodPrefix")) else null,
+            if (sport == "ice-hockey") strength(plays, sides) else null, lastPlays(root, if (sport == "baseball") batting(plays) else plays), if (sport == "basketball") run(plays) else null,
+            if (cricket) innings(competitors, sides) else emptyList(), if (sport == "ice-hockey") goalies(root, sides) else emptyList(),
+            statusJson?.str("summary")?.takeIf { status == FixtureStatus.FINAL }?.take(120), awards(statusJson, sides))
     }
+
+    private fun batting(plays: List<JSONObject>): List<JSONObject> {
+        val texted = plays.filter { it.str("summaryType") != "P" && it.str("text") != null }
+        return texted.filterIndexed { index, play -> play.str("summaryType") != "A" || index == texted.lastIndex }
+    }
+
+    private fun awards(status: JSONObject?, sides: Sides): List<SummaryAward> = status?.optJSONArray("featuredAthletes")?.let(::objs).orEmpty().mapNotNull { item ->
+        val athlete = item.optJSONObject("athlete")
+        val name = (athlete?.str("displayName") ?: athlete?.str("fullName"))?.take(60) ?: return@mapNotNull null
+        val key = item.str("name")?.take(40) ?: return@mapNotNull null
+        SummaryAward(key, (item.str("displayName") ?: key).take(40), name, sides.byId(setOfNotNull(item.optJSONObject("team")?.str("id"), athlete?.optJSONObject("team")?.str("id"))))
+    }.distinctBy { it.key }.take(MAX_AWARDS)
 
     private fun drives(root: JSONObject): List<JSONObject> {
         val drives = root.optJSONObject("drives") ?: return emptyList()

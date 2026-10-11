@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui21_fight_ko">Nokaut</string>
+    <string name="iptv_ui21_fight_submission">Dorëzim</string>
+    <string name="iptv_ui21_fight_decision">Vendim</string>
+    <string name="iptv_ui21_fight_draw">Barazim</string>
+    <string name="iptv_ui21_fight_won">Fitoi %1$s · %2$s</string>
+    <string name="iptv_ui21_fight_ended">Raundi %1$d, %2$s</string>
+    <string name="iptv_ui21_award_player_of_match">Lojtari i ndeshjes</string>
+    <string name="iptv_ui21_award_winning_pitcher">Gjuajtësi fitues</string>
+    <string name="iptv_ui21_award_losing_pitcher">Gjuajtësi humbës</string>
+    <string name="iptv_ui21_award_save">Pritje</string>
+    <string name="iptv_ui21_award_winning_goalie">Portieri fitues</string>
+    <string name="iptv_ui21_award_first_star">Ylli i parë</string>
+</resources>

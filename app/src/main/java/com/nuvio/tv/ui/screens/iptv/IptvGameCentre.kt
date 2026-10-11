@@ -48,6 +48,7 @@ import androidx.tv.material3.Text
 import com.nuvio.tv.R
 import com.nuvio.tv.core.iptv.FixtureSide
 import com.nuvio.tv.core.iptv.FixtureStatus
+import com.nuvio.tv.core.iptv.SummaryAward
 import com.nuvio.tv.core.iptv.FixtureTeam
 import com.nuvio.tv.core.iptv.MomentKind
 import com.nuvio.tv.core.iptv.SportsEvents
@@ -338,6 +339,10 @@ private fun centreItems(tab: CentreTab, fixture: SportsFixture, summary: SportsS
     }
     return when (tab) {
         CentreTab.SUMMARY -> if (hidden || summary == null) emptyList() else buildList {
+            if (fixture.status == FixtureStatus.FINAL) {
+                summary.result?.let { add(CentreItem.Line(it, null, true, "result")) }
+                summary.awards.filter { it.key in AWARD_KEYS }.forEachIndexed { i, award -> add(CentreItem.Line(awardLabel(award), listOfNotNull(team(award.side), award.name).joinToString(" · "), false, "award:$i")) }
+            }
             val moments = summary.moments.filter { it.kind != MomentKind.SUBSTITUTION || summary.moments.size <= 20 }
             if (moments.isNotEmpty()) add(CentreItem.Heading(R.string.iptv_sport5p_key_moments, "h:moments"))
             moments.asReversed().forEachIndexed { i, moment ->
@@ -523,3 +528,16 @@ private fun Base(on: Boolean, size: Dp, modifier: Modifier) {
 }
 
 private const val FIXTURE_SLACK = 15L * 60 * 1000
+
+private val AWARD_KEYS = setOf("playerOfTheMatch", "winningPitcher", "losingPitcher", "savingPitcher", "winningGoalie", "firstStar")
+
+@Composable
+private fun awardLabel(award: SummaryAward): String = when (award.key) {
+    "playerOfTheMatch" -> stringResource(R.string.iptv_ui21_award_player_of_match)
+    "winningPitcher" -> stringResource(R.string.iptv_ui21_award_winning_pitcher)
+    "losingPitcher" -> stringResource(R.string.iptv_ui21_award_losing_pitcher)
+    "savingPitcher" -> stringResource(R.string.iptv_ui21_award_save)
+    "winningGoalie" -> stringResource(R.string.iptv_ui21_award_winning_goalie)
+    "firstStar" -> stringResource(R.string.iptv_ui21_award_first_star)
+    else -> award.label
+}

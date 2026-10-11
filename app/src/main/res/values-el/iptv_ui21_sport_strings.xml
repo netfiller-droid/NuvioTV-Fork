@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui21_fight_ko">Νοκ άουτ</string>
+    <string name="iptv_ui21_fight_submission">Υποταγή</string>
+    <string name="iptv_ui21_fight_decision">Απόφαση κριτών</string>
+    <string name="iptv_ui21_fight_draw">Ισοπαλία</string>
+    <string name="iptv_ui21_fight_won">Νίκη %1$s · %2$s</string>
+    <string name="iptv_ui21_fight_ended">Γύρος %1$d, %2$s</string>
+    <string name="iptv_ui21_award_player_of_match">Παίκτης του αγώνα</string>
+    <string name="iptv_ui21_award_winning_pitcher">Νικητής pitcher</string>
+    <string name="iptv_ui21_award_losing_pitcher">Ηττημένος pitcher</string>
+    <string name="iptv_ui21_award_save">Save</string>
+    <string name="iptv_ui21_award_winning_goalie">Νικητής τερματοφύλακας</string>
+    <string name="iptv_ui21_award_first_star">Πρώτο αστέρι</string>
+</resources>

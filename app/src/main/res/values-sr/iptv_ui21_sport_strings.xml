@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui21_fight_ko">Нокаут</string>
+    <string name="iptv_ui21_fight_submission">Предаја</string>
+    <string name="iptv_ui21_fight_decision">Одлука судија</string>
+    <string name="iptv_ui21_fight_draw">Нерешено</string>
+    <string name="iptv_ui21_fight_won">%1$s победио · %2$s</string>
+    <string name="iptv_ui21_fight_ended">Рунда %1$d, %2$s</string>
+    <string name="iptv_ui21_award_player_of_match">Играч утакмице</string>
+    <string name="iptv_ui21_award_winning_pitcher">Победнички бацач</string>
+    <string name="iptv_ui21_award_losing_pitcher">Поражени бацач</string>
+    <string name="iptv_ui21_award_save">Спас</string>
+    <string name="iptv_ui21_award_winning_goalie">Победнички голман</string>
+    <string name="iptv_ui21_award_first_star">Прва звезда</string>
+</resources>

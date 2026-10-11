@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui21_fight_ko">击倒/技术击倒</string>
+    <string name="iptv_ui21_fight_submission">降服</string>
+    <string name="iptv_ui21_fight_decision">判定</string>
+    <string name="iptv_ui21_fight_draw">平局</string>
+    <string name="iptv_ui21_fight_won">%1$s 获胜 · %2$s</string>
+    <string name="iptv_ui21_fight_ended">第 %1$d 回合，%2$s</string>
+    <string name="iptv_ui21_award_player_of_match">全场最佳</string>
+    <string name="iptv_ui21_award_winning_pitcher">胜利投手</string>
+    <string name="iptv_ui21_award_losing_pitcher">失利投手</string>
+    <string name="iptv_ui21_award_save">救援成功</string>
+    <string name="iptv_ui21_award_winning_goalie">获胜门将</string>
+    <string name="iptv_ui21_award_first_star">一号明星</string>
+</resources>

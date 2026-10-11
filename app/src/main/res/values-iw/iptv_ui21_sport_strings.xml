@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui21_fight_ko">נוקאאוט</string>
+    <string name="iptv_ui21_fight_submission">כניעה</string>
+    <string name="iptv_ui21_fight_decision">הכרעת שופטים</string>
+    <string name="iptv_ui21_fight_draw">תיקו</string>
+    <string name="iptv_ui21_fight_won">%1$s ניצח · %2$s</string>
+    <string name="iptv_ui21_fight_ended">סיבוב %1$d, %2$s</string>
+    <string name="iptv_ui21_award_player_of_match">שחקן המשחק</string>
+    <string name="iptv_ui21_award_winning_pitcher">המגיש המנצח</string>
+    <string name="iptv_ui21_award_losing_pitcher">המגיש המפסיד</string>
+    <string name="iptv_ui21_award_save">הצלה</string>
+    <string name="iptv_ui21_award_winning_goalie">השוער המנצח</string>
+    <string name="iptv_ui21_award_first_star">הכוכב הראשון</string>
+</resources>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui21_fight_ko">ضربة قاضية</string>
+    <string name="iptv_ui21_fight_submission">استسلام</string>
+    <string name="iptv_ui21_fight_decision">قرار الحكام</string>
+    <string name="iptv_ui21_fight_draw">تعادل</string>
+    <string name="iptv_ui21_fight_won">%1$s فاز · %2$s</string>
+    <string name="iptv_ui21_fight_ended">الجولة %1$d، %2$s</string>
+    <string name="iptv_ui21_award_player_of_match">أفضل لاعب في المباراة</string>
+    <string name="iptv_ui21_award_winning_pitcher">الرامي الفائز</string>
+    <string name="iptv_ui21_award_losing_pitcher">الرامي الخاسر</string>
+    <string name="iptv_ui21_award_save">إنقاذ</string>
+    <string name="iptv_ui21_award_winning_goalie">الحارس الفائز</string>
+    <string name="iptv_ui21_award_first_star">النجم الأول</string>
+</resources>

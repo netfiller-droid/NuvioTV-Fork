@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui21_fight_ko">நாக்அவுட்</string>
+    <string name="iptv_ui21_fight_submission">சரணடைவு</string>
+    <string name="iptv_ui21_fight_decision">நடுவர் முடிவு</string>
+    <string name="iptv_ui21_fight_draw">சமநிலை</string>
+    <string name="iptv_ui21_fight_won">%1$s வென்றார் · %2$s</string>
+    <string name="iptv_ui21_fight_ended">சுற்று %1$d, %2$s</string>
+    <string name="iptv_ui21_award_player_of_match">ஆட்ட நாயகன்</string>
+    <string name="iptv_ui21_award_winning_pitcher">வென்ற பிட்சர்</string>
+    <string name="iptv_ui21_award_losing_pitcher">தோற்ற பிட்சர்</string>
+    <string name="iptv_ui21_award_save">சேவ்</string>
+    <string name="iptv_ui21_award_winning_goalie">வென்ற கோல்கீப்பர்</string>
+    <string name="iptv_ui21_award_first_star">முதல் நட்சத்திரம்</string>
+</resources>

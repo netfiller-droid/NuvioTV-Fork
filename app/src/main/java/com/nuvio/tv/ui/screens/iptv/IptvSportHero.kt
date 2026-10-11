@@ -474,7 +474,7 @@ private fun PeriodTable(fixture: SportsFixture, first: FixtureTeam, second: Fixt
         Row(Modifier.height(15.dp), verticalAlignment = Alignment.CenterVertically) {
             Spacer(Modifier.width(TABLE_NAME))
             periods.forEach { index ->
-                Text(SportsFixtureText.periodLabel(fixture.sport, index + 1) ?: "${index + 1}", style = SportCaps, maxLines = 1, textAlign = TextAlign.Center,
+                Text(SportsFixtureText.periodLabel(fixture, index + 1) ?: "${index + 1}", style = SportCaps, maxLines = 1, textAlign = TextAlign.Center,
                     color = if (index == current) NuvioTheme.colors.TextPrimary else NuvioTheme.colors.TextTertiary, modifier = Modifier.width(TABLE_CELL))
             }
             Text(stringResource(R.string.iptv_ui11_sport_total).uppercase(Locale.getDefault()), style = SportCaps, color = NuvioTheme.colors.TextTertiary, maxLines = 1,

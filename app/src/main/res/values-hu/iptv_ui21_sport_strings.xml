@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui21_fight_ko">KO/TKO</string>
+    <string name="iptv_ui21_fight_submission">Feladás</string>
+    <string name="iptv_ui21_fight_decision">Pontozás</string>
+    <string name="iptv_ui21_fight_draw">Döntetlen</string>
+    <string name="iptv_ui21_fight_won">%1$s nyert · %2$s</string>
+    <string name="iptv_ui21_fight_ended">%1$d. menet, %2$s</string>
+    <string name="iptv_ui21_award_player_of_match">A meccs játékosa</string>
+    <string name="iptv_ui21_award_winning_pitcher">Győztes dobó</string>
+    <string name="iptv_ui21_award_losing_pitcher">Vesztes dobó</string>
+    <string name="iptv_ui21_award_save">Mentés</string>
+    <string name="iptv_ui21_award_winning_goalie">Győztes kapus</string>
+    <string name="iptv_ui21_award_first_star">Első csillag</string>
+</resources>

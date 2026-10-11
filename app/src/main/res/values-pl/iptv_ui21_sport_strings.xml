@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui21_fight_ko">KO/TKO</string>
+    <string name="iptv_ui21_fight_submission">Poddanie</string>
+    <string name="iptv_ui21_fight_decision">Decyzja</string>
+    <string name="iptv_ui21_fight_draw">Remis</string>
+    <string name="iptv_ui21_fight_won">Wygrywa %1$s · %2$s</string>
+    <string name="iptv_ui21_fight_ended">Runda %1$d, %2$s</string>
+    <string name="iptv_ui21_award_player_of_match">Zawodnik meczu</string>
+    <string name="iptv_ui21_award_winning_pitcher">Zwycięski miotacz</string>
+    <string name="iptv_ui21_award_losing_pitcher">Przegrany miotacz</string>
+    <string name="iptv_ui21_award_save">Obrona</string>
+    <string name="iptv_ui21_award_winning_goalie">Zwycięski bramkarz</string>
+    <string name="iptv_ui21_award_first_star">Pierwsza gwiazda</string>
+</resources>

@@ -1,0 +1,12 @@
+{"livescore":[
+ {"idEvent":"2600752","strSport":"Ice Hockey","strLeague":"Canadian WHL","strStatus":"P3","strProgress":"20","intHomeScore":"7","intAwayScore":"4","strTimestamp":"2026-10-10T01:00:00","updated":"2026-10-10 04:34:30"},
+ {"idEvent":"2526140","strSport":"Ice Hockey","strLeague":"American AHL","strStatus":"OT","strProgress":"4","intHomeScore":"3","intAwayScore":"3","strTimestamp":"2026-10-10T01:05:00","updated":"2026-10-10 05:04:35"},
+ {"idEvent":"2517720","strSport":"Ice Hockey","strLeague":"American USHL","strStatus":"P3","strProgress":"19","intHomeScore":"8","intAwayScore":"5","strTimestamp":"2026-10-10T22:00:00","updated":"2026-10-11 09:36:31"},
+ {"idEvent":"2526143","strSport":"Ice Hockey","strLeague":"American AHL","strStatus":"P3","strProgress":"20","intHomeScore":"1","intAwayScore":"7","strTimestamp":"2026-10-10T22:00:00","updated":"2026-10-11 09:36:31"},
+ {"idEvent":"2583446","strSport":"Basketball","strLeague":"Korean Basketball League","strStatus":"HT","strProgress":"0","intHomeScore":"42","intAwayScore":"41","strTimestamp":"2026-10-11T07:30:00","updated":"2026-10-11 09:36:31"},
+ {"idEvent":"2589510","strSport":"Basketball","strLeague":"Japanese B1 League","strStatus":"Q2","strProgress":"4","intHomeScore":"32","intAwayScore":"24","strTimestamp":"2026-10-11T08:05:00","updated":"2026-10-11 09:36:31"},
+ {"idEvent":"2616721","strSport":"Baseball","strLeague":"Nippon Baseball League","strStatus":"FT","strProgress":"FT","intHomeScore":null,"intAwayScore":"1","strTimestamp":"2026-10-11T05:00:00","updated":"2026-10-11 09:36:34"},
+ {"idEvent":"2604884","strSport":"Soccer","strLeague":"Taiwan Football Premier League","strStatus":"HT","strProgress":"45+4","intHomeScore":"0","intAwayScore":"0","strTimestamp":"2026-10-11T07:30:00","updated":"2026-10-11 09:36:35"},
+ {"idEvent":"2487910","strSport":"Basketball","strLeague":"Australian NBL","strStatus":"FT","strProgress":"10","intHomeScore":"100","intAwayScore":"110","strTimestamp":"2026-10-11T06:00:00","updated":"2026-10-11 08:52:31"},
+ {"idEvent":"2492866","strSport":"Soccer","strLeague":"Japanese J1 League","strStatus":"2H","strProgress":"76","intHomeScore":"1","intAwayScore":"2","strTimestamp":"2026-10-11T07:00:00","updated":"2026-10-11 09:36:35"}
+]}

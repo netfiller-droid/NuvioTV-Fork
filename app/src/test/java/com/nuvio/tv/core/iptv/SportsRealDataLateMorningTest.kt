@@ -28,7 +28,7 @@ class SportsRealDataLateMorningTest {
         val summary = EspnSummary.parse(root, "baseball")
         assertEquals("Bot 4th", summary.detail)
         assertEquals(SummaryCount(0, 0, 0, true, false, false, 4, true, "Sean Burke", null), summary.count)
-        assertEquals(listOf("Kwan singled to right.", "Sean Burke pitches to Steven Kwan", "Bottom of the 4th inning"), summary.lastPlays.map { it.text })
+        assertEquals(listOf("Kwan singled to right.", "Bottom of the 4th inning", "Middle of the 4th inning"), summary.lastPlays.map { it.text })
         assertEquals(listOf(0.583f, 0.635f), summary.winProbability.takeLast(2))
         val beforeEnd = EspnSummary.parse(withPlays(root, 12), "baseball").count!!
         assertEquals(1, beforeEnd.strikes)

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui21_fight_ko">KO/TKO</string>
+    <string name="iptv_ui21_fight_submission">一本</string>
+    <string name="iptv_ui21_fight_decision">判定</string>
+    <string name="iptv_ui21_fight_draw">引き分け</string>
+    <string name="iptv_ui21_fight_won">%1$s の勝利 · %2$s</string>
+    <string name="iptv_ui21_fight_ended">%1$dラウンド %2$s</string>
+    <string name="iptv_ui21_award_player_of_match">マン・オブ・ザ・マッチ</string>
+    <string name="iptv_ui21_award_winning_pitcher">勝利投手</string>
+    <string name="iptv_ui21_award_losing_pitcher">敗戦投手</string>
+    <string name="iptv_ui21_award_save">セーブ</string>
+    <string name="iptv_ui21_award_winning_goalie">勝利ゴーリー</string>
+    <string name="iptv_ui21_award_first_star">ファーストスター</string>
+</resources>

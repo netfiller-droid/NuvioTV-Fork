@@ -66,6 +66,7 @@ import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import com.nuvio.tv.R
 import com.nuvio.tv.core.iptv.FightBout
+import com.nuvio.tv.core.iptv.FightMethod
 import com.nuvio.tv.core.iptv.Fighter
 import com.nuvio.tv.core.iptv.FixtureSide
 import com.nuvio.tv.core.iptv.FixtureStatus
@@ -452,8 +453,10 @@ private fun FightMiddle(fixture: SportsFixture, detail: SportsDetail.Card, hidde
             (live.round?.let { " · " + stringResource(R.string.iptv_sport5_section_fight_round, it) } ?: ""),
             style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.SemiBold, color = NuvioTheme.colors.Error, maxLines = 1, overflow = TextOverflow.Ellipsis)
         else main?.let { bout ->
-            Text(listOfNotNull(bout.weightClass, bout.rounds?.let { pluralStringResource(R.plurals.iptv_sport5_section_rounds, it, it) }).joinToString(" · "),
-                style = MaterialTheme.typography.labelSmall, color = NuvioTheme.colors.TextTertiary, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            val result = bout.method?.takeIf { fixture.status == FixtureStatus.FINAL && !hidden }?.let { method -> fightResult(bout, method) }
+            Text(result ?: listOfNotNull(bout.weightClass, bout.rounds?.let { pluralStringResource(R.plurals.iptv_sport5_section_rounds, it, it) }).joinToString(" · "),
+                style = MaterialTheme.typography.labelSmall, color = if (result != null) NuvioTheme.colors.TextSecondary else NuvioTheme.colors.TextTertiary,
+                maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
         Column(Modifier.fillMaxWidth().clip(SportPlaceholderShape).background(NuvioTheme.colors.TextPrimary.copy(alpha = .06f)).padding(horizontal = 8.dp, vertical = 3.dp),
             verticalArrangement = Arrangement.spacedBy(1.dp)) {
@@ -461,6 +464,22 @@ private fun FightMiddle(fixture: SportsFixture, detail: SportsDetail.Card, hidde
             CardSegment(stringResource(R.string.iptv_sport5_section_prelims), detail.prelims, false)
         }
     }
+}
+
+@Composable
+private fun fightResult(bout: FightBout, method: FightMethod): String {
+    val name = stringResource(when (method) {
+        FightMethod.KO -> R.string.iptv_ui21_fight_ko
+        FightMethod.SUBMISSION -> R.string.iptv_ui21_fight_submission
+        FightMethod.DECISION -> R.string.iptv_ui21_fight_decision
+        FightMethod.DRAW -> R.string.iptv_ui21_fight_draw
+    })
+    val winner = when (bout.winner) { 1 -> bout.first; 2 -> bout.second; else -> null }
+    val outcome = if (winner == null || method == FightMethod.DRAW) name else stringResource(R.string.iptv_ui21_fight_won, fighterName(winner), name)
+    val round = bout.endRound
+    val clock = bout.endClock
+    return if (method == FightMethod.DECISION || method == FightMethod.DRAW || round == null || clock == null) outcome
+        else outcome + " · " + stringResource(R.string.iptv_ui21_fight_ended, round, clock)
 }
 
 @Composable
@@ -483,7 +502,7 @@ private fun CricketMiddle(fixture: SportsFixture, detail: SportsDetail.Cricket, 
     val chasing = chase?.let { stringResource(R.string.iptv_sport5_section_chase, batting.team, it.runs, it.balls, String.format(Locale.getDefault(), "%.2f", it.rate)) }
     val overs = listOfNotNull(batting.overs?.let { o -> batting.maxOvers?.let { stringResource(R.string.iptv_sport5_section_overs_of, o, it) }
         ?: stringResource(R.string.iptv_sport5_section_overs, o) }, batting.target?.let { stringResource(R.string.iptv_sport5_section_target, it) }).joinToString(" · ")
-    val note = chasing ?: overs.takeIf(String::isNotEmpty)
+    val note = detail.result?.takeIf { fixture.status == FixtureStatus.FINAL } ?: chasing ?: overs.takeIf(String::isNotEmpty)
     fun innings(team: FixtureTeam) = detail.innings.lastOrNull { it.team == (team.abbreviation ?: team.shortName ?: team.name) }
     val active = when { innings(home)?.batting == true -> FixtureSide.HOME; innings(away)?.batting == true -> FixtureSide.AWAY; else -> null }
     CardBands(fixture, home, away, focused, modifier, if (note != null) BAND_LOGO_SMALL else BAND_LOGO, active,

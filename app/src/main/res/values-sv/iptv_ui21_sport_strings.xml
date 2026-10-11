@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui21_fight_ko">KO/TKO</string>
+    <string name="iptv_ui21_fight_submission">Submission</string>
+    <string name="iptv_ui21_fight_decision">Domslut</string>
+    <string name="iptv_ui21_fight_draw">Oavgjort</string>
+    <string name="iptv_ui21_fight_won">%1$s vann · %2$s</string>
+    <string name="iptv_ui21_fight_ended">Rond %1$d, %2$s</string>
+    <string name="iptv_ui21_award_player_of_match">Matchens lirare</string>
+    <string name="iptv_ui21_award_winning_pitcher">Vinnande pitcher</string>
+    <string name="iptv_ui21_award_losing_pitcher">Förlorande pitcher</string>
+    <string name="iptv_ui21_award_save">Räddning</string>
+    <string name="iptv_ui21_award_winning_goalie">Vinnande målvakt</string>
+    <string name="iptv_ui21_award_first_star">Första stjärnan</string>
+</resources>

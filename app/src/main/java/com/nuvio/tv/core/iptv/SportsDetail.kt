@@ -4,6 +4,7 @@ import org.json.JSONArray
 import org.json.JSONObject
 
 enum class InningHalf { TOP, MIDDLE, BOTTOM, END }
+enum class FightMethod { KO, SUBMISSION, DECISION, DRAW }
 
 data class TennisPlayer(val seed: Int? = null, val flag: String? = null, val country: String? = null)
 data class TennisSet(val home: Int? = null, val away: Int? = null, val homeTiebreak: Int? = null, val awayTiebreak: Int? = null, val winner: FixtureSide? = null)
@@ -12,7 +13,8 @@ data class GolfPlayer(val position: String, val name: String, val shortName: Str
 data class RaceSession(val abbreviation: String?, val name: String, val startMillis: Long, val state: FixtureStatus, val top: List<String> = emptyList())
 data class Fighter(val name: String, val shortName: String? = null, val record: String? = null, val flag: String? = null)
 data class FightBout(val weightClass: String?, val rounds: Int?, val first: Fighter, val second: Fighter, val winner: Int? = null, val startMillis: Long,
-    val state: FixtureStatus = FixtureStatus.SCHEDULED, val round: Int? = null, val mainCard: Boolean = false)
+    val state: FixtureStatus = FixtureStatus.SCHEDULED, val round: Int? = null, val mainCard: Boolean = false, val method: FightMethod? = null,
+    val endRound: Int? = null, val endClock: String? = null)
 data class CricketInnings(val team: String, val runs: Int, val wickets: Int, val overs: String? = null, val maxOvers: Int? = null, val target: Int? = null,
     val batting: Boolean = false)
 data class CricketChase(val runs: Int, val balls: Int, val rate: Double)
@@ -45,7 +47,7 @@ sealed class SportsDetail {
         val live: FightBout? get() = bouts.firstOrNull { it.state == FixtureStatus.LIVE }
     }
 
-    data class Cricket(val innings: List<CricketInnings>) : SportsDetail() {
+    data class Cricket(val innings: List<CricketInnings>, val result: String? = null) : SportsDetail() {
         val chase: CricketChase? get() {
             val chasing = innings.lastOrNull() ?: return null
             val target = chasing.target ?: return null
@@ -106,11 +108,12 @@ object SportsDetails {
                 put("bouts", JSONArray().apply { detail.bouts.forEach { bout -> put(JSONObject().apply {
                     bout.weightClass?.let { put("weightClass", it) }; bout.rounds?.let { put("rounds", it) }; put("first", fighter(bout.first))
                     put("second", fighter(bout.second)); bout.winner?.let { put("winner", it) }; put("start", bout.startMillis); put("state", bout.state.name)
-                    bout.round?.let { put("round", it) }; put("mainCard", bout.mainCard)
+                    bout.round?.let { put("round", it) }; put("mainCard", bout.mainCard); bout.method?.let { put("method", it.name) }
+                    bout.endRound?.let { put("endRound", it) }; bout.endClock?.let { put("endClock", it) }
                 }) } })
             }
             is SportsDetail.Cricket -> {
-                put("type", "cricket")
+                put("type", "cricket"); detail.result?.let { put("result", it) }
                 put("innings", JSONArray().apply { detail.innings.forEach { innings -> put(JSONObject().apply {
                     put("team", innings.team); put("runs", innings.runs); put("wickets", innings.wickets); innings.overs?.let { put("overs", it) }
                     innings.maxOvers?.let { put("maxOvers", it) }; innings.target?.let { put("target", it) }; put("batting", innings.batting)
@@ -143,12 +146,13 @@ object SportsDetails {
             "card" -> SportsDetail.Card(json.objects("bouts").mapNotNull { bout ->
                 FightBout(bout.text("weightClass"), bout.int("rounds"), bout.optJSONObject("first")?.let(::fighter) ?: return@mapNotNull null,
                     bout.optJSONObject("second")?.let(::fighter) ?: return@mapNotNull null, bout.int("winner"), bout.long("start") ?: return@mapNotNull null,
-                    status(bout.text("state")), bout.int("round"), bout.optBoolean("mainCard"))
+                    status(bout.text("state")), bout.int("round"), bout.optBoolean("mainCard"), FightMethod.entries.firstOrNull { it.name == bout.text("method") },
+                    bout.int("endRound"), bout.text("endClock"))
             })
             "cricket" -> SportsDetail.Cricket(json.objects("innings").mapNotNull { innings ->
                 CricketInnings(innings.text("team") ?: return@mapNotNull null, innings.int("runs") ?: 0, innings.int("wickets") ?: 0, innings.text("overs"),
                     innings.int("maxOvers"), innings.int("target"), innings.optBoolean("batting"))
-            })
+            }, json.text("result"))
             "baseball" -> SportsDetail.Baseball(json.int("inning"), InningHalf.entries.firstOrNull { it.name == json.text("half") }, json.int("outs"),
                 json.int("balls"), json.int("strikes"), json.optBoolean("first"), json.optBoolean("second"), json.optBoolean("third"))
             else -> null

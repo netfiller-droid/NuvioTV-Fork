@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui21_fight_ko">नॉकआउट</string>
+    <string name="iptv_ui21_fight_submission">सबमिशन</string>
+    <string name="iptv_ui21_fight_decision">जजों का फ़ैसला</string>
+    <string name="iptv_ui21_fight_draw">ड्रॉ</string>
+    <string name="iptv_ui21_fight_won">%1$s जीते · %2$s</string>
+    <string name="iptv_ui21_fight_ended">राउंड %1$d, %2$s</string>
+    <string name="iptv_ui21_award_player_of_match">प्लेयर ऑफ़ द मैच</string>
+    <string name="iptv_ui21_award_winning_pitcher">विजयी पिचर</string>
+    <string name="iptv_ui21_award_losing_pitcher">हारने वाला पिचर</string>
+    <string name="iptv_ui21_award_save">सेव</string>
+    <string name="iptv_ui21_award_winning_goalie">विजयी गोलकीपर</string>
+    <string name="iptv_ui21_award_first_star">पहला सितारा</string>
+</resources>
