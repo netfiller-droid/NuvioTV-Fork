@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui20_sched_yesterday">Kemarin</string>
+    <plurals name="iptv_ui20_sched_live">
+        <item quantity="other">%d langsung</item>
+    </plurals>
+    <plurals name="iptv_ui20_sched_games">
+        <item quantity="other">%d laga</item>
+    </plurals>
+    <plurals name="iptv_ui20_sched_results">
+        <item quantity="other">%d hasil</item>
+    </plurals>
+    <string name="iptv_ui20_sched_no_games">Tidak ada laga</string>
+    <string name="iptv_ui20_sched_results_label">Hasil</string>
+    <string name="iptv_ui20_sched_loading">Memuat hasil…</string>
+    <string name="iptv_ui20_sched_failed">Hari ini tidak dapat dimuat. Coba lagi nanti.</string>
+    <string name="iptv_ui20_sched_league_count">%1$d/%2$d</string>
+    <string name="iptv_ui20_sched_source_both">ESPN + TheSportsDB</string>
+    <string name="iptv_ui20_sched_source_needs_key">Perlu kunci TheSportsDB</string>
+    <string name="iptv_ui20_sched_leagues_hint">OK menambah atau menghapus liga. Kembali menyimpan pilihan Anda.</string>
+    <string name="iptv_ui20_sched_leagues_note">Tidak terkait dengan atau didukung oleh liga, klub, atau penyiar mana pun. Nama dan lambang hanya untuk membedakan.</string>
+</resources>

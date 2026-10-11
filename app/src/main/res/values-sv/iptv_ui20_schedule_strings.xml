@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui20_sched_yesterday">I går</string>
+    <plurals name="iptv_ui20_sched_live">
+        <item quantity="one">%d live</item>
+        <item quantity="other">%d live</item>
+    </plurals>
+    <plurals name="iptv_ui20_sched_games">
+        <item quantity="one">%d match</item>
+        <item quantity="other">%d matcher</item>
+    </plurals>
+    <plurals name="iptv_ui20_sched_results">
+        <item quantity="one">%d resultat</item>
+        <item quantity="other">%d resultat</item>
+    </plurals>
+    <string name="iptv_ui20_sched_no_games">Inga matcher</string>
+    <string name="iptv_ui20_sched_results_label">Resultat</string>
+    <string name="iptv_ui20_sched_loading">Läser in resultat…</string>
+    <string name="iptv_ui20_sched_failed">Dagen kunde inte läsas in. Försök igen lite senare.</string>
+    <string name="iptv_ui20_sched_league_count">%1$d/%2$d</string>
+    <string name="iptv_ui20_sched_source_both">ESPN + TheSportsDB</string>
+    <string name="iptv_ui20_sched_source_needs_key">Kräver en TheSportsDB-nyckel</string>
+    <string name="iptv_ui20_sched_leagues_hint">OK lägger till eller tar bort en liga. Tillbaka sparar valet.</string>
+    <string name="iptv_ui20_sched_leagues_note">Inte knuten till eller godkänd av någon liga, klubb eller tv-kanal. Namn och emblem visas bara för att skilja dem åt.</string>
+</resources>

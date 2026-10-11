@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui20_sched_yesterday">昨天</string>
+    <plurals name="iptv_ui20_sched_live">
+        <item quantity="other">%d 場直播</item>
+    </plurals>
+    <plurals name="iptv_ui20_sched_games">
+        <item quantity="other">%d 場比賽</item>
+    </plurals>
+    <plurals name="iptv_ui20_sched_results">
+        <item quantity="other">%d 個結果</item>
+    </plurals>
+    <string name="iptv_ui20_sched_no_games">沒有比賽</string>
+    <string name="iptv_ui20_sched_results_label">結果</string>
+    <string name="iptv_ui20_sched_loading">正在載入結果…</string>
+    <string name="iptv_ui20_sched_failed">無法載入這一天。請稍後再試。</string>
+    <string name="iptv_ui20_sched_league_count">%1$d/%2$d</string>
+    <string name="iptv_ui20_sched_source_both">ESPN + TheSportsDB</string>
+    <string name="iptv_ui20_sched_source_needs_key">需要 TheSportsDB 金鑰</string>
+    <string name="iptv_ui20_sched_leagues_hint">按 OK 新增或移除聯賽，按返回儲存選擇。</string>
+    <string name="iptv_ui20_sched_leagues_note">與任何聯賽、俱樂部或轉播單位無關，也未獲其認可。名稱和隊徽僅用於區分。</string>
+</resources>

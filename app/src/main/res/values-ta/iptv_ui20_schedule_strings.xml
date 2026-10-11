@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui20_sched_yesterday">நேற்று</string>
+    <plurals name="iptv_ui20_sched_live">
+        <item quantity="one">%d நேரலை</item>
+        <item quantity="other">%d நேரலை</item>
+    </plurals>
+    <plurals name="iptv_ui20_sched_games">
+        <item quantity="one">%d போட்டி</item>
+        <item quantity="other">%d போட்டிகள்</item>
+    </plurals>
+    <plurals name="iptv_ui20_sched_results">
+        <item quantity="one">%d முடிவு</item>
+        <item quantity="other">%d முடிவுகள்</item>
+    </plurals>
+    <string name="iptv_ui20_sched_no_games">போட்டிகள் இல்லை</string>
+    <string name="iptv_ui20_sched_results_label">முடிவுகள்</string>
+    <string name="iptv_ui20_sched_loading">முடிவுகள் ஏற்றப்படுகின்றன…</string>
+    <string name="iptv_ui20_sched_failed">இந்த நாளை ஏற்ற முடியவில்லை. சிறிது நேரம் கழித்து மீண்டும் முயலவும்.</string>
+    <string name="iptv_ui20_sched_league_count">%1$d/%2$d</string>
+    <string name="iptv_ui20_sched_source_both">ESPN + TheSportsDB</string>
+    <string name="iptv_ui20_sched_source_needs_key">TheSportsDB விசை தேவை</string>
+    <string name="iptv_ui20_sched_leagues_hint">OK லீக்கைச் சேர்க்கும் அல்லது நீக்கும். பின் செல்வது தேர்வைச் சேமிக்கும்.</string>
+    <string name="iptv_ui20_sched_leagues_note">எந்த லீக், கிளப் அல்லது ஒளிபரப்பாளருடனும் தொடர்போ ஒப்புதலோ இல்லை. பெயர்களும் சின்னங்களும் அடையாளம் காண மட்டுமே.</string>
+</resources>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui20_sched_yesterday">Χθες</string>
+    <plurals name="iptv_ui20_sched_live">
+        <item quantity="one">%d ζωντανά</item>
+        <item quantity="other">%d ζωντανά</item>
+    </plurals>
+    <plurals name="iptv_ui20_sched_games">
+        <item quantity="one">%d αγώνας</item>
+        <item quantity="other">%d αγώνες</item>
+    </plurals>
+    <plurals name="iptv_ui20_sched_results">
+        <item quantity="one">%d αποτέλεσμα</item>
+        <item quantity="other">%d αποτελέσματα</item>
+    </plurals>
+    <string name="iptv_ui20_sched_no_games">Χωρίς αγώνες</string>
+    <string name="iptv_ui20_sched_results_label">Αποτελέσματα</string>
+    <string name="iptv_ui20_sched_loading">Φόρτωση αποτελεσμάτων…</string>
+    <string name="iptv_ui20_sched_failed">Δεν ήταν δυνατή η φόρτωση αυτής της ημέρας. Δοκιμάστε ξανά σε λίγο.</string>
+    <string name="iptv_ui20_sched_league_count">%1$d/%2$d</string>
+    <string name="iptv_ui20_sched_source_both">ESPN + TheSportsDB</string>
+    <string name="iptv_ui20_sched_source_needs_key">Χρειάζεται κλειδί TheSportsDB</string>
+    <string name="iptv_ui20_sched_leagues_hint">Το OK προσθέτει ή αφαιρεί λίγκα. Το Πίσω αποθηκεύει την επιλογή.</string>
+    <string name="iptv_ui20_sched_leagues_note">Χωρίς σύνδεση ή έγκριση από λίγκα, σύλλογο ή κανάλι. Τα ονόματα και τα σήματα εμφανίζονται μόνο για διάκριση.</string>
+</resources>

@@ -100,8 +100,18 @@ class IptvSportsSettingsViewModel @Inject constructor(private val preferences: I
     val picks = pickState.asStateFlow()
     private var pickJob: Job? = null
     private var categoryJob: Job? = null
+    private val crestState = MutableStateFlow<Map<String, String>>(emptyMap())
+    val crests = crestState.asStateFlow()
 
     init { reload() }
+
+    fun loadCrests() {
+        viewModelScope.launch {
+            crestState.value = try { repository.leagueCrests() }
+                catch (cancel: CancellationException) { throw cancel }
+                catch (error: Exception) { IptvLog.failure("sports crests", error); crestState.value }
+        }
+    }
 
     fun reload() {
         mutable.value = IptvSportsSettingsState(preferences.enabled, preferences.leagues, preferences.hasKey, preferences.showScores,
@@ -235,7 +245,8 @@ fun IptvSportsSettingsSection(viewModel: IptvSportsSettingsViewModel = hiltViewM
                 val keyNeeded = !state.hasKey && chosen.any(SportsSources::needsKey)
                 SettingsActionRow(title = stringResource(R.string.iptv_sport_leagues), subtitle = stringResource(R.string.iptv_sport7_leagues_subtitle),
                     value = if (chosen.isEmpty()) stringResource(R.string.iptv_sport_leagues_none) else pluralStringResource(R.plurals.iptv_sport_leagues_chosen, chosen.size, chosen.size),
-                    valueColor = if (keyNeeded) NuvioTheme.colors.Error else NuvioTheme.colors.TextSecondary, onClick = { choosing = IptvSportsChoice.LEAGUES })
+                    valueColor = if (keyNeeded) NuvioTheme.colors.Error else NuvioTheme.colors.TextSecondary,
+                    onClick = { viewModel.loadCrests(); choosing = IptvSportsChoice.LEAGUES })
                 SettingsActionRow(title = stringResource(R.string.iptv_sport7_add_league), subtitle = stringResource(R.string.iptv_sport7_add_league_subtitle),
                     onClick = { choosing = if (state.hasKey) IptvSportsChoice.SEARCH else IptvSportsChoice.KEY })
                 SettingsActionRow(title = stringResource(R.string.iptv_sport_key), subtitle = stringResource(R.string.iptv_sport7_key_subtitle),
@@ -294,12 +305,21 @@ fun IptvSportsSettingsSection(viewModel: IptvSportsSettingsViewModel = hiltViewM
     }
     val dismiss = { choosing = null }
     IptvOpaqueDialogs { when (choosing) {
-        IptvSportsChoice.LEAGUES -> SettingsMultiChoiceDialog(title = stringResource(R.string.iptv_sport_leagues),
-            subtitle = stringResource(R.string.iptv_sport7_leagues_subtitle),
-            options = state.offered.let { all -> all.map { it.sport }.distinct().let { order -> all.sortedBy { order.indexOf(it.sport) } } }
-                .map { SettingsPickerOption(it.id, it.name, sportName(it.sport) + " · " + stringResource(sourceLabel(it, state.hasKey))) },
-            selectedValues = state.offered.filter { it.id in state.leagues }.map { it.id },
-            onValuesSelected = { viewModel.setLeagues(it); dismiss() }, onDismiss = dismiss, maxHeight = 460.dp)
+        IptvSportsChoice.LEAGUES -> {
+            val crests by viewModel.crests.collectAsStateWithLifecycle()
+            var adding by remember { mutableStateOf(false) }
+            IptvSportsLeaguePicker(state.offered, state.leagues, state.hasKey, crests, onSave = viewModel::setLeagues, onAdd = { adding = true },
+                onDismiss = dismiss) {
+                if (adding) {
+                    if (state.hasKey) {
+                        val search by viewModel.search.collectAsStateWithLifecycle()
+                        SportsLeagueSearchDialog(search, state.leagues, onQuery = viewModel::searchLeagues, onAdd = viewModel::addLeague,
+                            onDismiss = { viewModel.closeSearch(); adding = false })
+                    } else SportsKeyDialog(false, onSave = { viewModel.saveKey(it) { if (!viewModel.state.value.hasKey) adding = false } }, onRemove = { adding = false },
+                        onDismiss = { adding = false })
+                }
+            }
+        }
         IptvSportsChoice.SEARCH -> {
             val search by viewModel.search.collectAsStateWithLifecycle()
             SportsLeagueSearchDialog(search, state.leagues, onQuery = viewModel::searchLeagues, onAdd = viewModel::addLeague,
@@ -480,12 +500,6 @@ private fun pickSubtitle(which: SportsPickList): Int = when (which) {
     SportsPickList.NEVER -> R.string.iptv_ui13_sport_never_subtitle
     SportsPickList.PREFERRED -> R.string.iptv_ui13_sport_preferred_subtitle
     SportsPickList.EXCLUDED -> R.string.iptv_ui13_sport_excluded_subtitle
-}
-
-private fun sourceLabel(league: SportsLeague, hasKey: Boolean): Int = when {
-    league.espn != null -> if (hasKey && league.sportsDb != null) R.string.iptv_sport7_source_both else R.string.iptv_sport7_source_espn
-    hasKey -> R.string.iptv_sport7_source_sportsdb
-    else -> R.string.iptv_sport7_source_needs_key
 }
 
 private fun channelSourceLabel(source: SportsChannelSource): Int = when (source) {

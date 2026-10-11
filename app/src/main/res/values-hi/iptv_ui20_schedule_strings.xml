@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui20_sched_yesterday">कल</string>
+    <plurals name="iptv_ui20_sched_live">
+        <item quantity="one">%d लाइव</item>
+        <item quantity="other">%d लाइव</item>
+    </plurals>
+    <plurals name="iptv_ui20_sched_games">
+        <item quantity="one">%d मैच</item>
+        <item quantity="other">%d मैच</item>
+    </plurals>
+    <plurals name="iptv_ui20_sched_results">
+        <item quantity="one">%d नतीजे</item>
+        <item quantity="other">%d नतीजे</item>
+    </plurals>
+    <string name="iptv_ui20_sched_no_games">कोई मैच नहीं</string>
+    <string name="iptv_ui20_sched_results_label">नतीजे</string>
+    <string name="iptv_ui20_sched_loading">नतीजे लोड हो रहे हैं…</string>
+    <string name="iptv_ui20_sched_failed">यह दिन लोड नहीं हो सका। थोड़ी देर बाद फिर कोशिश करें।</string>
+    <string name="iptv_ui20_sched_league_count">%1$d/%2$d</string>
+    <string name="iptv_ui20_sched_source_both">ESPN + TheSportsDB</string>
+    <string name="iptv_ui20_sched_source_needs_key">TheSportsDB कुंजी चाहिए</string>
+    <string name="iptv_ui20_sched_leagues_hint">OK लीग जोड़ता या हटाता है। बैक आपकी पसंद सहेजता है।</string>
+    <string name="iptv_ui20_sched_leagues_note">किसी लीग, क्लब या प्रसारक से जुड़ा या समर्थित नहीं। नाम और बैज केवल पहचान के लिए दिखाए जाते हैं।</string>
+</resources>

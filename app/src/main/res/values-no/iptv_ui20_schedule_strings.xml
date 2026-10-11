@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui20_sched_yesterday">I går</string>
+    <plurals name="iptv_ui20_sched_live">
+        <item quantity="one">%d direkte</item>
+        <item quantity="other">%d direkte</item>
+    </plurals>
+    <plurals name="iptv_ui20_sched_games">
+        <item quantity="one">%d kamp</item>
+        <item quantity="other">%d kamper</item>
+    </plurals>
+    <plurals name="iptv_ui20_sched_results">
+        <item quantity="one">%d resultat</item>
+        <item quantity="other">%d resultater</item>
+    </plurals>
+    <string name="iptv_ui20_sched_no_games">Ingen kamper</string>
+    <string name="iptv_ui20_sched_results_label">Resultater</string>
+    <string name="iptv_ui20_sched_loading">Laster inn resultater…</string>
+    <string name="iptv_ui20_sched_failed">Kunne ikke laste inn denne dagen. Prøv igjen litt senere.</string>
+    <string name="iptv_ui20_sched_league_count">%1$d/%2$d</string>
+    <string name="iptv_ui20_sched_source_both">ESPN + TheSportsDB</string>
+    <string name="iptv_ui20_sched_source_needs_key">Krever en TheSportsDB-nøkkel</string>
+    <string name="iptv_ui20_sched_leagues_hint">OK legger til eller fjerner en liga. Tilbake lagrer valget.</string>
+    <string name="iptv_ui20_sched_leagues_note">Ikke tilknyttet eller godkjent av noen liga, klubb eller kringkaster. Navn og logoer vises bare for å skille dem.</string>
+</resources>

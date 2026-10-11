@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui20_sched_yesterday">Dün</string>
+    <plurals name="iptv_ui20_sched_live">
+        <item quantity="one">%d canlı</item>
+        <item quantity="other">%d canlı</item>
+    </plurals>
+    <plurals name="iptv_ui20_sched_games">
+        <item quantity="one">%d maç</item>
+        <item quantity="other">%d maç</item>
+    </plurals>
+    <plurals name="iptv_ui20_sched_results">
+        <item quantity="one">%d sonuç</item>
+        <item quantity="other">%d sonuç</item>
+    </plurals>
+    <string name="iptv_ui20_sched_no_games">Maç yok</string>
+    <string name="iptv_ui20_sched_results_label">Sonuçlar</string>
+    <string name="iptv_ui20_sched_loading">Sonuçlar yükleniyor…</string>
+    <string name="iptv_ui20_sched_failed">Bu gün yüklenemedi. Biraz sonra tekrar dene.</string>
+    <string name="iptv_ui20_sched_league_count">%1$d/%2$d</string>
+    <string name="iptv_ui20_sched_source_both">ESPN + TheSportsDB</string>
+    <string name="iptv_ui20_sched_source_needs_key">TheSportsDB anahtarı gerekir</string>
+    <string name="iptv_ui20_sched_leagues_hint">OK lig ekler veya kaldırır. Geri seçimini kaydeder.</string>
+    <string name="iptv_ui20_sched_leagues_note">Hiçbir lig, kulüp ya da yayıncıyla bağlantılı değildir ve onlarca desteklenmez. Adlar ve armalar yalnızca ayırt etmek içindir.</string>
+</resources>

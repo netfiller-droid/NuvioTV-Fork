@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui20_sched_yesterday">Včera</string>
+    <plurals name="iptv_ui20_sched_live">
+        <item quantity="one">%d naživo</item>
+        <item quantity="few">%d naživo</item>
+        <item quantity="many">%d naživo</item>
+        <item quantity="other">%d naživo</item>
+    </plurals>
+    <plurals name="iptv_ui20_sched_games">
+        <item quantity="one">%d zápas</item>
+        <item quantity="few">%d zápasy</item>
+        <item quantity="many">%d zápasu</item>
+        <item quantity="other">%d zápasov</item>
+    </plurals>
+    <plurals name="iptv_ui20_sched_results">
+        <item quantity="one">%d výsledok</item>
+        <item quantity="few">%d výsledky</item>
+        <item quantity="many">%d výsledku</item>
+        <item quantity="other">%d výsledkov</item>
+    </plurals>
+    <string name="iptv_ui20_sched_no_games">Žiadne zápasy</string>
+    <string name="iptv_ui20_sched_results_label">Výsledky</string>
+    <string name="iptv_ui20_sched_loading">Načítavajú sa výsledky…</string>
+    <string name="iptv_ui20_sched_failed">Tento deň sa nepodarilo načítať. Skúste to znova o chvíľu.</string>
+    <string name="iptv_ui20_sched_league_count">%1$d/%2$d</string>
+    <string name="iptv_ui20_sched_source_both">ESPN + TheSportsDB</string>
+    <string name="iptv_ui20_sched_source_needs_key">Vyžaduje kľúč TheSportsDB</string>
+    <string name="iptv_ui20_sched_leagues_hint">OK pridá alebo odoberie ligu. Späť uloží výber.</string>
+    <string name="iptv_ui20_sched_leagues_note">Bez väzby na akúkoľvek ligu, klub či vysielateľa a bez ich podpory. Názvy a znaky slúžia len na rozlíšenie.</string>
+</resources>

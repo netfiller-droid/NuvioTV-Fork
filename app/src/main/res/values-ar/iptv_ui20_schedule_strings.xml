@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui20_sched_yesterday">أمس</string>
+    <plurals name="iptv_ui20_sched_live">
+        <item quantity="zero">%d مباشر</item>
+        <item quantity="one">%d مباشر</item>
+        <item quantity="two">%d مباشر</item>
+        <item quantity="few">%d مباشر</item>
+        <item quantity="many">%d مباشر</item>
+        <item quantity="other">%d مباشر</item>
+    </plurals>
+    <plurals name="iptv_ui20_sched_games">
+        <item quantity="zero">%d مباراة</item>
+        <item quantity="one">مباراة واحدة</item>
+        <item quantity="two">مباراتان</item>
+        <item quantity="few">%d مباريات</item>
+        <item quantity="many">%d مباراة</item>
+        <item quantity="other">%d مباراة</item>
+    </plurals>
+    <plurals name="iptv_ui20_sched_results">
+        <item quantity="zero">%d نتيجة</item>
+        <item quantity="one">نتيجة واحدة</item>
+        <item quantity="two">نتيجتان</item>
+        <item quantity="few">%d نتائج</item>
+        <item quantity="many">%d نتيجة</item>
+        <item quantity="other">%d نتيجة</item>
+    </plurals>
+    <string name="iptv_ui20_sched_no_games">لا مباريات</string>
+    <string name="iptv_ui20_sched_results_label">النتائج</string>
+    <string name="iptv_ui20_sched_loading">جارٍ تحميل النتائج…</string>
+    <string name="iptv_ui20_sched_failed">تعذّر تحميل هذا اليوم. حاول مرة أخرى بعد قليل.</string>
+    <string name="iptv_ui20_sched_league_count">%1$d/%2$d</string>
+    <string name="iptv_ui20_sched_source_both">ESPN + TheSportsDB</string>
+    <string name="iptv_ui20_sched_source_needs_key">يتطلب مفتاح TheSportsDB</string>
+    <string name="iptv_ui20_sched_leagues_hint">زر OK يضيف الدوري أو يزيله. زر الرجوع يحفظ اختيارك.</string>
+    <string name="iptv_ui20_sched_leagues_note">لا علاقة لنا بأي دوري أو نادٍ أو جهة بث ولا نحظى بتأييدها. تُعرض الأسماء والشعارات للتمييز بينها فقط.</string>
+</resources>

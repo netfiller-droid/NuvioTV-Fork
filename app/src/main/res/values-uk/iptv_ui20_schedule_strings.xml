@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui20_sched_yesterday">Учора</string>
+    <plurals name="iptv_ui20_sched_live">
+        <item quantity="one">%d наживо</item>
+        <item quantity="few">%d наживо</item>
+        <item quantity="many">%d наживо</item>
+        <item quantity="other">%d наживо</item>
+    </plurals>
+    <plurals name="iptv_ui20_sched_games">
+        <item quantity="one">%d матч</item>
+        <item quantity="few">%d матчі</item>
+        <item quantity="many">%d матчів</item>
+        <item quantity="other">%d матчу</item>
+    </plurals>
+    <plurals name="iptv_ui20_sched_results">
+        <item quantity="one">%d результат</item>
+        <item quantity="few">%d результати</item>
+        <item quantity="many">%d результатів</item>
+        <item quantity="other">%d результату</item>
+    </plurals>
+    <string name="iptv_ui20_sched_no_games">Немає матчів</string>
+    <string name="iptv_ui20_sched_results_label">Результати</string>
+    <string name="iptv_ui20_sched_loading">Завантаження результатів…</string>
+    <string name="iptv_ui20_sched_failed">Не вдалося завантажити цей день. Спробуйте трохи згодом.</string>
+    <string name="iptv_ui20_sched_league_count">%1$d/%2$d</string>
+    <string name="iptv_ui20_sched_source_both">ESPN + TheSportsDB</string>
+    <string name="iptv_ui20_sched_source_needs_key">Потрібен ключ TheSportsDB</string>
+    <string name="iptv_ui20_sched_leagues_hint">OK додає або прибирає лігу. Назад зберігає вибір.</string>
+    <string name="iptv_ui20_sched_leagues_note">Не пов’язано з жодною лігою, клубом чи мовником і не схвалено ними. Назви й емблеми показано лише для розрізнення.</string>
+</resources>

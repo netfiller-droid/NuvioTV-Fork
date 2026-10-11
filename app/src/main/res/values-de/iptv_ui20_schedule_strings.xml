@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui20_sched_yesterday">Gestern</string>
+    <plurals name="iptv_ui20_sched_live">
+        <item quantity="one">%d live</item>
+        <item quantity="other">%d live</item>
+    </plurals>
+    <plurals name="iptv_ui20_sched_games">
+        <item quantity="one">%d Spiel</item>
+        <item quantity="other">%d Spiele</item>
+    </plurals>
+    <plurals name="iptv_ui20_sched_results">
+        <item quantity="one">%d Ergebnis</item>
+        <item quantity="other">%d Ergebnisse</item>
+    </plurals>
+    <string name="iptv_ui20_sched_no_games">Keine Spiele</string>
+    <string name="iptv_ui20_sched_results_label">Ergebnisse</string>
+    <string name="iptv_ui20_sched_loading">Ergebnisse werden geladen…</string>
+    <string name="iptv_ui20_sched_failed">Dieser Tag konnte nicht geladen werden. Versuche es später noch einmal.</string>
+    <string name="iptv_ui20_sched_league_count">%1$d/%2$d</string>
+    <string name="iptv_ui20_sched_source_both">ESPN + TheSportsDB</string>
+    <string name="iptv_ui20_sched_source_needs_key">TheSportsDB-Schlüssel nötig</string>
+    <string name="iptv_ui20_sched_leagues_hint">OK fügt eine Liga hinzu oder entfernt sie. Zurück speichert die Auswahl.</string>
+    <string name="iptv_ui20_sched_leagues_note">Keine Verbindung zu und keine Billigung durch Ligen, Vereine oder Sender. Namen und Wappen dienen nur der Unterscheidung.</string>
+</resources>

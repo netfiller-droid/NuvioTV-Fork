@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui20_sched_yesterday">Dje</string>
+    <plurals name="iptv_ui20_sched_live">
+        <item quantity="one">%d live</item>
+        <item quantity="other">%d live</item>
+    </plurals>
+    <plurals name="iptv_ui20_sched_games">
+        <item quantity="one">%d ndeshje</item>
+        <item quantity="other">%d ndeshje</item>
+    </plurals>
+    <plurals name="iptv_ui20_sched_results">
+        <item quantity="one">%d rezultat</item>
+        <item quantity="other">%d rezultate</item>
+    </plurals>
+    <string name="iptv_ui20_sched_no_games">Asnjë ndeshje</string>
+    <string name="iptv_ui20_sched_results_label">Rezultatet</string>
+    <string name="iptv_ui20_sched_loading">Po ngarkohen rezultatet…</string>
+    <string name="iptv_ui20_sched_failed">Kjo ditë nuk u ngarkua dot. Provo përsëri pak më vonë.</string>
+    <string name="iptv_ui20_sched_league_count">%1$d/%2$d</string>
+    <string name="iptv_ui20_sched_source_both">ESPN + TheSportsDB</string>
+    <string name="iptv_ui20_sched_source_needs_key">Kërkon një çelës TheSportsDB</string>
+    <string name="iptv_ui20_sched_leagues_hint">OK shton ose heq një ligë. Prapa ruan zgjedhjen.</string>
+    <string name="iptv_ui20_sched_leagues_note">Pa lidhje dhe pa mbështetje nga asnjë ligë, klub apo transmetues. Emrat dhe stemat shfaqen vetëm për t\'i dalluar.</string>
+</resources>

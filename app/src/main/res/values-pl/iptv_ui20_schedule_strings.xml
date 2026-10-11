@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui20_sched_yesterday">Wczoraj</string>
+    <plurals name="iptv_ui20_sched_live">
+        <item quantity="one">%d na żywo</item>
+        <item quantity="few">%d na żywo</item>
+        <item quantity="many">%d na żywo</item>
+        <item quantity="other">%d na żywo</item>
+    </plurals>
+    <plurals name="iptv_ui20_sched_games">
+        <item quantity="one">%d mecz</item>
+        <item quantity="few">%d mecze</item>
+        <item quantity="many">%d meczów</item>
+        <item quantity="other">%d meczu</item>
+    </plurals>
+    <plurals name="iptv_ui20_sched_results">
+        <item quantity="one">%d wynik</item>
+        <item quantity="few">%d wyniki</item>
+        <item quantity="many">%d wyników</item>
+        <item quantity="other">%d wyniku</item>
+    </plurals>
+    <string name="iptv_ui20_sched_no_games">Brak meczów</string>
+    <string name="iptv_ui20_sched_results_label">Wyniki</string>
+    <string name="iptv_ui20_sched_loading">Wczytywanie wyników…</string>
+    <string name="iptv_ui20_sched_failed">Nie udało się wczytać tego dnia. Spróbuj ponownie za chwilę.</string>
+    <string name="iptv_ui20_sched_league_count">%1$d/%2$d</string>
+    <string name="iptv_ui20_sched_source_both">ESPN + TheSportsDB</string>
+    <string name="iptv_ui20_sched_source_needs_key">Wymaga klucza TheSportsDB</string>
+    <string name="iptv_ui20_sched_leagues_hint">OK dodaje lub usuwa ligę. Wstecz zapisuje wybór.</string>
+    <string name="iptv_ui20_sched_leagues_note">Brak powiązań z jakąkolwiek ligą, klubem czy nadawcą i ich poparcia. Nazwy i herby służą wyłącznie do rozróżnienia.</string>
+</resources>

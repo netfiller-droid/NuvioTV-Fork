@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui20_sched_yesterday">Ontem</string>
+    <plurals name="iptv_ui20_sched_live">
+        <item quantity="one">%d em direto</item>
+        <item quantity="many">%d em direto</item>
+        <item quantity="other">%d em direto</item>
+    </plurals>
+    <plurals name="iptv_ui20_sched_games">
+        <item quantity="one">%d jogo</item>
+        <item quantity="many">%d jogos</item>
+        <item quantity="other">%d jogos</item>
+    </plurals>
+    <plurals name="iptv_ui20_sched_results">
+        <item quantity="one">%d resultado</item>
+        <item quantity="many">%d resultados</item>
+        <item quantity="other">%d resultados</item>
+    </plurals>
+    <string name="iptv_ui20_sched_no_games">Sem jogos</string>
+    <string name="iptv_ui20_sched_results_label">Resultados</string>
+    <string name="iptv_ui20_sched_loading">A carregar resultados…</string>
+    <string name="iptv_ui20_sched_failed">Não foi possível carregar este dia. Tente novamente daqui a pouco.</string>
+    <string name="iptv_ui20_sched_league_count">%1$d/%2$d</string>
+    <string name="iptv_ui20_sched_source_both">ESPN + TheSportsDB</string>
+    <string name="iptv_ui20_sched_source_needs_key">Requer uma chave do TheSportsDB</string>
+    <string name="iptv_ui20_sched_leagues_hint">OK adiciona ou remove uma liga. Voltar guarda a escolha.</string>
+    <string name="iptv_ui20_sched_leagues_note">Sem ligação nem apoio de qualquer liga, clube ou canal. Os nomes e emblemas servem apenas para os distinguir.</string>
+</resources>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui20_sched_yesterday">Tegnap</string>
+    <plurals name="iptv_ui20_sched_live">
+        <item quantity="one">%d élő</item>
+        <item quantity="other">%d élő</item>
+    </plurals>
+    <plurals name="iptv_ui20_sched_games">
+        <item quantity="one">%d meccs</item>
+        <item quantity="other">%d meccs</item>
+    </plurals>
+    <plurals name="iptv_ui20_sched_results">
+        <item quantity="one">%d eredmény</item>
+        <item quantity="other">%d eredmény</item>
+    </plurals>
+    <string name="iptv_ui20_sched_no_games">Nincs meccs</string>
+    <string name="iptv_ui20_sched_results_label">Eredmények</string>
+    <string name="iptv_ui20_sched_loading">Eredmények betöltése…</string>
+    <string name="iptv_ui20_sched_failed">Ezt a napot nem sikerült betölteni. Próbáld újra kicsit később.</string>
+    <string name="iptv_ui20_sched_league_count">%1$d/%2$d</string>
+    <string name="iptv_ui20_sched_source_both">ESPN + TheSportsDB</string>
+    <string name="iptv_ui20_sched_source_needs_key">TheSportsDB-kulcs szükséges</string>
+    <string name="iptv_ui20_sched_leagues_hint">Az OK hozzáad vagy eltávolít egy ligát. A Vissza menti a választást.</string>
+    <string name="iptv_ui20_sched_leagues_note">Semmilyen ligához, klubhoz vagy műsorszolgáltatóhoz nem kötődik, és azok nem támogatják. A nevek és címerek csak a megkülönböztetést szolgálják.</string>
+</resources>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui20_sched_yesterday">Vakar</string>
+    <plurals name="iptv_ui20_sched_live">
+        <item quantity="one">%d tiesiogiai</item>
+        <item quantity="few">%d tiesiogiai</item>
+        <item quantity="many">%d tiesiogiai</item>
+        <item quantity="other">%d tiesiogiai</item>
+    </plurals>
+    <plurals name="iptv_ui20_sched_games">
+        <item quantity="one">%d rungtynės</item>
+        <item quantity="few">%d rungtynės</item>
+        <item quantity="many">%d rungtynių</item>
+        <item quantity="other">%d rungtynių</item>
+    </plurals>
+    <plurals name="iptv_ui20_sched_results">
+        <item quantity="one">%d rezultatas</item>
+        <item quantity="few">%d rezultatai</item>
+        <item quantity="many">%d rezultato</item>
+        <item quantity="other">%d rezultatų</item>
+    </plurals>
+    <string name="iptv_ui20_sched_no_games">Rungtynių nėra</string>
+    <string name="iptv_ui20_sched_results_label">Rezultatai</string>
+    <string name="iptv_ui20_sched_loading">Įkeliami rezultatai…</string>
+    <string name="iptv_ui20_sched_failed">Šios dienos įkelti nepavyko. Bandykite dar kartą vėliau.</string>
+    <string name="iptv_ui20_sched_league_count">%1$d/%2$d</string>
+    <string name="iptv_ui20_sched_source_both">ESPN + TheSportsDB</string>
+    <string name="iptv_ui20_sched_source_needs_key">Reikia TheSportsDB rakto</string>
+    <string name="iptv_ui20_sched_leagues_hint">OK prideda arba pašalina lygą. Atgal išsaugo pasirinkimą.</string>
+    <string name="iptv_ui20_sched_leagues_note">Nesusiję su jokia lyga, klubu ar transliuotoju ir jų nepatvirtinta. Pavadinimai ir ženklai rodomi tik atskirti.</string>
+</resources>

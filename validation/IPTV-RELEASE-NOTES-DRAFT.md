@@ -798,6 +798,10 @@ Sport page and multiview look (11 October; sized for 1080p and 4K screens):
   score, clock or kick-off); it respects hidden scores and can be hidden per picture.
 - Multiview: a "Channel and programme" option (Always / Selected picture only / Off) shows
   the channel and what's on, with progress, along the bottom of every picture.
+- All scores: a day strip shows a few days back and the days ahead with live, game or result
+  counts; past days load their results when you choose them.
+- Leagues open as a full screen: sports down the side, leagues as badge tiles with a tick,
+  and a note that the app isn't linked to any league or broadcaster.
 
 ## Ready below the UI (screens pending)
 

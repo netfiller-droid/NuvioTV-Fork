@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui20_sched_yesterday">Hôm qua</string>
+    <plurals name="iptv_ui20_sched_live">
+        <item quantity="other">%d trực tiếp</item>
+    </plurals>
+    <plurals name="iptv_ui20_sched_games">
+        <item quantity="other">%d trận</item>
+    </plurals>
+    <plurals name="iptv_ui20_sched_results">
+        <item quantity="other">%d kết quả</item>
+    </plurals>
+    <string name="iptv_ui20_sched_no_games">Không có trận</string>
+    <string name="iptv_ui20_sched_results_label">Kết quả</string>
+    <string name="iptv_ui20_sched_loading">Đang tải kết quả…</string>
+    <string name="iptv_ui20_sched_failed">Không tải được ngày này. Hãy thử lại sau ít phút.</string>
+    <string name="iptv_ui20_sched_league_count">%1$d/%2$d</string>
+    <string name="iptv_ui20_sched_source_both">ESPN + TheSportsDB</string>
+    <string name="iptv_ui20_sched_source_needs_key">Cần khóa TheSportsDB</string>
+    <string name="iptv_ui20_sched_leagues_hint">OK để thêm hoặc bỏ giải. Quay lại để lưu lựa chọn.</string>
+    <string name="iptv_ui20_sched_leagues_note">Không liên kết hay được bảo trợ bởi giải đấu, câu lạc bộ hay đài nào. Tên và huy hiệu chỉ dùng để phân biệt.</string>
+</resources>

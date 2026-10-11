@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui20_sched_yesterday">Ieri</string>
+    <plurals name="iptv_ui20_sched_live">
+        <item quantity="one">%d live</item>
+        <item quantity="few">%d live</item>
+        <item quantity="other">%d live</item>
+    </plurals>
+    <plurals name="iptv_ui20_sched_games">
+        <item quantity="one">%d meci</item>
+        <item quantity="few">%d meciuri</item>
+        <item quantity="other">%d de meciuri</item>
+    </plurals>
+    <plurals name="iptv_ui20_sched_results">
+        <item quantity="one">%d rezultat</item>
+        <item quantity="few">%d rezultate</item>
+        <item quantity="other">%d de rezultate</item>
+    </plurals>
+    <string name="iptv_ui20_sched_no_games">Niciun meci</string>
+    <string name="iptv_ui20_sched_results_label">Rezultate</string>
+    <string name="iptv_ui20_sched_loading">Se încarcă rezultatele…</string>
+    <string name="iptv_ui20_sched_failed">Această zi nu a putut fi încărcată. Încearcă din nou puțin mai târziu.</string>
+    <string name="iptv_ui20_sched_league_count">%1$d/%2$d</string>
+    <string name="iptv_ui20_sched_source_both">ESPN + TheSportsDB</string>
+    <string name="iptv_ui20_sched_source_needs_key">Necesită o cheie TheSportsDB</string>
+    <string name="iptv_ui20_sched_leagues_hint">OK adaugă sau elimină o ligă. Înapoi salvează alegerea.</string>
+    <string name="iptv_ui20_sched_leagues_note">Fără legătură cu vreo ligă, club sau televiziune și fără susținerea lor. Numele și emblemele apar doar pentru a le deosebi.</string>
+</resources>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui20_sched_yesterday">Včeraj</string>
+    <plurals name="iptv_ui20_sched_live">
+        <item quantity="one">%d v živo</item>
+        <item quantity="two">%d v živo</item>
+        <item quantity="few">%d v živo</item>
+        <item quantity="other">%d v živo</item>
+    </plurals>
+    <plurals name="iptv_ui20_sched_games">
+        <item quantity="one">%d tekma</item>
+        <item quantity="two">%d tekmi</item>
+        <item quantity="few">%d tekme</item>
+        <item quantity="other">%d tekem</item>
+    </plurals>
+    <plurals name="iptv_ui20_sched_results">
+        <item quantity="one">%d rezultat</item>
+        <item quantity="two">%d rezultata</item>
+        <item quantity="few">%d rezultati</item>
+        <item quantity="other">%d rezultatov</item>
+    </plurals>
+    <string name="iptv_ui20_sched_no_games">Ni tekem</string>
+    <string name="iptv_ui20_sched_results_label">Rezultati</string>
+    <string name="iptv_ui20_sched_loading">Nalaganje rezultatov…</string>
+    <string name="iptv_ui20_sched_failed">Tega dne ni bilo mogoče naložiti. Poskusi znova malo pozneje.</string>
+    <string name="iptv_ui20_sched_league_count">%1$d/%2$d</string>
+    <string name="iptv_ui20_sched_source_both">ESPN + TheSportsDB</string>
+    <string name="iptv_ui20_sched_source_needs_key">Potreben je ključ TheSportsDB</string>
+    <string name="iptv_ui20_sched_leagues_hint">OK doda ali odstrani ligo. Nazaj shrani izbiro.</string>
+    <string name="iptv_ui20_sched_leagues_note">Ni povezano z nobeno ligo, klubom ali izdajateljem in ga ti ne podpirajo. Imena in grbi so prikazani le za razlikovanje.</string>
+</resources>

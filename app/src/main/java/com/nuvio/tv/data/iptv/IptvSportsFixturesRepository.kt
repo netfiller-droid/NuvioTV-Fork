@@ -8,23 +8,38 @@ import com.nuvio.tv.core.iptv.GuideProgramme
 import com.nuvio.tv.core.iptv.SportsCatchup
 import com.nuvio.tv.core.iptv.SportsChannelPick
 import com.nuvio.tv.core.iptv.SportsChannelPicks
+import com.nuvio.tv.core.iptv.SportsCacheEntry
 import com.nuvio.tv.core.iptv.SportsChannelRules
+import com.nuvio.tv.core.iptv.SportsCrest
 import com.nuvio.tv.core.iptv.SportsDays
 import com.nuvio.tv.core.iptv.SportsDbLeague
 import com.nuvio.tv.core.iptv.SportsFixture
 import com.nuvio.tv.core.iptv.SportsFixtureMatching
 import com.nuvio.tv.core.iptv.SportsGuideSlices
+import com.nuvio.tv.core.iptv.SportsLeague
+import com.nuvio.tv.core.iptv.SportsLeagueCrests
 import com.nuvio.tv.core.iptv.SportsLeagues
 import com.nuvio.tv.core.iptv.SportsPickKind
 import com.nuvio.tv.core.iptv.SportsPickList
 import com.nuvio.tv.core.iptv.SportsPolling
+import com.nuvio.tv.core.iptv.SportsRefresh
+import com.nuvio.tv.core.iptv.SportsScoreDays
+import com.nuvio.tv.core.iptv.SportsService
 import com.nuvio.tv.core.iptv.SportsSources
+import java.time.LocalDate
 import java.time.ZoneId
 import java.util.Locale
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withContext
 
 data class IptvSportsFixtures(val enabled: Boolean, val fixtures: List<SportsFixture> = emptyList(), val failed: Boolean = false,
@@ -38,6 +53,8 @@ class IptvSportsFixturesRepository(private val preferences: IptvSportsPreference
     client: IptvSportsFixturesClient, store: IptvSportsFixturesStore, private val guideDays: () -> Int? = { null }) {
     private val browse = IptvBrowseRepository(catalogue, guides)
     private val cache = IptvSportsFixturesCache(client, store)
+    private val days = IptvSportsDayCache(client, store)
+    private val crests = IptvSportsCrests(store)
 
     suspend fun load(nowMillis: Long, zone: ZoneId, refresh: Boolean, favourites: Set<String> = emptySet(), followedOnly: Boolean = false,
         alsoLeagues: Set<String> = emptySet()): IptvSportsFixtures =
@@ -51,8 +68,25 @@ class IptvSportsFixturesRepository(private val preferences: IptvSportsPreference
             val usable = leagues.filter { SportsSources.available(it, key != null) }
             if (usable.isEmpty()) return@withContext IptvSportsFixtures(true, missingKey = true)
             val result = cache.load(usable, key, nowMillis, zone, refresh, favourites, prune = !followedOnly, country = Locale.getDefault().country)
+            crests.keep(result.fixtures)
             result.copy(fixtures = SportsSources.logos(result.fixtures, preferences.logos))
         }
+
+    suspend fun day(date: LocalDate, zone: ZoneId, nowMillis: Long, fetch: Boolean = true): IptvSportsFixtures = withContext(Dispatchers.IO) {
+        if (!preferences.enabled) return@withContext IptvSportsFixtures(false)
+        syncDays()
+        val chosen = SportsLeagues.chosen(preferences.leagues)
+        if (chosen.isEmpty()) return@withContext IptvSportsFixtures(true, noLeagues = true)
+        val key = if (preferences.hasKey) preferences.key()?.takeIf { IptvSportsPreferences.validKey(it) } else null
+        val usable = chosen.filter { SportsSources.available(it, key != null) }
+        if (usable.isEmpty()) return@withContext IptvSportsFixtures(true, missingKey = true)
+        if (!SportsScoreDays.offered(date, nowMillis, zone)) return@withContext IptvSportsFixtures(true)
+        val result = days.load(usable, key, date, zone, nowMillis, fetch)
+        crests.keep(result.fixtures)
+        result.copy(fixtures = SportsSources.logos(result.fixtures, preferences.logos))
+    }
+
+    suspend fun leagueCrests(): Map<String, String> = withContext(Dispatchers.IO) { SportsLeagueCrests.shown(crests.known(), preferences.logos) }
 
     suspend fun leagueList(nowMillis: Long): List<SportsDbLeague>? {
         val key = withContext(Dispatchers.IO) { if (preferences.hasKey) preferences.key()?.takeIf { IptvSportsPreferences.validKey(it) } else null } ?: return null
@@ -190,5 +224,91 @@ class IptvSportsFixturesRepository(private val preferences: IptvSportsPreference
         const val MAX_ALWAYS = 120
         const val ROWS_PER_ALWAYS = 120
         const val MAX_PICK_CHANNELS = 60
+    }
+}
+
+class IptvSportsDayCache(private val client: IptvSportsFixturesClient, private val store: IptvSportsFixturesStore) {
+    private val entries = object : LinkedHashMap<String, SportsCacheEntry>(64, .75f, true) {
+        override fun removeEldestEntry(eldest: MutableMap.MutableEntry<String, SportsCacheEntry>?): Boolean = size > SportsScoreDays.MAX_ENTRIES
+    }
+    private val loads = Mutex()
+    private val requests = Semaphore(MAX_REQUESTS)
+
+    suspend fun load(leagues: List<SportsLeague>, key: String?, date: LocalDate, zone: ZoneId, nowMillis: Long, fetch: Boolean = true): IptvSportsFixtures =
+        withContext(Dispatchers.IO) {
+            fun wanted(service: SportsService, league: SportsLeague) =
+                SportsScoreDays.serviceDates(date, zone, service).map { Wanted(IptvSportsFixturesStore.key(service, league, it), service, league, it) }
+            val usable = leagues.filter { SportsSources.available(it, key != null) }
+            val found = loads.withLock {
+                val primary = usable.associate { league -> league.id to wanted(if (league.espn != null) SportsService.ESPN else SportsService.THESPORTSDB, league) }
+                val got = load(primary.values.flatten(), key, nowMillis, fetch).toMutableMap()
+                val fallback = usable.filter { league -> key != null && league.espn != null && league.sportsDb != null &&
+                    primary[league.id].orEmpty().all { got[it.key]?.fetchedAt == null } && primary[league.id].orEmpty().any { (got[it.key]?.failures ?: 0) > 0 } }
+                    .flatMap { wanted(SportsService.THESPORTSDB, it) }
+                got += load(fallback, key, nowMillis, fetch)
+                got.values.toList()
+            }
+            val fixtures = SportsScoreDays.on(found.flatMap { it.fixtures }, date, nowMillis, zone)
+            IptvSportsFixtures(true, fixtures, failed = fixtures.isEmpty() && found.any { it.fetchedAt == null && it.failures > 0 })
+        }
+
+    private suspend fun load(items: List<Wanted>, key: String?, nowMillis: Long, fetch: Boolean): Map<String, SportsCacheEntry> {
+        if (items.isEmpty()) return emptyMap()
+        val known = items.associate { item ->
+            val held = synchronized(entries) { entries[item.key] }
+            val stored = try { store.read(item.key) } catch (error: Exception) { IptvLog.failure("sports day cache", error); null }
+            item.key to listOfNotNull(held, stored).maxByOrNull { it.fetchedAt ?: Long.MIN_VALUE }
+        }
+        val due = if (fetch) items.filter { SportsScoreDays.due(known[it.key], it.date, SportsDays.zone(it.service), nowMillis) } else emptyList()
+        val fetched = if (due.isEmpty()) emptyMap() else coroutineScope {
+            due.map { item -> async { requests.withPermit { item.key to request(item, known[item.key], key, nowMillis) } } }.awaitAll().toMap()
+        }
+        if (fetched.isNotEmpty()) {
+            synchronized(entries) { entries.putAll(fetched) }
+            IptvLog.info("sports day requests=${fetched.size} failed=${fetched.values.count { it.failedAt == nowMillis }}")
+        }
+        return items.mapNotNull { item -> (fetched[item.key] ?: known[item.key])?.let { item.key to it } }.toMap()
+    }
+
+    private suspend fun request(item: Wanted, previous: SportsCacheEntry?, key: String?, nowMillis: Long): SportsCacheEntry = try {
+        SportsRefresh.succeeded(client.fixtures(item.service, item.league, item.date, key, nowMillis), nowMillis)
+    } catch (cancel: CancellationException) { throw cancel }
+    catch (error: Exception) {
+        IptvLog.failure("sports day ${item.service.name.lowercase()}${(error as? SportsFetchException)?.status?.let { " status=$it" }.orEmpty()}", error)
+        SportsRefresh.failed(previous, nowMillis)
+    }
+
+    private data class Wanted(val key: String, val service: SportsService, val league: SportsLeague, val date: LocalDate)
+
+    private companion object {
+        const val MAX_REQUESTS = 2
+    }
+}
+
+class IptvSportsCrests(private val store: IptvSportsFixturesStore) {
+    private val lock = Any()
+    private var crests: Map<String, SportsCrest>? = null
+
+    fun known(): Map<String, SportsCrest> = synchronized(lock) {
+        crests ?: (try { SportsLeagueCrests.decode(store.readText(KEY)) } catch (error: Exception) { IptvLog.failure("sports crests", error); emptyMap() })
+            .also { crests = it }
+    }
+
+    fun keep(fixtures: List<SportsFixture>) {
+        val found = SportsLeagueCrests.collect(fixtures)
+        if (found.isEmpty()) return
+        try {
+            synchronized(lock) {
+                val known = known()
+                val merged = SportsLeagueCrests.merge(known, found)
+                if (merged == known) return
+                crests = merged
+                store.writeText(KEY, SportsLeagueCrests.encode(merged))
+            }
+        } catch (error: Exception) { IptvLog.failure("sports crests", error) }
+    }
+
+    private companion object {
+        const val KEY = "meta-crests"
     }
 }

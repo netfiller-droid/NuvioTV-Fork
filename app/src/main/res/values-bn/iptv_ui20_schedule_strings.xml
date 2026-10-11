@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui20_sched_yesterday">গতকাল</string>
+    <plurals name="iptv_ui20_sched_live">
+        <item quantity="one">%d লাইভ</item>
+        <item quantity="other">%d লাইভ</item>
+    </plurals>
+    <plurals name="iptv_ui20_sched_games">
+        <item quantity="one">%dটি খেলা</item>
+        <item quantity="other">%dটি খেলা</item>
+    </plurals>
+    <plurals name="iptv_ui20_sched_results">
+        <item quantity="one">%dটি ফলাফল</item>
+        <item quantity="other">%dটি ফলাফল</item>
+    </plurals>
+    <string name="iptv_ui20_sched_no_games">কোনো খেলা নেই</string>
+    <string name="iptv_ui20_sched_results_label">ফলাফল</string>
+    <string name="iptv_ui20_sched_loading">ফলাফল লোড হচ্ছে…</string>
+    <string name="iptv_ui20_sched_failed">এই দিনটি লোড করা যায়নি। একটু পরে আবার চেষ্টা করুন।</string>
+    <string name="iptv_ui20_sched_league_count">%1$d/%2$d</string>
+    <string name="iptv_ui20_sched_source_both">ESPN + TheSportsDB</string>
+    <string name="iptv_ui20_sched_source_needs_key">TheSportsDB কী দরকার</string>
+    <string name="iptv_ui20_sched_leagues_hint">OK দিয়ে লিগ যোগ বা সরান। ব্যাক আপনার পছন্দ সংরক্ষণ করে।</string>
+    <string name="iptv_ui20_sched_leagues_note">কোনো লিগ, ক্লাব বা সম্প্রচারকের সঙ্গে যুক্ত বা অনুমোদিত নয়। নাম ও ব্যাজ শুধু আলাদা করে চেনার জন্য দেখানো হয়।</string>
+</resources>

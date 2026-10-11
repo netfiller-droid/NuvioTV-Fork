@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui20_sched_yesterday">昨日</string>
+    <plurals name="iptv_ui20_sched_live">
+        <item quantity="other">%d 試合ライブ</item>
+    </plurals>
+    <plurals name="iptv_ui20_sched_games">
+        <item quantity="other">%d 試合</item>
+    </plurals>
+    <plurals name="iptv_ui20_sched_results">
+        <item quantity="other">%d 件の結果</item>
+    </plurals>
+    <string name="iptv_ui20_sched_no_games">試合なし</string>
+    <string name="iptv_ui20_sched_results_label">結果</string>
+    <string name="iptv_ui20_sched_loading">結果を読み込み中…</string>
+    <string name="iptv_ui20_sched_failed">この日を読み込めませんでした。しばらくしてからもう一度お試しください。</string>
+    <string name="iptv_ui20_sched_league_count">%1$d/%2$d</string>
+    <string name="iptv_ui20_sched_source_both">ESPN + TheSportsDB</string>
+    <string name="iptv_ui20_sched_source_needs_key">TheSportsDB キーが必要</string>
+    <string name="iptv_ui20_sched_leagues_hint">OKでリーグを追加/削除。戻るで保存します。</string>
+    <string name="iptv_ui20_sched_leagues_note">どのリーグ、クラブ、放送局とも提携・承認関係はありません。名前とエンブレムは区別のためだけに表示しています。</string>
+</resources>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui20_sched_yesterday">Вчера</string>
+    <plurals name="iptv_ui20_sched_live">
+        <item quantity="one">%d на живо</item>
+        <item quantity="other">%d на живо</item>
+    </plurals>
+    <plurals name="iptv_ui20_sched_games">
+        <item quantity="one">%d мач</item>
+        <item quantity="other">%d мача</item>
+    </plurals>
+    <plurals name="iptv_ui20_sched_results">
+        <item quantity="one">%d резултат</item>
+        <item quantity="other">%d резултата</item>
+    </plurals>
+    <string name="iptv_ui20_sched_no_games">Няма мачове</string>
+    <string name="iptv_ui20_sched_results_label">Резултати</string>
+    <string name="iptv_ui20_sched_loading">Резултатите се зареждат…</string>
+    <string name="iptv_ui20_sched_failed">Този ден не може да се зареди. Опитайте отново малко по-късно.</string>
+    <string name="iptv_ui20_sched_league_count">%1$d/%2$d</string>
+    <string name="iptv_ui20_sched_source_both">ESPN + TheSportsDB</string>
+    <string name="iptv_ui20_sched_source_needs_key">Нужен е ключ за TheSportsDB</string>
+    <string name="iptv_ui20_sched_leagues_hint">OK добавя или премахва лига. Назад запазва избора.</string>
+    <string name="iptv_ui20_sched_leagues_note">Не е свързано с лига, клуб или телевизия и не е одобрено от тях. Имената и емблемите служат само за разграничаване.</string>
+</resources>

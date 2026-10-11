@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui20_sched_yesterday">Yesterday</string>
+    <plurals name="iptv_ui20_sched_live">
+        <item quantity="one">%d live</item>
+        <item quantity="other">%d live</item>
+    </plurals>
+    <plurals name="iptv_ui20_sched_games">
+        <item quantity="one">%d game</item>
+        <item quantity="other">%d games</item>
+    </plurals>
+    <plurals name="iptv_ui20_sched_results">
+        <item quantity="one">%d result</item>
+        <item quantity="other">%d results</item>
+    </plurals>
+    <string name="iptv_ui20_sched_no_games">No games</string>
+    <string name="iptv_ui20_sched_results_label">Results</string>
+    <string name="iptv_ui20_sched_loading">Loading results…</string>
+    <string name="iptv_ui20_sched_failed">Couldn\'t load this day. Try again a little later.</string>
+    <string name="iptv_ui20_sched_league_count">%1$d/%2$d</string>
+    <string name="iptv_ui20_sched_source_both">ESPN + TheSportsDB</string>
+    <string name="iptv_ui20_sched_source_needs_key">Needs a TheSportsDB key</string>
+    <string name="iptv_ui20_sched_leagues_hint">OK adds or removes a league. Back saves your choice.</string>
+    <string name="iptv_ui20_sched_leagues_note">Not linked to or endorsed by any league, club or broadcaster. Names and badges are shown only so you can tell them apart.</string>
+</resources>

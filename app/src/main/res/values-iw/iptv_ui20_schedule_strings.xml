@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="iptv_ui20_sched_yesterday">אתמול</string>
+    <plurals name="iptv_ui20_sched_live">
+        <item quantity="one">%d בשידור חי</item>
+        <item quantity="two">%d בשידור חי</item>
+        <item quantity="many">%d בשידור חי</item>
+        <item quantity="other">%d בשידור חי</item>
+    </plurals>
+    <plurals name="iptv_ui20_sched_games">
+        <item quantity="one">משחק אחד</item>
+        <item quantity="two">%d משחקים</item>
+        <item quantity="many">%d משחקים</item>
+        <item quantity="other">%d משחקים</item>
+    </plurals>
+    <plurals name="iptv_ui20_sched_results">
+        <item quantity="one">תוצאה אחת</item>
+        <item quantity="two">%d תוצאות</item>
+        <item quantity="many">%d תוצאות</item>
+        <item quantity="other">%d תוצאות</item>
+    </plurals>
+    <string name="iptv_ui20_sched_no_games">אין משחקים</string>
+    <string name="iptv_ui20_sched_results_label">תוצאות</string>
+    <string name="iptv_ui20_sched_loading">טוען תוצאות…</string>
+    <string name="iptv_ui20_sched_failed">לא ניתן לטעון את היום הזה. נסו שוב בעוד מעט.</string>
+    <string name="iptv_ui20_sched_league_count">%1$d/%2$d</string>
+    <string name="iptv_ui20_sched_source_both">ESPN + TheSportsDB</string>
+    <string name="iptv_ui20_sched_source_needs_key">נדרש מפתח TheSportsDB</string>
+    <string name="iptv_ui20_sched_leagues_hint">OK מוסיף או מסיר ליגה. חזרה שומרת את הבחירה.</string>
+    <string name="iptv_ui20_sched_leagues_note">אין קשר לאף ליגה, מועדון או גוף שידור ואין תמיכה מצדם. השמות והסמלים מוצגים רק כדי להבחין ביניהם.</string>
+</resources>
