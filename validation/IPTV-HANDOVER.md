@@ -9,6 +9,14 @@ Older sections further down are history; read "Start here" first.
 
 ## Start here — next session (from 10 October 2026)
 
+Update 11 October (evening): fourth capture of the day checked (first live tennis; UFC
+results, cricket results, Game Centre awards, shootout labels; `56de654bc`), and a timing
+race in `IptvRecordingCopierTest` fixed. Build: CI debug green at `fcd9f1f0b` (run
+38128849657); checklist starts at 7l; printable sheet regenerated. The user has a capture
+schedule (best: Monday 04:00–08:00 Brisbane for NFL). Still unchecked with real data: NFL
+live, live Premier League added time, NHL empty net/shootout in progress, MLB pitching
+change, golf mid-round, F1 race in progress, live cricket.
+
 Update 11 October (afternoon): the Sport visual decisions (items 1–9 in "Decisions — 11
 October 2026 (Sport visuals)") are done in code (`3397061c8`, `7bf9f8b5a`, `428ec7c99`).
 Build: CI debug green at `428ec7c99` (run 38109063375); checklist starts at 7k; a printable
@@ -86,7 +94,7 @@ session winners shown. CI green at `3de7568` (run 38012700521) and at `3065341` 
 focused game's summary (one extra request).
 
 Next, in order:
-1. Device pass on `428ec7c99` (run 38109063375; checklist 7k, 7j, 7i, 7h, 7g, 7f, then 7e); take the findings,
+1. Device pass on `fcd9f1f0b` (run 38128849657; checklist 7l, 7k, 7j, 7i, 7h, 7g, 7f, then 7e); take the findings,
    record and fix them the same way. Playback options, menu order, external player and
    source expiry (7e) have not been tried on a device yet.
 2. Waiting on the user (do not do these without them):

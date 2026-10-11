@@ -1,6 +1,6 @@
-# Nuvio IPTV — device test checklist (build `428ec7c99`, run 38109063375)
+# Nuvio IPTV — device test checklist (build `fcd9f1f0b`, run 38128849657)
 
-For this build start with section 7k, then 7j, 7i, 7h, 7g, 7f, 7e, 7d, 7c (fixes from the second 9 October pass), then 7b, 7 (Sport) and the rest.
+For this build start with section 7l, then 7k, 7j, 7i, 7h, 7g, 7f, 7e, 7d, 7c (fixes from the second 9 October pass), then 7b, 7 (Sport) and the rest.
 
 Mark each item pass / fail / not tested. For failures, note what happened and keep a
 logcat (`adb logcat -s NuvioIptv:V *:E`). Do not share logs that contain addresses.
@@ -83,6 +83,20 @@ logcat (`adb logcat -s NuvioIptv:V *:E`). Do not share logs that contain address
 11. Press Home on the remote with Game Centre open: logcat should show sports requests
    stop (`sports fetch` lines cease).
 12. Useful logs: `sports fetch service=`, `sports links`, `sports fixtures`.
+
+## 7l. Fourth 11 October capture: results, awards and live tennis (build `fcd9f1f0b`)
+1. A finished UFC card: the card shows the main event result, e.g. "Allen won ·
+   Submission · Round 5, 2:46" (decisions and draws show without round and time).
+2. A finished cricket match: the card shows the result, e.g. "Australia won by 112 runs".
+3. Game Centre after a finished game: the result line and awards where the source has
+   them (player of the match, winning and losing pitcher, save, winning goalie, first star).
+4. NHL game decided in a shootout: the line score labels the column "SO"; a game with more
+   than one overtime shows 2OT, 3OT.
+5. Rugby: a half-time score of 0–0 that contradicts the tries listed is not shown.
+6. Lower-league hockey games (e.g. AHL, USHL via TheSportsDB) that ended are not shown as
+   live hours later.
+7. Live tennis: sets and games update and the server is marked; no point score (the source
+   does not send it).
 
 ## 7k. Sport page, multiview and schedule look (build `428ec7c99`; try on the 4K TV and a 1080p one if you can)
 Sport page:

@@ -1025,6 +1025,10 @@ Phone setup (security review)
 
 ## Validation
 
+- Fourth 11 October capture (UFC results, cricket results, Game Centre awards, shootout
+  labels): CI debug green at `fcd9f1f0b` (run 38128849657; run 38127353933 at `56de654bc`
+  built the app but stopped on a timing-sensitive recording copier test, fixed in the
+  test). 935 core and 298 data-layer JVM tests on the host. Not device-tested.
 - Sport page, multiview strips, All scores day strip and league picker screen: CI debug
   green at `428ec7c99` (run 38109063375; run 38108029708 at `7bf9f8b5a` failed on one
   compile error, a hidden ICU number formatter, fixed). 924 core and 298 data-layer JVM
