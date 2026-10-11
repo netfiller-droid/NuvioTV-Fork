@@ -12,9 +12,8 @@ Decided: IPTV will ship as part of the full app after a clean device pass, merge
 - Live TV is a destination in Nuvio's sidebar (IPTV build only). Left from the guide
   opens the Live TV menu and Left again the Nuvio sidebar; Back closes Live TV's own
   layers, then opens the sidebar, then exits as on Home. The sidebar and top bar stay
-  hidden in full screen and multiview. Live TV settings are a "Live TV" category in
-  the main Settings; the Live TV menu's Settings item opens it. (Replaces the earlier
-  Exit item and separate Live TV settings screen.)
+  hidden in full screen and multiview. Live TV settings open inside Live TV from the
+  Live TV menu's Settings item.
 - After the first device pass: the corner picture plays the channel in focus after a
   short pause and opens full screen from Up then OK; HDR channels stay SDR in the
   corner picture; the menu has Exit Live TV, Recordings and Live TV settings at the
@@ -24,7 +23,7 @@ Decided: IPTV will ship as part of the full app after a clean device pass, merge
   limit for Xtream; a failed channel change stays in full screen and says why;
   forms keep Save and Cancel reachable; the phone setup page is redesigned and can
   change Live TV settings.
-- Live TV settings (now in the main Settings) bring together sources and
+- Live TV settings bring together sources and
   guides, phone or computer setup and recordings, plus: default stream format for
   channels on Auto; pause and rewind with catch-up (on by default); the stats overlay
   on open; which view Live TV opens on (last category, all channels, favourites or
@@ -820,28 +819,23 @@ Sport data (fifth capture of 11 October, 22:46; first live Formula 1 race):
 - Games from TheSportsDB that have no status no longer stay live after they should have
   finished; overtime reads "OT" with the minute.
 - Tennis, golf, motor racing and UFC no longer request a game summary that ESPN does not
-  provide (these use the scoreboard data), and a summary that does not exist (400/404) is
-  not requested again for that game.
+  provide (these use the scoreboard data), and a summary that does not exist (400, 404 or
+  410) is not requested again for that game.
 
 Sport data (capture of 12 October, 05:46; first live NFL and a NASCAR race in progress):
 - Live NFL games show each team's timeouts left (three small bars beside the logo on the
   score bug), the red zone (score bug and Sport hero) and the current drive (e.g. "KC drive:
-  8 plays, 57 yards, 4:12"); the team with the ball is marked in Game Centre and on the
-  multiview score strip. When the feed leaves out who has the ball, it is taken from the
+  8 plays, 57 yards, 4:12"); the team with the ball is marked in Game Centre, on multiview
+  game tiles and in the full-screen game info. When the feed leaves out who has the ball, it is taken from the
   last play.
 - Last plays read without formation tags such as "(Shotgun)" or "No Huddle-Shotgun".
-- NFL games from TheSportsDB show the quarter and game clock (e.g. "Q4 · 3:08").
-- Hockey games from TheSportsDB decided by a shoot-out show as finished, and a live score
-  that has not changed for half an hour after the game should have ended is no longer
-  shown as live.
+- NFL games from TheSportsDB show the quarter and game clock (e.g. "Q4 · 3:08"); other
+  worded progress from TheSportsDB (up to 24 characters) is shown as the game's status.
+- Hockey games from TheSportsDB decided by a shoot-out show as finished. In any sport, a
+  TheSportsDB live score that has not been updated for half an hour after the game should
+  have ended is no longer shown as live.
 - After a Grand Prix or race weekend, the score bug shows the podium instead of the
   circuit. NASCAR races in progress show the lap and running order like Formula 1.
-
-## Ready below the UI (screens pending)
-
-- Provider account groups shared by several sources (each source has its own
-  connection limit in Live TV sources; grouping sources under one shared limit has
-  no screen yet).
 
 ## Reliability
 
@@ -987,8 +981,10 @@ Phone setup (security review)
 ## Known limitations
 
 - Device testing so far: the user's passes on 8 October (builds `f29cbe2`, `24d6868`), 9 October
-  (`374e1f6`) and a further pass on `8354d89` (findings being worked on). Everything else,
-  including the latest fixes, is host-tested and CI-built only. Device limits for multiview
+  (`374e1f6`, `8354d89`), 10 October (`01f19bbed`, `e7e1d17b5`) and a ~3 hour recording to an
+  SMB network share on 11 October (`f79646c53`); the findings of each are fixed. Changes made
+  after those passes (the sections marked "not device-tested") are host-tested and CI-built
+  only. Device limits for multiview
   (pictures, decode capacity, what each box reports as its output height) come from
   what Android reports, not from measurements.
 - No DRM, encrypted HLS, fMP4 or separate-audio support has been validated.
@@ -1003,15 +999,16 @@ Phone setup (security review)
 - Exact alarms in deep sleep on Fire OS and recording across stream gaps are
   unverified. With one connection on an account, watching and recording block each
   other. Stalker streams that need extra headers may not record. Encrypted HLS and
-  fMP4 HLS cannot be recorded. USB, SMB, WebDAV, FTP and Movies folder
-  recording is untested on devices. WebDAV servers without append support keep the
+  fMP4 HLS cannot be recorded. Recording to an SMB share has been used on a device
+  (11 October); USB, WebDAV, FTP and Movies folder recording are untested on devices. WebDAV servers without append support keep the
   whole recording on the box until it ends.
 - Stalker portals have no catch-up. Xtream catch-up assumes the provider uses the
   device's time zone. "Search what's on now" does not find programmes longer than
   24 hours.
 - Subtitles, closed captions, DVB subtitles and teletext are not all validated.
 - Live TV text is translated into all 40 app languages by the developer, not by
-  native speakers; wording may need polishing.
+  native speakers; wording may need polishing. League table positions show as "1st",
+  "2nd" in English and as a plain number in other languages.
 - On-screen keyboard focus in source forms needs device checks. Devices without a
   document picker (such as the AM9) add guide files through the iptv-guides folder.
 - Phone setup uses plain HTTP on the home network (pairing code, single-use token and
@@ -1020,11 +1017,12 @@ Phone setup (security review)
   the busy/refused messages are untested on devices; m3u8 movies are untested. Resume for titles without a TMDB/IMDb match
   stays on the TV and is not sent to Trakt, Simkl or MDBList.
 - Sports data: ESPN's feed is unofficial and may change without notice. TheSportsDB leagues
-  need the viewer's own key (the free test key is not allowed in published apps); its
-  live scores, TV channels and league list are built from documentation and not yet
-  checked against real responses. ESPN shapes were checked against real responses with no
-  game in play: running clocks, NFL down and distance, baseball count and bases, tennis
-  serve and in-play sets, golf mid-round, F1 results and UFC live rounds are unverified.
+  need the viewer's own key (the free test key is not allowed in published apps). ESPN and
+  TheSportsDB responses were checked against real captures taken before, during and after
+  play (10–12 October), including live NFL, MLB, NBA, NHL, college football, tennis, golf,
+  F1 and NASCAR. Not yet seen live: NFL red zone, half-time and overtime; NBA overtime; an
+  NHL empty net; an MLB pitching change; tennis point scores; a UFC round in progress;
+  live cricket; AFL and NRL clocks; football own goals, penalties and extra time.
   Team logos and league badges are third-party trademarks; TheSportsDB artwork without a
   confirmed licence must not be shown in public builds (Team logos setting: ESPN only by
   default). Credit: "Sports data from ESPN and TheSportsDB".
@@ -1049,6 +1047,10 @@ Phone setup (security review)
 
 ## Validation
 
+- Twelfth sport capture (12 October 05:46; live NFL timeouts, drive, red zone and
+  possession; TheSportsDB NFL clock and hockey shoot-outs; podium after a race) and no
+  summary requests for sports ESPN has none for: CI debug at `85fe99dce` (run
+  38171196925, result pending); 945 core and 299 data-layer JVM tests on the host. Not device-tested.
 - Fifth 11 October capture (live Formula 1 lap and top three, football HT, TheSportsDB
   status-less and OT rows): CI debug green at `d4fc94d24` (run 38142066345); 939 core and
   298 data-layer JVM tests on the host. Not device-tested.

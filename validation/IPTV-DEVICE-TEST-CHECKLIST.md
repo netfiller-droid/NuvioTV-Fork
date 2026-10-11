@@ -91,8 +91,8 @@ logcat (`adb logcat -s NuvioIptv:V *:E`). Do not share logs that contain address
    (or reads "Red zone") and the Sport hero adds "Red zone" after the down and distance.
 3. Sport hero during a drive: after the last play, a line such as "KC drive: 8 plays, 57
    yards, 4:12."; it disappears once the drive ends.
-4. Game Centre and the multiview score strip for a live NFL game: a small dot after the name
-   of the team with the ball.
+4. Game Centre, a multiview game tile and the full-screen game info for a live NFL game: a
+   small dot after the name of the team with the ball.
 5. Last plays (NFL and college football) start with the play itself, without "(Shotgun)" or
    "No Huddle-Shotgun".
 6. With TheSportsDB as the source for an NFL game: the card shows the quarter and clock,
