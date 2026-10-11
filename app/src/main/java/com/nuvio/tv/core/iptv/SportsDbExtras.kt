@@ -61,9 +61,9 @@ object SportsDbLive {
 
     private fun apply(fixture: SportsFixture, score: SportsDbLiveScore, nowMillis: Long): SportsFixture {
         val raw = score.status.trim()
-        val code = SportsGuide.normalise(raw).ifEmpty { SportsGuide.normalise(score.progress.orEmpty()).takeIf { it in SportsDbEvents.FINISHED }.orEmpty() }
+        val code = SportsGuide.normalise(raw).ifEmpty { SportsGuide.normalise(score.progress.orEmpty()).takeIf(SportsDbEvents::finished).orEmpty() }
         if (code in SKIPPED || code in SportsDbEvents.NOT_STARTED || (code.isEmpty() && fixture.startMillis > nowMillis)) return fixture
-        val status = if (code in SportsDbEvents.FINISHED) FixtureStatus.FINAL else FixtureStatus.LIVE
+        val status = if (SportsDbEvents.finished(code)) FixtureStatus.FINAL else FixtureStatus.LIVE
         if (status == FixtureStatus.LIVE && score.updatedMillis?.let { nowMillis - it > STALE_MILLIS } == true) return settled(fixture, nowMillis)
         if (status == FixtureStatus.LIVE && stale(fixture.startMillis, SportsRefresh.durationMillis(fixture), nowMillis)) return settled(fixture, nowMillis)
         val running = score.progress?.trim()?.takeIf { status == FixtureStatus.LIVE }?.let { QUARTER.matches(it) || BREAK.matches(it) } == true
@@ -79,6 +79,7 @@ object SportsDbLive {
         val progress = quarter?.groupValues?.get(1)?.takeIf { quarterPeriod != null }
             ?: score.progress?.trim()?.takeIf { live && it.isNotEmpty() && it.length <= 8 }?.let { if (it.matches(MINUTE)) "$it'" else it }
         val words = score.progress?.trim()?.takeIf { live && raw.isEmpty() && quarter == null && it.length in 9..24 && it.any(Char::isLetter) }
+            ?: score.progress?.trim()?.takeIf { !live && raw.isEmpty() && SportsGuide.normalise(it).matches(SportsDbEvents.OVERTIME_FINAL) }
         return fixture.copy(status = status, score = if (both) "$home–$away" else fixture.score, detail = raw.takeIf { live && it.isNotEmpty() && it.length <= 24 } ?: words,
             period = if (live) quarterPeriod ?: SportsDbEvents.PERIODS[code] ?: OVERTIME[fixture.sport]?.takeIf { code == "ot" } ?: fixture.period else null,
             clock = if (live) progress ?: fixture.clock else null,

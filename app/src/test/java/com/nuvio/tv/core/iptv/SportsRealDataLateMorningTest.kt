@@ -72,7 +72,7 @@ class SportsRealDataLateMorningTest {
         val half = games.first { it.id == "401856715" }
         assertEquals(FixtureStatus.LIVE, half.status)
         assertEquals("Halftime", half.detail)
-        assertEquals(FixtureSituation(null, null, "Extra Point Good (A. Zouagui KICK)", null, false, 0, 0), half.situation)
+        assertEquals(FixtureSituation(null, null, "Extra Point Good (A. Zouagui KICK)", null, false, null, null), half.situation)
         assertEquals(SportsBugText("LSU 17–21 UK", "Halftime"), SportsFixtureText.bug(half))
         val drive = games.first { it.id == "401856712" }
         assertEquals(FixtureSituation("3rd & 6 · UGA 18", FixtureSide.AWAY,

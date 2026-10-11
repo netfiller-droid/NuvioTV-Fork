@@ -1,6 +1,6 @@
 # Nuvio IPTV — device test checklist (build `91e1e7f1b`, run 38178089678)
 
-For this build start with section 7n, then 7m, 7l, 7k, 7j, 7i, 7h, 7g and 7f (not yet tried on a device). 7e and earlier passed on earlier builds; repeat them only as a regression check. After the 1.1.0-nt.5 merge, also repeat sections 1 and 2.
+For this build start with section 7o, then 7n, 7m, 7l, 7k, 7j, 7i, 7h, 7g and 7f (not yet tried on a device). 7e and earlier passed on earlier builds; repeat them only as a regression check. After the 1.1.0-nt.5 merge, also repeat sections 1 and 2.
 
 Mark each item pass / fail / not tested. For failures, note what happened and keep a
 logcat (`adb logcat -s NuvioIptv:V *:E`). Do not share logs that contain addresses.
@@ -83,6 +83,12 @@ logcat (`adb logcat -s NuvioIptv:V *:E`). Do not share logs that contain address
 11. Press Home on the remote with Game Centre open: logcat should show sports requests
    stop (`sports fetch` lines cease).
 12. Useful logs: `sports fetch service=`, `sports links`, `sports fixtures`.
+
+## 7o. 8:01 12 October capture: NFL half-time and overtime finals (build pending)
+1. NFL at half-time: the score bug reads Halftime with no timeout marks; they come back in
+   the 3rd quarter.
+2. With TheSportsDB as the source, an NFL or hockey game that ended in overtime or a
+   shoot-out shows as finished with "Final/OT" (or "Final/SO").
 
 ## 7n. Merge of 1.1.0-nt.5, second-pass fixes and the 6:42 12 October capture (build `91e1e7f1b`)
 1. After installing: the sidebar shows Live TV next to Home and, if turned on, Calendar;

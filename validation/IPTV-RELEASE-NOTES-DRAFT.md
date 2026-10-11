@@ -843,6 +843,12 @@ Sport data (capture of 12 October, 06:42; first live NFL overtime):
   being fetched for up to an hour past the game length while they have not finished.
 - The red-zone marker no longer appears after a touchdown while the conversion is pending.
 
+Sport data (capture of 12 October, 08:01; NFL half-time and an overtime tie):
+- NFL and college football no longer show the first half's used timeouts during half-time;
+  the marks come back for the second half.
+- Games from TheSportsDB that end in overtime or a shoot-out ("Final/OT", "Final/SO") show
+  as finished with that text, instead of staying live or going back to not started.
+
 ## Second pass over the untested work (12 October 2026, not device-tested)
 
 Sport screens and multiview:
@@ -1090,8 +1096,9 @@ Phone setup (security review)
   need the viewer's own key (the free test key is not allowed in published apps). ESPN and
   TheSportsDB responses were checked against real captures taken before, during and after
   play (10–12 October), including live NFL, MLB, NBA, NHL, college football, tennis, golf,
-  F1 and NASCAR, and NFL overtime, end of quarter and red zone. Not yet seen live: NFL
-  half-time, the two-minute warning and an overtime final; NBA overtime; an NHL empty net;
+  F1 and NASCAR, and NFL overtime, end of quarter, half-time, red zone and an overtime
+  tie, and an NHL end of period. Not yet seen live: the NFL two-minute warning; NBA
+  overtime; an NHL empty net;
   an MLB pitching change; tennis point scores; a UFC round in progress; live cricket; AFL
   and NRL clocks; football own goals, penalties and extra time.
   Team logos and league badges are third-party trademarks; TheSportsDB artwork without a

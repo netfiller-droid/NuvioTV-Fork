@@ -916,3 +916,68 @@ the scoreboard; NBA overtime; an NHL empty net or shootout in progress; an MLB p
 or full count; tennis point score and the server in a tie-break; NASCAR stages; F1 gaps, pit
 stops and fastest lap; a UFC bout in progress; live cricket; AFL/NRL live clock (off season);
 golf after a cut or a playoff; football own goals, penalties and extra time.
+
+## Fourteenth pass (12 October, 08:01)
+
+ESPN and TheSportsDB responses captured at 08:01 Brisbane time on Monday 12 October (22:01Z on
+11 October), 79 minutes after the thirteenth pass; TheSportsDB `updated` reads 23:01 London time.
+In play: three NFL 4pm games (Broncos at Chargers in the 3rd quarter, 10–10 with 5:32 left; Lions at
+Cardinals and 49ers at Seahawks at half-time), the first NHL game of the evening (Kraken at Capitals,
+2–2 at the end of the 1st) and the NASCAR Cup race at Charlotte (lap 235). Giants at Commanders
+finished as a 27–27 tie after overtime; the other 1pm games and the London game were final. NBA,
+MLB, the later NHL games, A-League, URC and Champions League were still to start; every other
+league showed the same finals as before. Only `nfl-summary-LIVE.json` (the Chargers game) and
+`nhl-summary-LIVE.json` are new summaries; the other summaries differ from the previous upload only
+in `news`, `odds` and ticket fields, and 19 of the 41 files are byte-for-byte the previous upload
+(tennis, golf, F1, UFC, cricket, AFL, NRL, NBL and A-League scoreboards among them). The multi-sport
+header is again a cached copy from about 19:46Z. The nested `espn-pass.zip` is the seventh-pass
+capture again. The TheSportsDB calls folder holds the 22:01Z livescore and 9 new `lookuptv` files;
+the coverage folder's `v2-livescore-app-*` files are the thirteenth-pass set from 20:42Z. Every
+scoreboard and summary parses without errors. Trimmed copies are in
+`app/src/test/resources/sports/*-real-20261012c.json` (`SportsRealDataHalfTimeTest`).
+
+| Shape | What the real response showed | Parser change |
+|---|---|---|
+| NFL half-time | `STATUS_HALFTIME`, `state` `in`, `period` 2, `displayClock` `0:00`, `shortDetail` `Halftime`. `situation` keeps `down` 1 and a `distance` but no down text, spot or `possession`; `isRedZone` false; `lastPlay` type `End of Half`, text `END QUARTER 2`, its drive with `result` `INT` or `END OF HALF`; win probability present. `homeTimeouts`/`awayTimeouts` are the first-half counts: 0 for the Seahawks, who had used all three. In the Chargers game the Broncos used all three timeouts late in the 2nd, and both sides were back to 3 in the 3rd (`timeoutsUsed` 0 in the summary header); the college half-time in the ninth pass showed 0 and 0 the same way. | Timeouts are left out at half-time (the score bug drops the marks until the second half); the bug reads `Halftime` with no down line |
+| NFL 3rd quarter | `5:32 - 3rd` straight after a touchdown and a touchback: `1st & 10 at DEN 35`, no `possession` key, `lastPlay` the kick-off with a `0 plays` drive | none: possession comes from the end of the last play (Broncos), the empty drive is left out, `Q3 · 5:32` |
+| NFL overtime final | `STATUS_FINAL`, `period` 5, `shortDetail` `Final/OT`, `altDetail` `OT`; `winner` false for both sides of a 27–27 tie; fifth linescore `0` on both sides; no `situation`; records with ties (`1-3-1`, `3-1-1`, home `1-1-1`, road `0-1-1`) | none: `Final/OT`, line score `6 6 7 8 0` with an `OT` column, records read as won–lost–tied |
+| NFL summary (3rd quarter) | 13 `drives.previous` plus a `drives.current` holding only the new kick-off. Kick-off 30 s after the listed start; Q1 ended at +36 min, Q2 at +85 (the two-minute warning at +71, then all three Broncos timeouts inside the last 1:37), half-time 14.6 minutes, Q3 kick-off at +100. The touchdown's drive play carries the conversion and a declined penalty as its text; `scoringPlays` has the touchdown (`Hayden Rucci 7 Yd pass from Justin Herbert (Cameron Dicker Kick)`). 109 win-probability rows. | none: scoring plays take the drive play's wallclock, last plays use the scoring text |
+| NHL end of period (live) | Scoreboard `STATUS_END_PERIOD`, `shortDetail` `End of 1st`, `situation` with only `lastPlay` (`Period End`, no team). Summary: 102 `plays` with `wallclock` and `strength` relative to the team making the play (`Power Play`, `Shorthanded`, `Even Strength`); three minor penalties (`penaltyMinutes` `2`, `penaltyType` `Minor`); four goals; goalie lines with saves, shots against and save percentage; a new `onIce` array (roster references only). The 1st period began 10 minutes after the listed start and lasted 37.6 real minutes. No empty net. | none: `End of 1st`, goals at their real times, no power play shown once the period is over |
+| NASCAR race (live) | Lap 235, 39 cars in order; still no stage, caution or lap-total field | none |
+
+TheSportsDB at 22:01Z: livescore returned Soccer (60), Ice Hockey (22), American Football (12) and
+Basketball (4, all `NS`); every other sport answered `{"Message":"No data found"}`. The NFL rows
+read `5:32 - 3rd` (matching ESPN), `Halftime` twice, eight `Final` and, for the tie, `Final/OT`, all
+with `strStatus` null. `Final/OT` was not taken as finished: within the game length such a row would
+have stayed live with `Final/OT` as its clock, and after it (this one was 301 minutes after the
+start) the fixture fell back to its eventsday state, which for a row without a status is "not started" until
+four hours after the start. A Copa Colombia row was `P` (penalties) at 2–2 with an empty progress,
+181 minutes after the start and last refreshed 46 minutes earlier, so the stuck-row rule dropped it.
+The NHL game read `BT` at the end of the 1st; AHL rows `P2` `2`, an AHL shoot-out final `AP`; the
+two DEL `P3` rows from 14:30Z were five hours stale, and the USHL and AHL rows from 22:00Z on 10
+October were still `P3` `19`/`20` and refreshed every minute (all skipped as before). `lookuptv`
+returned channels for 22 of 74 events, including the Jaguars–Eagles London game (31 rows: Sky
+Sports NFL, Sky Sports Football and Sky Sports+ in the United Kingdom, DAZN in 14 countries, also
+Iceland, Qatar, Czechia and Turkey), the Chargers game (16, with Bulgaria), the NHL game (7, four in
+Finland) and two NBA preseason games (5 and 1 rows, both with `World`); every country named resolves. ESPN and TheSportsDB
+league lists are unchanged.
+
+Parser changes: TheSportsDB `Final/OT`, `Final/2OT` and `Final/SO` (in the livescore progress or the
+eventsday status) count as finished, and the finished row keeps `Final/OT` as its status text, as on
+ESPN; ESPN NFL and college football timeouts are left out at half-time.
+
+Checked again on this data: possession after a kick-off, the red-zone flag at half-time, line scores
+and the `OT` column for a tie, won–lost–tied records, scoring-play times and texts in the summary,
+NHL goal times, strength and goalies, TheSportsDB quarter clocks and breaks, stuck and stale rows,
+worldwide channels.
+
+Confirmed now: NFL half-time and an overtime final (a tie) on the scoreboard; the NFL summary after
+half-time; NHL end of period live on the scoreboard and summary; TheSportsDB NFL half-time and
+overtime final progress; a TheSportsDB penalty shoot-out status (`P`, stuck).
+
+Still unconfirmed: the NFL two-minute warning on the scoreboard; NBA overtime; an NHL power play,
+empty net or shootout in progress on the scoreboard; an MLB pitching change or full count; tennis
+point score and the server in a tie-break; NASCAR stages; F1 gaps, pit stops and fastest lap; a UFC
+bout in progress; live cricket; AFL/NRL live clock (off season); golf after a cut or a playoff;
+football own goals, penalties and extra time on ESPN; a refreshed TheSportsDB shoot-out row (`P`
+with a progress).

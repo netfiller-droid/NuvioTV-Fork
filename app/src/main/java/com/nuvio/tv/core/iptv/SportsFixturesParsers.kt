@@ -69,7 +69,7 @@ object EspnScoreboard {
             blankHalf(league.sport, homePeriods, awayPeriods, events)
         val homeLine = if (started) FixtureLine(homeScore, if (unfilled) emptyList() else homePeriods) else null
         val awayLine = if (started) FixtureLine(awayScore, if (unfilled) emptyList() else awayPeriods) else null
-        val situation = if (paired && status == FixtureStatus.LIVE) competition?.optJSONObject("situation")?.let { situation(it, home!!, away!!) } else null
+        val situation = if (paired && status == FixtureStatus.LIVE) competition?.optJSONObject("situation")?.let { situation(it, home!!, away!!, name == "STATUS_HALFTIME") } else null
         val extra = when {
             !started -> null
             league.sport == "cricket" -> cricket(listOf(home!! to homeTeam!!, away!! to awayTeam!!),
@@ -488,7 +488,7 @@ object EspnScoreboard {
         return SportsLines.perPeriod(values, total)
     }
 
-    private fun situation(json: JSONObject, home: JSONObject, away: JSONObject): FixtureSituation? {
+    private fun situation(json: JSONObject, home: JSONObject, away: JSONObject, halfTime: Boolean): FixtureSituation? {
         val short = json.text("shortDownDistanceText")
         val spot = json.text("possessionText")?.takeIf { it.any(Char::isLetter) }
         val downDistance = (if (short != null && spot != null) "$short · $spot" else json.text("downDistanceText") ?: short)?.take(MAX_TEXT)
@@ -506,7 +506,7 @@ object EspnScoreboard {
         val probability = last?.optJSONObject("probability") ?: json.optJSONObject("probability")
         val homeWin = probability?.let { if (it.isNull("homeWinPercentage")) null else it.optDouble("homeWinPercentage", Double.NaN) }
             ?.takeIf { !it.isNaN() && it >= 0 }?.let { if (it <= 1.0) it * 100 else it }?.takeIf { it <= 100.0 }?.let { Math.round(it).toInt() }
-        fun timeouts(key: String) = json.optIntOrNull(key)?.takeIf { it in 0..3 }
+        fun timeouts(key: String) = json.optIntOrNull(key)?.takeIf { it in 0..3 && !halfTime }
         val drive = last?.optJSONObject("drive")?.takeIf { it.text("result") == null && possession != null && last.optJSONObject("team")?.text("id").let { team -> team == null || team == owner } }
             ?.text("description")
             ?.takeIf { (LEADING.find(it)?.value?.toIntOrNull() ?: 0) > 0 }?.take(60)
@@ -600,7 +600,7 @@ object SportsDbEvents {
         val homeScore = event.text("intHomeScore")
         val awayScore = event.text("intAwayScore")
         val status = when {
-            code in FINISHED -> FixtureStatus.FINAL
+            finished(code) -> FixtureStatus.FINAL
             code in NOT_STARTED || code.isEmpty() -> if (code.isEmpty() && homeScore != null && start < nowMillis - 4L * 60 * 60 * 1000) FixtureStatus.FINAL else FixtureStatus.SCHEDULED
             start > nowMillis -> FixtureStatus.SCHEDULED
             SportsDbLive.stale(start, league.durationMinutes * 60_000L, nowMillis) -> if (homeScore != null) FixtureStatus.FINAL else FixtureStatus.SCHEDULED
@@ -634,6 +634,9 @@ object SportsDbEvents {
 
     private fun parseLocal(value: String): Long? = runCatching { LocalDateTime.parse(value).toInstant(ZoneOffset.UTC).toEpochMilli() }.getOrNull()
 
+    internal fun finished(code: String): Boolean = code in FINISHED || OVERTIME_FINAL.matches(code)
+
+    internal val OVERTIME_FINAL = Regex("final (?:[2-9]?ot|so)")
     internal val FINISHED = setOf("match finished", "ft", "aet", "pen", "ft pen", "aot", "final", "finished", "after over time", "after extra time", "after penalties", "ended", "full time", "ap")
     internal val NOT_STARTED = setOf("not started", "ns", "tbd", "time to be defined", "scheduled")
     internal val PERIODS = mapOf("1h" to 1, "2h" to 2, "et" to 3, "q1" to 1, "q2" to 2, "q3" to 3, "q4" to 4, "p1" to 1, "p2" to 2, "p3" to 3)

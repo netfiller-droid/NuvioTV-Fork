@@ -59,9 +59,11 @@ under "Earlier session notes" and the dated sections is history kept for referen
 2. Keep processing the user's ESPN/TheSportsDB captures (process below). The thirteenth
    pass (12 October 06:42) showed NFL overtime, end of quarter and a real red zone, and a
    football second yellow (a yellow, then a red for the same player, no other wording).
+   The fourteenth pass (12 October 08:01) showed NFL half-time, an NFL overtime tie
+   (`Final/OT`) and the NFL summary after half-time, an NHL end of period live, and
+   TheSportsDB `Halftime`, `Final/OT` and a stuck penalty shoot-out (`P`).
    Still not seen in real data (see the latest pass in `IPTV-SPORTS-DATA-FIELDS.md` for
-   the full list): NFL half-time, two-minute warning and an overtime final on the
-   scoreboard; NBA overtime; an NHL empty net or
+   the full list): the NFL two-minute warning on the scoreboard; NBA overtime; an NHL empty net or
    shootout in progress; an MLB pitching change or full count; tennis point score and the
    server during a match tie-break; NASCAR stages; a UFC bout in progress; live cricket;
    AFL/NRL clocks (off season); football own goals, penalties, second yellows and extra
