@@ -1,4 +1,4 @@
-# Nuvio IPTV — device test checklist (build `fcd9f1f0b`, run 38128849657)
+# Nuvio IPTV — device test checklist (build `d4fc94d24`, run 38142066345)
 
 For this build start with section 7l, then 7k, 7j, 7i, 7h, 7g, 7f, 7e, 7d, 7c (fixes from the second 9 October pass), then 7b, 7 (Sport) and the rest.
 
@@ -84,7 +84,7 @@ logcat (`adb logcat -s NuvioIptv:V *:E`). Do not share logs that contain address
    stop (`sports fetch` lines cease).
 12. Useful logs: `sports fetch service=`, `sports links`, `sports fixtures`.
 
-## 7l. Fourth 11 October capture: results, awards and live tennis (build `fcd9f1f0b`)
+## 7l. Fourth and fifth 11 October captures: results, awards, live tennis and F1 (build `d4fc94d24`)
 1. A finished UFC card: the card shows the main event result, e.g. "Allen won ·
    Submission · Round 5, 2:46" (decisions and draws show without round and time).
 2. A finished cricket match: the card shows the result, e.g. "Australia won by 112 runs".
@@ -97,6 +97,11 @@ logcat (`adb logcat -s NuvioIptv:V *:E`). Do not share logs that contain address
    live hours later.
 7. Live tennis: sets and games update and the server is marked; no point score (the source
    does not send it).
+8. Live Formula 1 race: the Sport hero shows "Race · Lap N" with the top three; the card
+   shows "Lap N"; the score over the video shows the running order, not the next session.
+9. Football at half-time: the score over the video shows "HT", not "45+1'".
+10. TheSportsDB games in overtime read "OT" with the minute; games without a status stop
+    showing as live once they should have finished.
 
 ## 7k. Sport page, multiview and schedule look (build `428ec7c99`; try on the 4K TV and a 1080p one if you can)
 Sport page:

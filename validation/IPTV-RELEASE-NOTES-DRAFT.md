@@ -1032,6 +1032,9 @@ Phone setup (security review)
 
 ## Validation
 
+- Fifth 11 October capture (live Formula 1 lap and top three, football HT, TheSportsDB
+  status-less and OT rows): CI debug green at `d4fc94d24` (run 38142066345); 939 core and
+  298 data-layer JVM tests on the host. Not device-tested.
 - Fourth 11 October capture (UFC results, cricket results, Game Centre awards, shootout
   labels): CI debug green at `fcd9f1f0b` (run 38128849657; run 38127353933 at `56de654bc`
   built the app but stopped on a timing-sensitive recording copier test, fixed in the

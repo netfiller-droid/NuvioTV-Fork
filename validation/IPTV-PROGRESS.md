@@ -37,5 +37,6 @@ Updated 10 October 2026.
 | 11 Oct | 7741e4029 | Third 11 October capture (11:03): baseball count after an at-bat, NBA end of quarter, UFC walkouts, college football last plays | 895 core + 293 data-layer host tests; CI debug green at 7741e4029 (run 38101462318); device pending |
 | 11 Oct | 3397061c8 – 428ec7c99 | Sport visual pass: quiet days filled, no cut-off text, pre-game form/table/last meeting, sized cards, team colours; multiview score and channel/programme strips; All scores day strip with past results; league picker screen | 924 core + 298 data-layer host tests; CI debug green at 428ec7c99 (run 38109063375); device pending |
 | 11 Oct | 56de654bc – fcd9f1f0b | Fourth 11 October capture: live tennis checked; UFC finish method, round and time; cricket results; Game Centre result and awards; shootout and multi-overtime labels; stale lower-league hockey; copier test timing fixed | 935 core + 298 data-layer host tests; CI debug green at fcd9f1f0b (run 38128849657); device pending |
+| 11 Oct | d4fc94d24 | Fifth 11 October capture: live F1 race lap and top three (hero, cards, video score), football HT, TheSportsDB status-less and OT rows | 939 core + 298 data-layer host tests; CI debug green at d4fc94d24 (run 38142066345); device pending |
 
 Design notes are in this folder (`IPTV-*-DESIGN.md`).

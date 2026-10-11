@@ -9,6 +9,11 @@ Older sections further down are history; read "Start here" first.
 
 ## Start here — next session (from 10 October 2026)
 
+Update 11 October (late): fifth capture checked (22:46 Brisbane; first live F1 race:
+lap and top three now shown; football HT; TheSportsDB status-less/OT rows; `d4fc94d24`).
+Build: CI debug green at `d4fc94d24` (run 38142066345); checklist 7l now has 10 items.
+ESPN gives no gaps, pit stops, retirements or fastest lap during an F1 race.
+
 Update 11 October (evening): fourth capture of the day checked (first live tennis; UFC
 results, cricket results, Game Centre awards, shootout labels; `56de654bc`), and a timing
 race in `IptvRecordingCopierTest` fixed. Build: CI debug green at `fcd9f1f0b` (run
@@ -94,7 +99,7 @@ session winners shown. CI green at `3de7568` (run 38012700521) and at `3065341` 
 focused game's summary (one extra request).
 
 Next, in order:
-1. Device pass on `fcd9f1f0b` (run 38128849657; checklist 7l, 7k, 7j, 7i, 7h, 7g, 7f, then 7e); take the findings,
+1. Device pass on `d4fc94d24` (run 38142066345; checklist 7l, 7k, 7j, 7i, 7h, 7g, 7f, then 7e); take the findings,
    record and fix them the same way. Playback options, menu order, external player and
    source expiry (7e) have not been tried on a device yet.
 2. Waiting on the user (do not do these without them):
