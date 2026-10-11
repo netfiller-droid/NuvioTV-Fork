@@ -359,6 +359,24 @@ reporting, resets 10 October 2026 00:00 UTC):
   services; unmatched titles resume locally; navigation and settings integration as
   above (reverses the earlier "IPTV settings only on the Live TV side").
 
+## Decisions — 11 October 2026 (Sport visuals)
+
+After comparing with screenshots of another sports IPTV app (for ideas only; its look and wording
+must not be copied), the user asked for all of these, in our own design language and working on
+both 1080p and 4K TVs (layouts sized from the available width; images loaded at drawn pixel size):
+1. Sport page: no stranded single card — fill thin days with earlier results, tomorrow's games and
+   "Your teams next".
+2. Fix truncations: hero broadcaster line, "5 othe…" feeds button (short "+5 feeds"), card footer.
+3. Pre-game hero uses its empty space: form as five W/D/L marks, league position, last meeting.
+4. Denser, equal-height game cards, status always in the same place, cards per row from the width.
+5. Team colours in the hero (both teams' colours in the top rule or a soft glow behind each crest).
+6. Multiview: a slim live score strip on each video tile matched to a game.
+7. All scores: a day strip with counts (live, games, no games), including past days with results.
+8. League picker as its own screen: sports down the side, leagues as crest tiles with a tick, a
+   short "not affiliated" note in our own words.
+Not yet decided: the channel-matching ideas (event and team channel names, confidence labels,
+remembering the chosen feed, grouping HD/4K versions, "My countries", more cricket).
+
 ## Device findings — 11 October 2026 (build `f79646c53`; ~3 h recording to an SMB NAS)
 
 The overnight recording to the NAS worked. Findings (all fixed in code: `b9e16e2e4` guide,
