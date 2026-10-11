@@ -86,14 +86,14 @@ class IptvRecordingCopierTest {
         val calls = AtomicInteger()
         val server = server {
             if (calls.getAndIncrement() == 0) ts(packets(1, 400)).setSocketPolicy(SocketPolicy.DISCONNECT_DURING_RESPONSE_BODY)
-            else ts(packets(2, 400)).throttleBody(188L * 20, 100, TimeUnit.MILLISECONDS)
+            else ts(packets(2, 2_000)).throttleBody(188L * 20, 100, TimeUnit.MILLISECONDS)
         }
         server.protocols = listOf(Protocol.H2_PRIOR_KNOWLEDGE)
         server.use {
             val client = IptvRecordingCopier.newClient().newBuilder().protocols(listOf(Protocol.H2_PRIOR_KNOWLEDGE)).build()
             val (result, logged) = logged {
                 IptvRecordingCopier(client, freeBytes = { Long.MAX_VALUE }, pause = { }, minimumStallMillis = 2_000)
-                    .copy(server.url("/live/1.ts").toString(), IptvStreamFormat.MPEG_TS, output(), System.currentTimeMillis() + 1_500)
+                    .copy(server.url("/live/1.ts").toString(), IptvStreamFormat.MPEG_TS, output(), System.currentTimeMillis() + 4_000)
             }
             assertNull(result.failure)
             assertEquals(1, result.gaps)
