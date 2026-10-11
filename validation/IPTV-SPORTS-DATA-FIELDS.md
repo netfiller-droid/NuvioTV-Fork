@@ -574,3 +574,67 @@ probability; tennis serve in a live match tiebreak; F1/NASCAR live order and gap
 round, method and winner; cricket live innings; AFL/NRL live clock; golf with the field on
 the course and after a cut; football own goals, penalties, second yellows and the
 half-time and second-half status names on the scoreboard.
+
+## Eighth pass (11 October, morning)
+
+Real responses captured about 10:35 Brisbane time on 11 October (00:35Z), TheSportsDB calls
+in the same minute. In play: the first live MLB game seen (Cleveland v Chicago White Sox, end
+of the 2nd, 0–0), five NBA preseason games (two in the 1st quarter, three in the 3rd), four
+college football games, nine NHL games (eight in the 2nd period, one in the 3rd), the PGA
+final round with 36 of 72 players on the course, and a UFC card at the walkouts for the first
+main-card bout. `epl-summary-LIVE.json`, `nbl-summary-LIVE.json` and
+`rugby-urc-summary-LIVE.json` are byte-for-byte the earlier files, so there is no new live
+football, NBL or rugby; the Premier League, NFL, NHL final, NBL final, AFL and NRL summaries
+are the same events as the seventh pass. Trimmed copies are in
+`app/src/test/resources/sports/*-real-20261011b.json` (`SportsRealDataSundayTest`,
+`SportsDbExtrasTest`).
+
+| Shape | What the real response showed | Parser change |
+|---|---|---|
+| MLB scoreboard (live) | `STATUS_IN_PROGRESS`, `period` 2, `displayClock` `0:00`, `shortDetail` `End 2nd`. `situation` has `balls`, `strikes`, `outs` all reset to 0 between innings, `onFirst`…`onThird` false, `dueUp` (three batters with full athlete) and `lastPlay` (`End of the 2nd inning`). Linescores per inning with `period`; competitors carry `hits` and `errors` totals. | Between innings (`End`, `Mid`) no count, outs or runners are kept: the bug shows `End 2` without `0 outs · 0–0` |
+| MLB summary (live) | Header `periodPrefix` `End`, linescores with `hits`/`errors` per inning, no `period`. Root `situation` as on the scoreboard but `dueUp` by `playerId` only, plus `situationNotes` (chance of scoring), no `pitcher`/`batter` between innings. `plays` (90) are pitch by pitch: `summaryType` `A` (now batting), `P` (each pitch, `Pitch 4 : Strike 3 Swinging`), `N` (at-bat result), then an untexted end row; `pitchCount` is the count before the pitch and `resultCount` after it; `outs` on every row is the total after the at-bat; `period.type` `Top`/`Bottom`/`End`; `participants` by id only (pitcher, batter). Batters are named in `rosters` (the line-up), pitchers only in `boxscore.players[].statistics[type=pitching]`. `atBats` and `playsMap` index the plays. Every play has `wallclock`; first pitch 9 min after the listed start, the first two innings 9 and 13 min. | Between innings the count is cleared; pitch rows are left out of the last plays (results and "now batting" stay); a situation player given by `playerId` is looked up by name |
+| NBA scoreboard (live) | `displayClock` `1:53` and, under a minute, `24.7`/`13.3` (`clock` 24.7). `situation` holds only `lastPlay` with `probability.homeWinPercentage`; one free-throw `lastPlay` had no player or team (`misses free throw 2 of 2`). One game's 1st-quarter line read 23 while the score was 24 (line lags the score). | none — the lag is at source and clears with the next update |
+| NBA summary (live) | Header competitors carry `timeoutsUsed`/`timeoutsRemaining` and `fouls` (`teamFouls`, `teamFoulsCurrent`, `foulsToGive`, `bonusState` `DOUBLE`); `possession` false for both. 366 `plays` with `wallclock`, `scoringPlay`, `shortDescription`; `winprobability` 366 entries. Tip-off was 13 min after the listed start; quarters 28–37 real minutes, half-time 16. | none (fouls and timeouts are not shown; markers for plays use the wallclock) |
+| College football scoreboard (live) | During a timeout `situation` drops `downDistanceText`, `possessionText` and `possession` (`down` 0). At midfield `possessionText` is `50` with no team; `downDistanceText` `4th & 10 at 50`. Snap-clock prefix again on most `lastPlay` texts. | A spot without a team uses the source text (`4th & 10 at 50`, was `4th & 10 · 50`) |
+| College football summary (live) | Same shape as the seventh pass. Kick-off 8.5 min late; 2nd 0:32 at 94 min after the listed start (timeline shape 92). | none |
+| NHL (live) | Scoreboard `situation` only `lastPlay`. Summary: at one stoppage four roughing minors (two each) were followed by a holding minor; the penalty plays carry `Power Play`/`Even Strength` inconsistently, so the last roughing minor read as a home power play for the four minutes of the TV timeout. Puck drop 8.5 min late, periods 38 real minutes, intermissions 19. | Penalties at the same stoppage are counted per side: equal numbers are even strength, an extra minor gives the other side the power play |
+| Golf (final round) | 36 of 72 players on the course: hole lines and today's to-par on the round line; the leaders, yet to start, have tee times only. Still no per-player `status`. | none |
+| UFC (walkouts) | Card `STATUS_IN_PROGRESS`; the bout at the walkouts is `STATUS_PRE_FIGHT` with state `in`, `period` 0, `displayClock` `-`. Finished bouts keep the finishing round and time (`period` 1, `2:59`) and `details` such as `Unofficial Winner Kotko` or `Unofficial Winner Submission`; a draw has no winner. | none (method and finishing time are not stored) |
+| URC | No live game. New final (Bulls 57–15 Lions): halves 29/28 and 10/5, 20'/60' totals 5/36 and 7/15. | none |
+
+TheSportsDB at 00:35Z: livescore returned Soccer (36), Basketball (114), Ice_Hockey (127) and
+Baseball (4, all KBO and NPB not started); no MLB, and every other sport answered
+`{"Message":"No data found"}`. The NBA rows agree with ESPN: `Q3` `10` (ESPN 3rd 2:12),
+`Q1` `11` (ESPN 13.3 left); one game was still `HT` `0` after ESPN had restarted the 3rd, and
+one not yet started was `NS` `0`. NHL `P3` `13` matched ESPN's 3rd 6:07. The WHL and AHL rows
+stuck since 9 October (`P3 20`, `OT 4`, `updated` 20 hours old) are still there and are
+skipped. A Guatemalan match sat at `1H` `45+16` with `updated` 29 minutes old (a long delay;
+still shown as live). `lookuptv` returned channels for 6 of 29 events; new is
+`strCountry` `World` (NBA League Pass, Fanatiz INT). Parser change: worldwide channels are
+listed after the viewer's own country's channels instead of being dropped.
+
+Checked again on this data: college football clocks without the snap prefix and the
+45-minute quarter shape, NHL power plays, TheSportsDB stale rows and count-up clocks; the
+rugby clock, substitution text and URC live summary had no new live data.
+
+ESPN league lists are unchanged. Added to the app's list (off by default), all football
+competitions on the soccer parser already checked live: AFC Champions League Elite, AFC
+Asian Cup, UEFA Nations League, Copa Libertadores, EFL League One and League Two, Copa del
+Rey, DFB-Pokal, Coppa Italia, Coupe de France, Belgian Pro League, Brasileirão, Argentine
+Primera División and J1 League. Still not added: men's college basketball (needs two halves
+in the Game Centre strip and `1H`/`2H` labels, which are screen changes), FIBA (10-minute
+quarters, no data seen), baseball's college, winter and international leagues (no data
+seen), XFL (now part of the UFL), golf's Champions and Korn Ferry tours, TGL and Olympic
+events, the other MMA promotions, the unnamed rugby union ids, lacrosse, volleyball, water
+polo, field hockey and the remaining football competitions.
+
+Confirmed now: MLB live status, inning half, count reset between innings, pitch-by-pitch
+plays, wallclocks and win probability; NBA live clock under a minute, live win probability,
+fouls and timeouts in the summary header; college football timeouts and midfield; NHL
+coincidental minors; golf with the field on the course; UFC walkouts and finished bouts.
+
+Still unconfirmed: MLB count, runners, pitcher and batter during an at-bat (only seen
+between innings); NFL live `situation`; tennis serve in a match tiebreak; F1/NASCAR live
+order and gaps; UFC round in progress; cricket live innings; AFL/NRL live clock; golf after
+a cut; football own goals, penalties, second yellows and the half-time and second-half
+status names on the scoreboard.

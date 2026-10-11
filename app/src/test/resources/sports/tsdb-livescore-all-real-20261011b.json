@@ -1,0 +1,15 @@
+{"livescore":[
+ {"idEvent":"2601635","strSport":"Basketball","strLeague":"NBA","strStatus":"Q3","strProgress":"10","intHomeScore":"87","intAwayScore":"67","strTimestamp":"2026-10-10T22:30:00","updated":"2026-10-11 01:34:32"},
+ {"idEvent":"2548856","strSport":"Basketball","strLeague":"NBA","strStatus":"Q1","strProgress":"9","intHomeScore":"22","intAwayScore":"23","strTimestamp":"2026-10-11T00:00:00","updated":"2026-10-11 01:34:32"},
+ {"idEvent":"2601636","strSport":"Basketball","strLeague":"NBA","strStatus":"HT","strProgress":"0","intHomeScore":"56","intAwayScore":"50","strTimestamp":"2026-10-10T23:00:00","updated":"2026-10-11 01:34:32"},
+ {"idEvent":"2548858","strSport":"Basketball","strLeague":"NBA","strStatus":"NS","strProgress":"0","intHomeScore":null,"intAwayScore":null,"strTimestamp":"2026-10-11T00:30:00","updated":"2026-10-11 01:34:32"},
+ {"idEvent":"2600752","strSport":"Ice Hockey","strLeague":"Canadian WHL","strStatus":"P3","strProgress":"20","intHomeScore":"7","intAwayScore":"4","strTimestamp":"2026-10-10T01:00:00","updated":"2026-10-10 04:34:30"},
+ {"idEvent":"2526140","strSport":"Ice Hockey","strLeague":"American AHL","strStatus":"OT","strProgress":"4","intHomeScore":"3","intAwayScore":"3","strTimestamp":"2026-10-10T01:05:00","updated":"2026-10-10 05:04:35"},
+ {"idEvent":"2591557","strSport":"Ice Hockey","strLeague":"NHL","strStatus":"P3","strProgress":"13","intHomeScore":"1","intAwayScore":"3","strTimestamp":"2026-10-10T22:00:00","updated":"2026-10-11 01:34:30"},
+ {"idEvent":"2497282","strSport":"Soccer","strLeague":"Guatemala Liga Nacional","strStatus":"1H","strProgress":"45+16","intHomeScore":"1","intAwayScore":"0","strTimestamp":"2026-10-10T23:00:00","updated":"2026-10-11 01:05:35"},
+ {"idEvent":"2601472","strSport":"Soccer","strLeague":"Venezuela Primera Division","strStatus":"HT","strProgress":"45+3","intHomeScore":"2","intAwayScore":"0","strTimestamp":"2026-10-10T23:30:00","updated":"2026-10-11 01:34:34"},
+ {"idEvent":"2487542","strSport":"Soccer","strLeague":"Mexican Liga MX","strStatus":"2H","strProgress":"72","intHomeScore":"2","intAwayScore":"0","strTimestamp":"2026-10-10T23:00:00","updated":"2026-10-11 01:34:34"},
+ {"idEvent":"2536613","strSport":"Ice Hockey","strLeague":"Canadian OHL","strStatus":"FT","strProgress":null,"intHomeScore":"0","intAwayScore":"3","strTimestamp":"2026-10-10T22:00:00","updated":"2026-10-11 01:28:30"},
+ {"idEvent":"2521329","strSport":"Soccer","strLeague":"Mexican Liga de Expansión MX","strStatus":"FT","strProgress":"90+8","intHomeScore":"4","intAwayScore":"2","strTimestamp":"2026-10-10T22:00:00","updated":"2026-10-11 01:06:35"},
+ {"idEvent":"2591565","strSport":"Ice Hockey","strLeague":"NHL","strStatus":"BT","strProgress":null,"intHomeScore":"0","intAwayScore":"2","strTimestamp":"2026-10-10T23:30:00","updated":"2026-10-11 01:34:30"}
+]}

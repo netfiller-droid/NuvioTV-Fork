@@ -107,8 +107,8 @@ object EspnSummary {
         return SportsSummary(header?.str("id") ?: competition?.str("id"), sport, status, period, shownClock.takeIf { !stale },
             ((if (stale) type?.str("description") else null) ?: type?.str("shortDetail") ?: type?.str("detail"))?.take(80), team(home), team(away), homeLine, awayLine,
             moments, stats(teamStats, sport), leaders(root, sides, sport), rosters(root, sides, sport),
-            tables(root, sides), headToHead(root, sides), probability(root), if (sport == "baseball") count(root, plays, names) else null,
-            if (sport == "ice-hockey") strength(plays, sides) else null, lastPlays(root, plays), if (sport == "basketball") run(plays) else null,
+            tables(root, sides), headToHead(root, sides), probability(root), if (sport == "baseball") count(root, plays, names, statusJson?.str("periodPrefix")) else null,
+            if (sport == "ice-hockey") strength(plays, sides) else null, lastPlays(root, if (sport == "baseball") plays.filter { it.str("summaryType") != "P" } else plays), if (sport == "basketball") run(plays) else null,
             if (cricket) innings(competitors, sides) else emptyList(), if (sport == "ice-hockey") goalies(root, sides) else emptyList())
     }
 
@@ -372,20 +372,23 @@ object EspnSummary {
         return map
     }
 
-    private fun count(root: JSONObject, plays: List<JSONObject>, names: Map<String, String>): SummaryCount? {
+    private fun count(root: JSONObject, plays: List<JSONObject>, names: Map<String, String>, prefix: String?): SummaryCount? {
         val situation = root.optJSONObject("situation")
         val last = plays.lastOrNull { it.optJSONObject("period") != null }
         if (last == null && situation == null) return null
+        val period = last?.optJSONObject("period")
+        val between = (prefix ?: period?.str("type"))?.lowercase()?.let { it.startsWith("end") || it.startsWith("mid") } == true
+        if (between) return SummaryCount(null, null, null, false, false, false, period?.int("number"), period?.str("type")?.let(::bottom), null, null)
         val tally = last?.optJSONObject("resultCount") ?: last?.optJSONObject("pitchCount")
         fun on(json: JSONObject?, key: String): Boolean? = json?.takeIf { it.has(key) }?.let { j ->
             when (val v = j.opt(key)) { is JSONObject -> true; is Boolean -> v; is Number -> v.toInt() != 0; else -> false }
         }
         fun person(role: String): String? {
-            situation?.optJSONObject(role)?.let { p -> (p.optJSONObject("athlete") ?: p).let { it.str("displayName") ?: it.str("shortName") ?: it.str("id")?.let(names::get) } }?.let { return it }
+            situation?.optJSONObject(role)?.let { p -> (p.optJSONObject("athlete") ?: p).let { it.str("displayName") ?: it.str("shortName") ?: (it.str("id") ?: p.str("playerId"))?.let(names::get) } }
+                ?.let { return it }
             val participant = last?.optJSONArray("participants")?.let(::objs)?.firstOrNull { it.str("type") == role }?.optJSONObject("athlete") ?: return null
             return participant.str("displayName") ?: participant.str("id")?.let(names::get)
         }
-        val period = last?.optJSONObject("period")
         return SummaryCount(situation?.int("balls") ?: tally?.int("balls"), situation?.int("strikes") ?: tally?.int("strikes"),
             situation?.int("outs") ?: last?.int("outs"), on(situation, "onFirst") ?: on(last, "onFirst") ?: false,
             on(situation, "onSecond") ?: on(last, "onSecond") ?: false, on(situation, "onThird") ?: on(last, "onThird") ?: false,
@@ -394,7 +397,7 @@ object EspnSummary {
 
     private fun strength(plays: List<JSONObject>, sides: Sides): SummaryStrength? {
         val play = plays.lastOrNull { it.optJSONObject("strength") != null && sides.of(it) != null } ?: plays.lastOrNull { it.optJSONObject("strength") != null } ?: return null
-        penalty(play, plays, sides)?.let { return SummaryStrength("Power Play", it) }
+        if (penalised(play, sides)) return penalty(play, plays, sides)?.let { SummaryStrength("Power Play", it) }
         val strength = play.optJSONObject("strength")!!
         val text = strength.str("text") ?: strength.str("abbreviation") ?: return null
         val lower = text.lowercase()
@@ -411,14 +414,17 @@ object EspnSummary {
         return SummaryStrength(label.take(40), power)
     }
 
+    private fun penalised(play: JSONObject, sides: Sides): Boolean {
+        val type = play.optJSONObject("type") ?: return false
+        return (type.int("penaltyMinutes") ?: 0) > 0 && type.str("penaltyType")?.lowercase() in POWER_PLAY_PENALTIES && sides.of(play) != null
+    }
+
     private fun penalty(play: JSONObject, plays: List<JSONObject>, sides: Sides): FixtureSide? {
-        val type = play.optJSONObject("type") ?: return null
-        if ((type.int("penaltyMinutes") ?: 0) <= 0 || type.str("penaltyType")?.lowercase() !in POWER_PLAY_PENALTIES) return null
-        val side = sides.of(play) ?: return null
         val at = play.optJSONObject("period")?.int("number") to clock(play)
-        val matching = plays.filter { (it.optJSONObject("period")?.int("number") to clock(it)) == at && (it.optJSONObject("type")?.int("penaltyMinutes") ?: 0) > 0 }
-        if (matching.any { sides.of(it) != null && sides.of(it) != side }) return null
-        return if (side == FixtureSide.HOME) FixtureSide.AWAY else FixtureSide.HOME
+        val matching = plays.filter { (it.optJSONObject("period")?.int("number") to clock(it)) == at && penalised(it, sides) }.distinctBy { it.str("id") ?: it }
+        val home = matching.count { sides.of(it) == FixtureSide.HOME }
+        val away = matching.count { sides.of(it) == FixtureSide.AWAY }
+        return when { home > away -> FixtureSide.AWAY; away > home -> FixtureSide.HOME; else -> null }
     }
 
     private fun lastPlays(root: JSONObject, plays: List<JSONObject>): List<SummaryPlay> {

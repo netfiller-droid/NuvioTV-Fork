@@ -763,6 +763,19 @@ Changes after the 11 October device test:
 - The watch party button no longer appears when playing recordings (it stays for IPTV
   movies and series).
 
+Sport data (second capture of 11 October, first real live baseball):
+- Baseball: between innings the score no longer shows a reset "0 outs · 0–0" (and the
+  multiview score tile hides the empty bases); the last plays show at-bat results instead
+  of every pitch; pitchers and batters are named.
+- NHL Game Centre no longer shows a power play after offsetting penalties.
+- College football at halfway reads "4th & 10 at 50".
+- TV channel lists include worldwide services such as NBA League Pass after your country's
+  channels.
+- 14 more football competitions can be followed: AFC Champions League Elite, AFC Asian Cup,
+  UEFA Nations League, Copa Libertadores, EFL League One and Two, Copa del Rey, DFB-Pokal,
+  Coppa Italia, Coupe de France, Belgian Pro League, Brasileirão, Argentine Primera División
+  and J1 League.
+
 ## Ready below the UI (screens pending)
 
 - Provider account groups shared by several sources (each source has its own

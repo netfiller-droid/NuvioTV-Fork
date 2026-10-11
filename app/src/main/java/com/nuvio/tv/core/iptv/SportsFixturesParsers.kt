@@ -400,8 +400,9 @@ object EspnScoreboard {
     private fun baseball(status: JSONObject?, type: JSONObject?, situation: JSONObject?): SportsDetail.Baseball? {
         val half = listOfNotNull(status?.text("periodPrefix"), type?.text("shortDetail"), type?.text("detail")).firstNotNullOfOrNull(::half)
         if (situation == null && half == null) return null
-        fun count(key: String) = situation?.optIntOrNull(key)?.takeIf { it in 0..4 }
-        fun base(key: String) = when (val value = situation?.opt(key)) {
+        val between = half == InningHalf.MIDDLE || half == InningHalf.END
+        fun count(key: String) = situation?.optIntOrNull(key)?.takeIf { it in 0..4 && !between }
+        fun base(key: String) = !between && when (val value = situation?.opt(key)) {
             is Boolean -> value
             is Number -> value.toInt() != 0
             is JSONObject -> true
@@ -459,7 +460,7 @@ object EspnScoreboard {
 
     private fun situation(json: JSONObject, home: JSONObject, away: JSONObject): FixtureSituation? {
         val short = json.text("shortDownDistanceText")
-        val spot = json.text("possessionText")
+        val spot = json.text("possessionText")?.takeIf { it.any(Char::isLetter) }
         val downDistance = (if (short != null && spot != null) "$short · $spot" else json.text("downDistanceText") ?: short)?.take(MAX_TEXT)
         val owner = json.text("possession")
         fun ids(competitor: JSONObject) = setOfNotNull(competitor.text("id"), competitor.optJSONObject("team")?.text("id"))

@@ -33,7 +33,10 @@ object SportsGuideCells {
         "scottish-premiership" to "SPFL", "eredivisie" to "ERE", "primeira-liga" to "POR", "super-lig" to "TSL", "saudi-pro-league" to "SPL", "liga-mx" to "LMX",
         "womens-champions-league" to "UWCL", "g-league" to "GL", "womens-college-basketball" to "WCBB", "college-hockey" to "CHK", "womens-college-hockey" to "WCHK",
         "dp-world-tour" to "DPWT", "nascar-xfinity" to "NXS", "nascar-truck" to "NTS", "indycar" to "INDY", "premiership-rugby" to "PREM", "top-14" to "T14",
-        "champions-cup" to "ECC", "six-nations" to "6N", "rugby-championship" to "TRC")
+        "champions-cup" to "ECC", "six-nations" to "6N", "rugby-championship" to "TRC",
+        "afc-champions-league" to "ACL", "asian-cup" to "AAC", "nations-league" to "UNL", "copa-libertadores" to "LIB", "league-one" to "EFL1", "league-two" to "EFL2",
+        "copa-del-rey" to "CDR", "dfb-pokal" to "DFB", "coppa-italia" to "CIT", "coupe-de-france" to "CDF", "belgian-pro-league" to "BEL", "brasileirao" to "BRA",
+        "argentine-primera" to "ARG", "j1-league" to "J1")
     private val ALIASES by lazy {
         SportsLeagues.ALL.flatMap { league -> (league.aliases + league.name).map { SportsGuide.normalise(it) to league.id } }
             .filter { it.first.length >= 2 }.sortedByDescending { it.first.length }

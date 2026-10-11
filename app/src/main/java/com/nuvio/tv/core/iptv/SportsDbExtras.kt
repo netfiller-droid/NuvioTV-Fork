@@ -75,6 +75,7 @@ object SportsTv {
         "Great Britain"), "IE" to listOf("Republic of Ireland"), "KR" to listOf("Korea"), "NL" to listOf("Holland", "The Netherlands"), "CZ" to listOf("Czechia", "Czech Republic"),
         "TR" to listOf("Turkey", "Türkiye"), "HK" to listOf("Hong Kong"), "MO" to listOf("Macau"), "MK" to listOf("Macedonia"), "CD" to listOf("DR Congo"),
         "CI" to listOf("Ivory Coast"))
+    private val WORLDWIDE = setOf("world", "worldwide", "international", "global")
 
     fun parse(json: String): List<SportsTvChannel> {
         val root = JSONObject(json)
@@ -87,7 +88,8 @@ object SportsTv {
     fun names(channels: List<SportsTvChannel>, country: String?): List<String> {
         val wanted = countryNames(country)
         val local = channels.filter { channel -> channel.country?.let { SportsGuide.normalise(it) in wanted } == true }
-        return local.ifEmpty { channels }.map { it.name }.distinct().take(MAX_CHANNELS)
+        val everywhere = channels.filter { channel -> channel.country?.let { SportsGuide.normalise(it) in WORLDWIDE } == true }
+        return (local + everywhere).ifEmpty { channels }.map { it.name }.distinct().take(MAX_CHANNELS)
     }
 
     fun countryNames(code: String?): Set<String> {
