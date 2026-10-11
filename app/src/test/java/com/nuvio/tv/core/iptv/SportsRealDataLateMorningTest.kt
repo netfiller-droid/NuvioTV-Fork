@@ -72,11 +72,11 @@ class SportsRealDataLateMorningTest {
         val half = games.first { it.id == "401856715" }
         assertEquals(FixtureStatus.LIVE, half.status)
         assertEquals("Halftime", half.detail)
-        assertEquals(FixtureSituation(null, null, "Extra Point Good (A. Zouagui KICK)", null), half.situation)
+        assertEquals(FixtureSituation(null, null, "Extra Point Good (A. Zouagui KICK)", null, false, 0, 0), half.situation)
         assertEquals(SportsBugText("LSU 17–21 UK", "Halftime"), SportsFixtureText.bug(half))
         val drive = games.first { it.id == "401856712" }
         assertEquals(FixtureSituation("3rd & 6 · UGA 18", FixtureSide.AWAY,
-            "Shotgun #20 D.Phillips Jr. rush middle for 0 yards to the UGA18 (#1 D.Thompkins; #18 B.Hubbard)", 44), drive.situation)
+            "#20 D.Phillips Jr. rush middle for 0 yards to the UGA18 (#1 D.Thompkins; #18 B.Hubbard)", 44, false, 3, 3), drive.situation)
         val game = EspnSummary.parse(sample("ncaaf-summary"), league("college-football"))
         assertEquals(FixtureStatus.LIVE, game.status)
         assertEquals("Halftime", game.detail)

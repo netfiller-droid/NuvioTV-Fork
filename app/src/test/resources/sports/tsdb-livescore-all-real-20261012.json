@@ -1,0 +1,11 @@
+{"livescore":[
+ {"idEvent":"2475439","strSport":"American Football","strLeague":"NFL","strStatus":null,"strProgress":"Final","intHomeScore":"19","intAwayScore":"17","strTimestamp":"2026-10-11T13:30:00","updated":"2026-10-11 20:29:30"},
+ {"idEvent":"2475440","strSport":"American Football","strLeague":"NFL","strStatus":null,"strProgress":"3:08 - 4th","intHomeScore":"3","intAwayScore":"26","strTimestamp":"2026-10-11T17:00:00","updated":"2026-10-11 20:46:31"},
+ {"idEvent":"2475448","strSport":"American Football","strLeague":"NFL","strStatus":null,"strProgress":"7:05 - 4th","intHomeScore":"31","intAwayScore":"7","strTimestamp":"2026-10-11T17:00:00","updated":"2026-10-11 20:46:31"},
+ {"idEvent":"2518549","strSport":"Ice Hockey","strLeague":"German DEL 2","strStatus":"AP","strProgress":null,"intHomeScore":"3","intAwayScore":"4","strTimestamp":"2026-10-11T16:30:00","updated":"2026-10-11 19:58:31"},
+ {"idEvent":"2480680","strSport":"Ice Hockey","strLeague":"Czech Extraliga","strStatus":"AOT","strProgress":null,"intHomeScore":"5","intAwayScore":"4","strTimestamp":"2026-10-11T16:30:00","updated":"2026-10-11 20:09:30"},
+ {"idEvent":"2518194","strSport":"Ice Hockey","strLeague":"German DEL","strStatus":"P3","strProgress":"20","intHomeScore":"3","intAwayScore":"4","strTimestamp":"2026-10-11T14:30:00","updated":"2026-10-11 17:49:30"},
+ {"idEvent":"2526155","strSport":"Ice Hockey","strLeague":"American AHL","strStatus":"P3","strProgress":"19","intHomeScore":"2","intAwayScore":"4","strTimestamp":"2026-10-11T17:05:00","updated":"2026-10-11 20:46:30"},
+ {"idEvent":"2584832","strSport":"Basketball","strLeague":"Italian Serie A2","strStatus":"HT","strProgress":"0","intHomeScore":"32","intAwayScore":"35","strTimestamp":"2026-10-11T18:45:00","updated":"2026-10-11 20:46:31"},
+ {"idEvent":"2559228","strSport":"Ice Hockey","strLeague":"Canadian QMJHL","strStatus":"P1","strProgress":"19","intHomeScore":"0","intAwayScore":"3","strTimestamp":"2026-10-11T19:00:00","updated":"2026-10-11 20:46:30"}
+]}

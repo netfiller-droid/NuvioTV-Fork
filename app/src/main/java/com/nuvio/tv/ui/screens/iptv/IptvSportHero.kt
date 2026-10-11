@@ -618,7 +618,11 @@ private fun situationSentence(fixture: SportsFixture): String? {
         val firstShare = if (awayFirst) 100 - homeWin else homeWin
         stringResource(R.string.iptv_ui11_sport_win_chance, first.shortName ?: first.name, firstShare, second.shortName ?: second.name, 100 - firstShare)
     }
-    return listOfNotNull(situation.downDistance, situation.lastPlay?.trim()?.let { if (it.endsWith('.')) it else "$it." }, win).joinToString(" ")
+    val live = fixture.sport == "american-football" && fixture.status == FixtureStatus.LIVE
+    val down = situation.downDistance?.let { if (live && situation.redZone) "$it · ${stringResource(R.string.iptv_ui23_sport_red_zone)}" else it }
+    val owner = when (situation.possession) { FixtureSide.HOME -> home; FixtureSide.AWAY -> away; null -> null }
+    val drive = situation.drive?.takeIf { live && owner != null }?.let { stringResource(R.string.iptv_ui23_sport_drive, SportsFixtureText.code(owner!!), it) + "." }
+    return listOfNotNull(down, situation.lastPlay?.trim()?.let { if (it.endsWith('.')) it else "$it." }, drive, win).joinToString(" ")
         .takeIf(String::isNotEmpty)
 }
 

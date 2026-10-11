@@ -14,12 +14,14 @@ object SportsDbLive {
     const val MAX_SPORTS = 3
     const val FRESH_MILLIS = 10L * 60 * 1000
     const val STALE_MILLIS = 3L * 60 * 60 * 1000
+    const val STUCK_MILLIS = 30L * 60 * 1000
     private const val MAX_SCORES = 500
     private val PATHS = mapOf("soccer" to "Soccer", "basketball" to "Basketball", "ice-hockey" to "Ice_Hockey", "baseball" to "Baseball",
         "american-football" to "American_Football")
     private val SKIPPED = SportsDbEvents.SKIPPED + "post"
     private val OVERTIME = mapOf("ice-hockey" to 4, "basketball" to 5, "american-football" to 5)
     private val MINUTE = Regex("[0-9]{1,3}(\\+[0-9]{1,2})?")
+    private val QUARTER = Regex("([0-9]{1,2}:[0-9]{2})\\s*-\\s*(?:([1-4])(?:st|nd|rd|th)|([2-9]?)OT)", RegexOption.IGNORE_CASE)
     private val UPDATED = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
     private val UPDATED_ZONE = ZoneId.of("Europe/London")
     val SPORTS: Set<String> = PATHS.keys
@@ -55,13 +57,20 @@ object SportsDbLive {
         if (status == FixtureStatus.LIVE && score.updatedMillis?.let { nowMillis - it > STALE_MILLIS } == true) return fixture
         if (status == FixtureStatus.LIVE && nowMillis - fixture.startMillis > maxOf(STALE_MILLIS, 3 * SportsRefresh.durationMillis(fixture))) return fixture
         if (code.isEmpty() && nowMillis - fixture.startMillis > SportsRefresh.durationMillis(fixture)) return fixture
+        if (status == FixtureStatus.LIVE && nowMillis - fixture.startMillis > SportsRefresh.durationMillis(fixture) && score.updatedMillis?.let { nowMillis - it > STUCK_MILLIS } == true)
+            return fixture
         val live = status == FixtureStatus.LIVE
         val home = score.homeScore?.trim()?.takeIf { it.isNotEmpty() && it.length <= 8 }
         val away = score.awayScore?.trim()?.takeIf { it.isNotEmpty() && it.length <= 8 }
         val both = fixture.teams && home != null && away != null
-        val progress = score.progress?.trim()?.takeIf { live && it.isNotEmpty() && it.length <= 8 }?.let { if (it.matches(MINUTE)) "$it'" else it }
-        return fixture.copy(status = status, score = if (both) "$home–$away" else fixture.score, detail = raw.takeIf { live && it.isNotEmpty() && it.length <= 24 },
-            period = if (live) SportsDbEvents.PERIODS[code] ?: OVERTIME[fixture.sport]?.takeIf { code == "ot" } ?: fixture.period else null, clock = if (live) progress ?: fixture.clock else null,
+        val quarter = score.progress?.trim()?.takeIf { live }?.let(QUARTER::matchEntire)
+        val quarterPeriod = quarter?.let { match -> match.groupValues[2].toIntOrNull() ?: OVERTIME[fixture.sport]?.let { it - 1 + (match.groupValues[3].toIntOrNull() ?: 1) } }
+        val progress = quarter?.groupValues?.get(1)?.takeIf { quarterPeriod != null }
+            ?: score.progress?.trim()?.takeIf { live && it.isNotEmpty() && it.length <= 8 }?.let { if (it.matches(MINUTE)) "$it'" else it }
+        val words = score.progress?.trim()?.takeIf { live && raw.isEmpty() && quarter == null && it.length in 9..24 && it.any(Char::isLetter) }
+        return fixture.copy(status = status, score = if (both) "$home–$away" else fixture.score, detail = raw.takeIf { live && it.isNotEmpty() && it.length <= 24 } ?: words,
+            period = if (live) quarterPeriod ?: SportsDbEvents.PERIODS[code] ?: OVERTIME[fixture.sport]?.takeIf { code == "ot" } ?: fixture.period else null,
+            clock = if (live) progress ?: fixture.clock else null,
             homeLine = if (both) FixtureLine(home) else fixture.homeLine, awayLine = if (both) FixtureLine(away) else fixture.awayLine)
     }
 }

@@ -453,7 +453,7 @@ object EspnSummary {
     private fun lastPlays(root: JSONObject, plays: List<JSONObject>): List<SummaryPlay> {
         val scored = root.optJSONArray("scoringPlays")?.let(::objs).orEmpty().mapNotNull { s -> s.str("id")?.let { id -> s.str("text")?.let { id to it } } }.toMap()
         val fromPlays = plays.filter { it.str("text") != null }.takeLast(3).map {
-            SummaryPlay(plain(it.str("id")?.let(scored::get) ?: it.str("text")!!).replaceFirst(SNAP, "").take(MAX_TEXT), it.optJSONObject("period")?.int("number"), clock(it))
+            SummaryPlay(sportsPlay(plain(it.str("id")?.let(scored::get) ?: it.str("text")!!).replaceFirst(SNAP, "")).take(MAX_TEXT), it.optJSONObject("period")?.int("number"), clock(it))
         }
         if (fromPlays.isNotEmpty()) return fromPlays.reversed()
         return root.optJSONArray("commentary")?.let(::objs).orEmpty().filter { it.str("text") != null }.takeLast(3).map {

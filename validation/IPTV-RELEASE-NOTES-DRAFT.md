@@ -823,6 +823,20 @@ Sport data (fifth capture of 11 October, 22:46; first live Formula 1 race):
   provide (these use the scoreboard data), and a summary that does not exist (400/404) is
   not requested again for that game.
 
+Sport data (capture of 12 October, 05:46; first live NFL and a NASCAR race in progress):
+- Live NFL games show each team's timeouts left (three small bars beside the logo on the
+  score bug), the red zone (score bug and Sport hero) and the current drive (e.g. "KC drive:
+  8 plays, 57 yards, 4:12"); the team with the ball is marked in Game Centre and on the
+  multiview score strip. When the feed leaves out who has the ball, it is taken from the
+  last play.
+- Last plays read without formation tags such as "(Shotgun)" or "No Huddle-Shotgun".
+- NFL games from TheSportsDB show the quarter and game clock (e.g. "Q4 · 3:08").
+- Hockey games from TheSportsDB decided by a shoot-out show as finished, and a live score
+  that has not changed for half an hour after the game should have ended is no longer
+  shown as live.
+- After a Grand Prix or race weekend, the score bug shows the podium instead of the
+  circuit. NASCAR races in progress show the lap and running order like Formula 1.
+
 ## Ready below the UI (screens pending)
 
 - Provider account groups shared by several sources (each source has its own

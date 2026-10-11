@@ -20,7 +20,8 @@ data class FixtureTeam(val name: String, val shortName: String? = null, val abbr
 
 data class FixtureLine(val score: String? = null, val periods: List<String> = emptyList())
 
-data class FixtureSituation(val downDistance: String? = null, val possession: FixtureSide? = null, val lastPlay: String? = null, val homeWinPercent: Int? = null)
+data class FixtureSituation(val downDistance: String? = null, val possession: FixtureSide? = null, val lastPlay: String? = null, val homeWinPercent: Int? = null,
+    val redZone: Boolean = false, val homeTimeouts: Int? = null, val awayTimeouts: Int? = null, val drive: String? = null)
 
 data class SportsFixture(val id: String, val league: String, val sport: String, val title: String, val home: FixtureTeam?, val away: FixtureTeam?,
     val startMillis: Long, val status: FixtureStatus, val score: String? = null, val detail: String? = null, val broadcasters: List<String> = emptyList(),
@@ -471,7 +472,7 @@ object SportsFixtureText {
             FixtureStatus.SCHEDULED -> "next"
             FixtureStatus.FINAL -> "finished"
         }
-        val order = session.top.takeIf { session.state == FixtureStatus.LIVE && it.isNotEmpty() }?.let(::runningOrder)
+        val order = session.top.takeIf { session.state != FixtureStatus.SCHEDULED && it.isNotEmpty() }?.let(::runningOrder)
         return SportsBugText(fixture.title, "${session.name} · $word", order ?: detail.venue)
     }
 
@@ -550,6 +551,8 @@ object SportsFixtureCodec {
             put("situation", JSONObject().apply {
                 situation.downDistance?.let { put("downDistance", it) }; situation.possession?.let { put("possession", it.name) }
                 situation.lastPlay?.let { put("lastPlay", it) }; situation.homeWinPercent?.let { put("homeWin", it) }
+                if (situation.redZone) put("redZone", true); situation.homeTimeouts?.let { put("homeTimeouts", it) }; situation.awayTimeouts?.let { put("awayTimeouts", it) }
+                situation.drive?.let { put("drive", it) }
             })
         }
     }
@@ -582,7 +585,8 @@ object SportsFixtureCodec {
         if (!json.has("start")) return null
         val situation = json.optJSONObject("situation")?.let { item ->
             FixtureSituation(item.text("downDistance"), FixtureSide.entries.firstOrNull { it.name == item.text("possession") }, item.text("lastPlay"),
-                item.optIntOrNull("homeWin")?.coerceIn(0, 100))
+                item.optIntOrNull("homeWin")?.coerceIn(0, 100), item.optBoolean("redZone"), item.optIntOrNull("homeTimeouts")?.coerceIn(0, 3),
+                item.optIntOrNull("awayTimeouts")?.coerceIn(0, 3), item.text("drive"))
         }
         return SportsFixture(id, league, json.text("sport").orEmpty(), json.text("title").orEmpty(), json.optJSONObject("home")?.let(::team),
             json.optJSONObject("away")?.let(::team), json.getLong("start"), status, json.text("score"), json.text("detail"), json.strings("broadcasters"),

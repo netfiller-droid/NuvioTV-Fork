@@ -801,3 +801,56 @@ college football red zone; NHL empty net; NFL live `situation`; UFC round in pro
 cricket live innings; AFL/NRL live clock; golf after a cut or a playoff; football own goals,
 penalties, second yellows, extra time and the half-time and second-half status names on
 ESPN's scoreboard.
+
+## Twelfth pass (12 October, 05:46)
+
+ESPN and TheSportsDB responses captured at 05:46 Brisbane time on Monday 12 October
+(19:46Z on 11 October). In play: the first live NFL seen (eight 1pm games, all in the 4th
+quarter between 10:49 and 2:45 to go; Eagles 17–19 Jaguars final from the London game; five
+games still to start) and the NASCAR Cup race at Charlotte (lap 41, 46 minutes after the listed
+19:00Z start). The Singapore Grand Prix is now final. Everything else on ESPN was before or after
+play: Premier League, AFL, NRL, NBA, NBL, college football, cricket and UFC finals; MLB, NHL,
+URC, A-League and Champions League still to start. Apart from the NFL file, the `*-LIVE.json`
+summaries are earlier-pass files, and `nfl-summary.json` is the 11 October pre-game file. Every
+scoreboard and summary parses without errors. Trimmed copies are in
+`app/src/test/resources/sports/*-real-20261012.json` (`SportsRealDataMondayTest`).
+
+| Shape | What the real response showed | Parser change |
+|---|---|---|
+| NFL `situation` (live) | `down`, `distance`, `yardLine` (0–100 from the home goal line), `downDistanceText` `3rd & 14 at CHI 37`, `shortDownDistanceText`, `possessionText` `CHI 37`, `isRedZone` (false in every game), `homeTimeouts`/`awayTimeouts` (0–3), `possession` (team id) and `lastPlay` with `type`, `text`, `team`, `start`/`end` (yard line and team), `probability` (0–1) and `drive` (`description` `4 plays, 20 yards, 2:00`, `start`, `timeElapsed`, `result` once the drive is over). After an extra point there is no down text and `possession` is the kicking side; after a kick-off return the Jets game had down text but no `possession` at all. | `FixtureSituation` keeps the red-zone flag, both teams' timeouts and the drive in progress (also in the cache); possession falls back to the team at the end of the last play when the down text is there; the drive is left out once it has a result or has no plays yet |
+| NFL last play text | Leading space, line breaks inside penalty texts, formation tags `(Shotgun)`, `(No Huddle, Shotgun)`; `Official Timeout at 04:34.`; an extra point reads `(Matt Gay Kick)` with type `Extra Point Good` | Formation tags (and college `No Huddle-Shotgun`, `Shotgun` before a shirt number) are dropped from the last play on the scoreboard and in the Game Centre |
+| NFL clock | `displayClock` `6:22`, `period` 4, `shortDetail` `6:22 - 4th`; no end-of-quarter, half-time or two-minute status live on the scoreboard at capture time | none (`Q4 · 6:22`; the bug extra is the down and spot) |
+| NFL summary (live) | No `plays` and no `situation`: 21 `drives.previous` (the current drive repeated last) plus `drives.current`, 153 plays with `wallclock`, types including `Penalty`, `Sack`, `Pass Interception Return`, `Fumble Recovery (Opponent)`, `Two-minute warning`, `End Period`, `End of Half`; drive results Punt, Touchdown, Interception, Missed FG, Fumble, Field Goal, End of Half. Six `scoringPlays` (no wallclock of their own, matched by id to the drive plays). Header competitors carry `possession` and `timeoutsUsed`. 154 win-probability rows; `odds` empty, `pickcenter` present | none: scoring plays get the real times, the line score, stats (turnovers 0–4), leaders and last three plays read correctly |
+| NFL timing | First play 3 m 40 s after the listed start; Q1 ended at +29 min, Q2 at +79 (the two-minute warning alone took 20 minutes), half-time 15.6 minutes, Q3 ended at +138; the game clock estimate (40 minutes a quarter, 13-minute half-time) was 10–17 minutes early late in the first half and 4–7 minutes late in the 4th | none: every NFL scoring play has a real timestamp, so the estimate is only a fallback |
+| Odds | `odds` only on the five games still to start; live and final games have none | none (not used) |
+| NASCAR race (live) | No competition `type` (named Race by default), `period` 41 is the lap, 39 competitors with `order` 1–39 updated live (Cindric 5th on the grid, 2nd now), `winner` false, empty `statistics`; no stage, caution or lap-total field and no circuit or venue | none: lap 41 and the running order show as for F1 |
+| F1 weekend (final) | Race `STATUS_FINAL`, `period` 62, `order` final with `winner` true on the winner | The bug shows the podium (`1 M. Verstappen · 2 C. Leclerc · 3 K. Antonelli`) instead of the circuit once the weekend is over |
+
+TheSportsDB at 19:46Z: livescore returned Soccer (75), Ice Hockey (31), Basketball (16) and,
+for the first time, American Football (9): NFL rows with `strStatus` null and `strProgress`
+copied from ESPN's short detail (`3:08 - 4th`, refreshed every minute; six games matched ESPN's
+clock, two were 23 and 43 seconds of game clock behind) or `Final`. A German DEL 2 row finished after a shoot-out was `AP`; a Czech
+row `AOT`. Two German DEL rows sat at `P3` `20` and `P3` `19` with `updated` three hours old,
+316 minutes after the start, while every other live row was refreshed at the capture minute.
+Basketball half-time is `HT` with progress `0`. `lookuptv` returned channels for the NFL games
+(12 to 46 rows: 7mate by state plus DAZN in Australia, NFL Sunday Ticket and Paramount+ in the
+United States) and the football matches seen in the eleventh pass; most other events had none.
+
+Parser changes: TheSportsDB `M:SS - Nth` (and `- OT`) progress sets the quarter and clock, so a
+TheSportsDB NFL game reads `Q4 · 3:08`; other worded progress up to 24 characters becomes the
+status text; `AP` counts as finished; a live row that has not been refreshed for 30 minutes after
+the game length is ignored.
+
+Checked again on this data: TheSportsDB `Final` rows with no status, worldwide and Australian
+channels, F1 lap and running order logic on NASCAR, the race window.
+
+Confirmed now: NFL live `situation`, timeouts, drive, possession and win probability; NFL
+summary drives and real play times; NASCAR live lap and running order; F1 finished race;
+TheSportsDB American football livescore.
+
+Still unconfirmed: NFL red zone, half-time, end of quarter and overtime on the scoreboard
+(college football showed `isRedZone` true during a timeout with no down text); F1 gaps, pit
+stops and fastest lap; NASCAR stages; tennis point score and a live tiebreak; MLB pitching
+change and a full count; NBA overtime; NHL empty net; UFC round in progress; cricket live
+innings; AFL/NRL live clock; golf after a cut or a playoff; football own goals, penalties,
+second yellows and extra time.

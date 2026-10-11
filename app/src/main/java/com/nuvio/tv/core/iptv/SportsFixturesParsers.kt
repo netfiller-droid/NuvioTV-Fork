@@ -492,7 +492,8 @@ object EspnScoreboard {
         val short = json.text("shortDownDistanceText")
         val spot = json.text("possessionText")?.takeIf { it.any(Char::isLetter) }
         val downDistance = (if (short != null && spot != null) "$short · $spot" else json.text("downDistanceText") ?: short)?.take(MAX_TEXT)
-        val owner = json.text("possession")
+        val last = json.optJSONObject("lastPlay")
+        val owner = json.text("possession") ?: last?.optJSONObject("end")?.optJSONObject("team")?.text("id")?.takeIf { downDistance != null }
         fun ids(competitor: JSONObject) = setOfNotNull(competitor.text("id"), competitor.optJSONObject("team")?.text("id"))
         val possession = when {
             owner == null -> null
@@ -500,14 +501,18 @@ object EspnScoreboard {
             owner in ids(away) -> FixtureSide.AWAY
             else -> null
         }
-        val last = json.optJSONObject("lastPlay")
-        val lastPlay = last?.text("text")?.replace(SPACES, " ")?.replaceFirst(SNAP, "")?.let { text ->
+        val lastPlay = last?.text("text")?.replace(SPACES, " ")?.replaceFirst(SNAP, "")?.let(::sportsPlay)?.let { text ->
             last.optJSONObject("type")?.text("text")?.takeIf { text.startsWith("(") && text.endsWith(")") }?.let { "$it $text" } ?: text }?.take(MAX_PLAY)
         val probability = last?.optJSONObject("probability") ?: json.optJSONObject("probability")
         val homeWin = probability?.let { if (it.isNull("homeWinPercentage")) null else it.optDouble("homeWinPercentage", Double.NaN) }
             ?.takeIf { !it.isNaN() && it >= 0 }?.let { if (it <= 1.0) it * 100 else it }?.takeIf { it <= 100.0 }?.let { Math.round(it).toInt() }
+        fun timeouts(key: String) = json.optIntOrNull(key)?.takeIf { it in 0..3 }
+        val drive = last?.optJSONObject("drive")?.takeIf { it.text("result") == null && possession != null && last.optJSONObject("team")?.text("id").let { team -> team == null || team == owner } }
+            ?.text("description")
+            ?.takeIf { (LEADING.find(it)?.value?.toIntOrNull() ?: 0) > 0 }?.take(60)
         if (downDistance == null && possession == null && lastPlay == null && homeWin == null) return null
-        return FixtureSituation(downDistance, possession, lastPlay, homeWin)
+        return FixtureSituation(downDistance, possession, lastPlay, homeWin, json.optBoolean("isRedZone"), timeouts("homeTimeouts"),
+            timeouts("awayTimeouts"), drive)
     }
 
     private fun broadcasters(json: JSONObject): List<String> {
@@ -627,11 +632,16 @@ object SportsDbEvents {
 
     private fun parseLocal(value: String): Long? = runCatching { LocalDateTime.parse(value).toInstant(ZoneOffset.UTC).toEpochMilli() }.getOrNull()
 
-    internal val FINISHED = setOf("match finished", "ft", "aet", "pen", "ft pen", "aot", "final", "finished", "after over time", "after extra time", "after penalties", "ended", "full time")
+    internal val FINISHED = setOf("match finished", "ft", "aet", "pen", "ft pen", "aot", "final", "finished", "after over time", "after extra time", "after penalties", "ended", "full time", "ap")
     internal val NOT_STARTED = setOf("not started", "ns", "tbd", "time to be defined", "scheduled")
     internal val PERIODS = mapOf("1h" to 1, "2h" to 2, "et" to 3, "q1" to 1, "q2" to 2, "q3" to 3, "q4" to 4, "p1" to 1, "p2" to 2, "p3" to 3)
     internal val SKIPPED = setOf("postponed", "pst", "post", "canc", "cancelled", "canceled", "abandoned", "abd", "awd", "wo", "susp", "suspended", "int", "interrupted")
 }
+
+internal fun sportsPlay(text: String): String = text.replaceFirst(FORMATION, "")
+
+private val FORMATION = Regex("^(?:\\((?:(?:no huddle|shotgun|pistol|under center|wildcat|[a-z ]{1,20}formation)(?:,\\s*)?)+\\)|(?:no huddle-)?(?:shotgun|pistol|no huddle)(?=\\s+#))\\s+",
+    RegexOption.IGNORE_CASE)
 
 internal fun sportsImage(value: String): String? = value.trim().takeIf { url ->
     url.length <= 1024 && (url.startsWith("https://") || url.startsWith("http://")) && url.none { it.isWhitespace() || it == '"' || it == '<' }

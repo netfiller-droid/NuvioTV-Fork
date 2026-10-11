@@ -277,9 +277,11 @@ internal fun GameScoreLine(fixture: SportsFixture, hidden: Boolean, logo: Dp, st
     val (left, right) = if (first) away to home else home to away
     val scores = SportsFixtureText.scores(fixture)?.takeIf { fixture.status != FixtureStatus.SCHEDULED }?.let { if (first) it.second to it.first else it }
     val lead = scores?.let { SportsLedger.leader(it.first, it.second) }
+    val ball = fixture.situation?.possession?.takeIf { fixture.sport == "american-football" && fixture.status == FixtureStatus.LIVE && !hidden }
+    val leftBall = ball != null && (ball == FixtureSide.AWAY) == first
     val big = style.copy(fontSize = style.fontSize * 1.5f, lineHeight = style.fontSize * 1.5f, fontWeight = FontWeight.SemiBold, fontFeatureSettings = "tnum")
     Row(modifier, verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-        LedgerName(left, logo, style, cities, Modifier.weight(1f, fill = false))
+        LedgerName(left, logo, style, cities, Modifier.weight(1f, fill = false), ball = leftBall)
         when {
             scores != null && hidden -> MaskBar(90.dp, Modifier.padding(bottom = 8.dp))
             scores != null -> {
@@ -291,12 +293,12 @@ internal fun GameScoreLine(fixture: SportsFixture, hidden: Boolean, logo: Dp, st
                 maxLines = 1)
             else -> Text(if (first) "@" else "v", style = big.copy(fontSize = style.fontSize * .75f), color = NuvioTheme.colors.TextTertiary, maxLines = 1)
         }
-        LedgerName(right, logo, style, cities, Modifier.weight(1f, fill = false))
+        LedgerName(right, logo, style, cities, Modifier.weight(1f, fill = false), ball = ball != null && !leftBall)
     }
 }
 
 @Composable
-private fun LedgerName(team: FixtureTeam, logo: Dp, style: TextStyle, cities: Boolean, modifier: Modifier) {
+private fun LedgerName(team: FixtureTeam, logo: Dp, style: TextStyle, cities: Boolean, modifier: Modifier, ball: Boolean = false) {
     val (city, nickname) = SportsLedger.names(team)
     Column(modifier) {
         if (cities && city != null) Text(city, style = MaterialTheme.typography.labelMedium, color = NuvioTheme.colors.TextSecondary, maxLines = 1,
@@ -304,7 +306,8 @@ private fun LedgerName(team: FixtureTeam, logo: Dp, style: TextStyle, cities: Bo
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             TeamLogo(team, logo)
             Text(if (cities || city == null) nickname else team.shortName ?: team.name, style = style, fontWeight = FontWeight.SemiBold, color = NuvioTheme.colors.TextPrimary,
-                maxLines = 1, overflow = TextOverflow.Ellipsis)
+                maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f, fill = false))
+            if (ball) Box(Modifier.size(6.dp).clip(CircleShape).background(NuvioTheme.colors.Secondary))
         }
     }
 }

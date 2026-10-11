@@ -411,7 +411,9 @@ internal fun IptvSportsBug(fixture: SportsFixture, hidden: Boolean, modifier: Mo
                 if (home != null && away != null) TeamsSegment(fixture, home, away) else BugText(bug.primary)
                 BugState(bug.state, fixture)
                 val scored = remember(fixture) { SportsEvents.recentTry(fixture) }
-                BugExtra(scored?.clock?.let { stringResource(R.string.iptv_sport6_try, it) } ?: bug.extra, accent = scored != null)
+                val redZone = fixture.situation?.redZone == true && fixture.sport == "american-football" && fixture.status == FixtureStatus.LIVE
+                BugExtra(scored?.clock?.let { stringResource(R.string.iptv_sport6_try, it) } ?: bug.extra ?: stringResource(R.string.iptv_ui23_sport_red_zone).takeIf { redZone },
+                    accent = scored != null || redZone)
             }
         }
     }
@@ -462,7 +464,11 @@ private fun TeamsSegment(fixture: SportsFixture, home: FixtureTeam, away: Fixtur
     val leftHas = possession != null && (possession == FixtureSide.AWAY) == first
     val leftReds = SportsEvents.reds(fixture, if (first) FixtureSide.AWAY else FixtureSide.HOME)
     val rightReds = SportsEvents.reds(fixture, if (first) FixtureSide.HOME else FixtureSide.AWAY)
+    val situation = fixture.situation?.takeIf { fixture.sport == "american-football" && fixture.status == FixtureStatus.LIVE }
+    val leftTimeouts = situation?.let { if (first) it.awayTimeouts else it.homeTimeouts }
+    val rightTimeouts = situation?.let { if (first) it.homeTimeouts else it.awayTimeouts }
     BugSegment {
+        Timeouts(leftTimeouts)
         TeamLogo(left, 20.dp)
         RedCards(leftReds)
         if (leftHas) Dot()
@@ -476,6 +482,15 @@ private fun TeamsSegment(fixture: SportsFixture, home: FixtureTeam, away: Fixtur
         if (possession != null && !leftHas) Dot()
         RedCards(rightReds)
         TeamLogo(right, 20.dp)
+        Timeouts(rightTimeouts)
+    }
+}
+
+@Composable
+private fun Timeouts(left: Int?) {
+    if (left == null) return
+    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+        repeat(3) { Box(Modifier.size(8.dp, 2.dp).background(if (it < left) NuvioTheme.colors.TextPrimary else NuvioTheme.colors.TextTertiary.copy(alpha = .5f))) }
     }
 }
 

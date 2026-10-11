@@ -25,11 +25,11 @@ class SportsRealDataWeekendTest {
         assertEquals(FixtureLine("17", listOf("10", "0", "0", "7")), game.homeLine)
         assertEquals(FixtureLine("13", listOf("3", "0", "3", "7")), game.awayLine)
         assertEquals(FixtureSituation("3rd & 4 · NEB 47", FixtureSide.AWAY,
-            "No Huddle-Shotgun #10 J.Hoover pass incomplete short middle to #8 T.Morris thrown to NEB37 broken up by #28 C.Benning QB hurried by #24 D.Foster", 60),
+            "#10 J.Hoover pass incomplete short middle to #8 T.Morris thrown to NEB37 broken up by #28 C.Benning QB hurried by #24 D.Foster", 60, false, 0, 0),
             game.situation)
         val other = games.first { it.id == "401856716" }
         assertEquals(FixtureSituation("2nd & 10 · MIZ 25", FixtureSide.AWAY,
-            "No Huddle-Shotgun #10 M.Reed pass incomplete short middle to #84 R.Anderson III thrown to Mizzou16 QB hurried by #10 D.Hopkins", 96), other.situation)
+            "#10 M.Reed pass incomplete short middle to #84 R.Anderson III thrown to Mizzou16 QB hurried by #10 D.Hopkins", 96, false, 0, 1), other.situation)
         val elapsed = (now - game.startMillis) / 60_000.0
         val progress = SportsMarkers.minutes("american-football", game.period, game.clock, league = "college-football")!!
         assertEquals(184.85, progress, 0.01)
@@ -47,7 +47,7 @@ class SportsRealDataWeekendTest {
             game.moments.map { it.kind })
         assertEquals(SummaryMoment(MomentKind.TOUCHDOWN, FixtureSide.AWAY, 4, "11:51", "J. Hoover pass to N. Marsh for 75 yds, for a TD (N. Radicic KICK)", 17, 13,
             millis("2026-10-10T18:49:37Z")), game.moments.last())
-        assertEquals(SummaryPlay("No Huddle-Shotgun #10 J.Hoover pass incomplete short middle to #8 T.Morris thrown to NEB37 broken up by #28 C.Benning QB hurried by #24 D.Foster",
+        assertEquals(SummaryPlay("#10 J.Hoover pass incomplete short middle to #8 T.Morris thrown to NEB37 broken up by #28 C.Benning QB hurried by #24 D.Foster",
             4, "8:02"), game.lastPlays.first())
         assertTrue(game.lastPlays.none { it.text.startsWith("(") })
         assertEquals(listOf(0.5644f, 0.6009f), game.winProbability.takeLast(2))
