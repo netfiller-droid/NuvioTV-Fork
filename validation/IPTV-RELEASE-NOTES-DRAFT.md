@@ -1049,8 +1049,8 @@ Phone setup (security review)
 
 - Twelfth sport capture (12 October 05:46; live NFL timeouts, drive, red zone and
   possession; TheSportsDB NFL clock and hockey shoot-outs; podium after a race) and no
-  summary requests for sports ESPN has none for: CI debug at `85fe99dce` (run
-  38171196925, result pending); 945 core and 299 data-layer JVM tests on the host. Not device-tested.
+  summary requests for sports ESPN has none for: CI debug green at `85fe99dce`
+  (run 38171196925); 945 core and 299 data-layer JVM tests on the host. Not device-tested.
 - Fifth 11 October capture (live Formula 1 lap and top three, football HT, TheSportsDB
   status-less and OT rows): CI debug green at `d4fc94d24` (run 38142066345); 939 core and
   298 data-layer JVM tests on the host. Not device-tested.

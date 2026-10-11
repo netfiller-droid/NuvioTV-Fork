@@ -15,7 +15,7 @@ under "Earlier session notes" and the dated sections is history kept for referen
 ### State
 
 - All work is committed and pushed to `iptv/player-binding`. Build for the next device pass:
-  CI debug at `85fe99dce` (run 38171196925, result pending), app "Nuvio IPTV Prototype", file
+  CI debug green at `85fe99dce` (run 38171196925), app "Nuvio IPTV Prototype", file
   `app-iptvPrototype-arm64-v8a-debug.apk`. Minified release (R8) was last built at
   `c1685393a` (run 38058607115); build it again before shipping.
 - Host tests at that commit: core 945, data 299, androidTest compiles.
