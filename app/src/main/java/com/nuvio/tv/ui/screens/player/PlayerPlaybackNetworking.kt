@@ -7,6 +7,7 @@ import androidx.media3.datasource.DataSource
 import androidx.media3.datasource.DefaultDataSource
 import androidx.media3.datasource.okhttp.OkHttpDataSource
 import com.nuvio.tv.core.network.IPv4FirstDns
+import com.nuvio.tv.core.network.NoDelaySocketFactory
 import com.nuvio.tv.core.network.ServerTrust
 import com.nuvio.tv.core.network.withServerTrust
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
@@ -54,9 +55,11 @@ internal object PlayerPlaybackNetworking {
         OkHttpClient.Builder()
             .dispatcher(dispatcher)
             .dns(IPv4FirstDns())
+            .socketFactory(NoDelaySocketFactory)
             .eventListenerFactory(PlaybackConnectionEvents)
             .sslSocketFactory(sslContext.socketFactory, trustAllManager)
             .hostnameVerifier(playbackHostnameVerifier)
+            .protocols(listOf(okhttp3.Protocol.HTTP_1_1))
             .connectTimeout(15, TimeUnit.SECONDS)
             .readTimeout(15, TimeUnit.SECONDS)
             .writeTimeout(15, TimeUnit.SECONDS)
@@ -88,6 +91,7 @@ internal object PlayerPlaybackNetworking {
         OkHttpClient.Builder()
             .dispatcher(dispatcher)
             .dns(IPv4FirstDns())
+            .socketFactory(NoDelaySocketFactory)
             // Attached HERE because OkHttpClient.Builder(client) copies
             // eventListenerFactory, so every newBuilder() derivative inherits
             // it -- the prewarm client, createHttpDataSourceFactory's client
@@ -96,6 +100,7 @@ internal object PlayerPlaybackNetworking {
             // overwrites it. One attachment covers all three startup opens.
             .eventListenerFactory(PlaybackConnectionEvents)
             .withServerTrust()
+            .protocols(listOf(okhttp3.Protocol.HTTP_1_1))
             .connectTimeout(15, TimeUnit.SECONDS)
             .readTimeout(15, TimeUnit.SECONDS)
             .writeTimeout(15, TimeUnit.SECONDS)
@@ -172,7 +177,6 @@ internal object PlayerPlaybackNetworking {
                 )
             )
             if (head) PrefetchWindowStore.putHead(entry) else PrefetchWindowStore.putTail(entry)
-            true
         }
     )
 
@@ -180,24 +184,24 @@ internal object PlayerPlaybackNetworking {
     fun prewarmSelectedPlayback(
         url: String?,
         headers: Map<String, String>?,
-        enableHttp2: Boolean,
         purpose: PlaybackPurpose = PlaybackPurpose.VOD,
     ) {
         if (!purpose.allowsVodNetworkOptimizations) return
         val request = prewarmRequest(url, headers) ?: return
+        if (SlowStartServer.matches(request.url.toString())) return
         if (!canReusePrewarmFor(request.url.toString())) return
         prewarmCoordinator.start(request) {
-            // Re-read effective settings per selection; keep the playback pool, DNS and event listener.
+            // Keep the playback pool, DNS and event listener.
             val primary = playbackHttpClient.newBuilder()
                 // Warm-up owns its fallback call so cancellation also stops its body read.
                 .apply { interceptors().remove(playbackSslFallbackInterceptor) }
-                .let { NuvioExoPlayerPerformanceHelper.applyNetworkOptimizations(it, enableHttp2) }
+                .let { NuvioExoPlayerPerformanceHelper.applyNetworkOptimizations(it) }
                 .callTimeout(15, TimeUnit.SECONDS)
                 .build()
                 .also { logPoolIdentity("prewarm", it) }
             PlaybackPrewarmCallFactory(primary, fallback = {
                 trustAllPlaybackHttpClient.newBuilder()
-                    .let { NuvioExoPlayerPerformanceHelper.applyNetworkOptimizations(it, enableHttp2) }
+                    .let { NuvioExoPlayerPerformanceHelper.applyNetworkOptimizations(it) }
                     .callTimeout(15, TimeUnit.SECONDS)
                     .build()
                     .also { logPoolIdentity("prewarm-tls-fallback", it) }
@@ -250,11 +254,14 @@ internal object PlayerPlaybackNetworking {
 
     fun createHttpClient(
         defaultHeaders: Map<String, String> = emptyMap(),
-        useLongReadTimeout: Boolean = false
+        useLongReadTimeout: Boolean = false,
+        slowStart: Boolean = false
     ): OkHttpClient {
         val builder = playbackHttpClient.newBuilder()
         if (useLongReadTimeout) {
             builder.readTimeout(LOOPBACK_READ_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+        } else if (slowStart) {
+            builder.readTimeout(SlowStartServer.FIRST_DATA_WAIT_MS, TimeUnit.MILLISECONDS)
         }
         if (defaultHeaders.any { it.key.equals("Authorization", ignoreCase = true) }) {
             // OkHttp strips the Authorization header on cross-host redirects.
@@ -288,9 +295,10 @@ internal object PlayerPlaybackNetworking {
     fun createHttpDataSourceFactory(
         defaultHeaders: Map<String, String> = emptyMap(),
         useLongReadTimeout: Boolean = false,
-        defaultUserAgent: Boolean = true
+        defaultUserAgent: Boolean = true,
+        slowStart: Boolean = false
     ): DataSource.Factory {
-        val client = createHttpClient(defaultHeaders, useLongReadTimeout)
+        val client = createHttpClient(defaultHeaders, useLongReadTimeout, slowStart)
         val httpFactory = OkHttpDataSource.Factory(client).apply {
             setDefaultRequestProperties(defaultHeaders)
             if (defaultUserAgent && defaultHeaders.none { it.key.equals("User-Agent", ignoreCase = true) }) {
@@ -304,9 +312,10 @@ internal object PlayerPlaybackNetworking {
     fun createDataSourceFactory(
         context: android.content.Context,
         defaultHeaders: Map<String, String> = emptyMap(),
-        defaultUserAgent: Boolean = true
+        defaultUserAgent: Boolean = true,
+        slowStart: Boolean = false
     ): DataSource.Factory {
-        return DefaultDataSource.Factory(context, createHttpDataSourceFactory(defaultHeaders, defaultUserAgent = defaultUserAgent))
+        return DefaultDataSource.Factory(context, createHttpDataSourceFactory(defaultHeaders, defaultUserAgent = defaultUserAgent, slowStart = slowStart))
     }
 
     fun openConnection(

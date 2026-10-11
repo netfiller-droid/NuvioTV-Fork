@@ -1,6 +1,6 @@
 # Nuvio IPTV — handover
 
-Branch: `iptv/player-binding` (includes `main` as of 6 October 2026). Only this branch is
+Branch: `iptv/player-binding` (includes the fork release `1.1.0-nt.5`, merged on 12 October 2026). Only this branch is
 worked on; `iptv/wip` and `nuvio-test` were tidied on 9 October with the user's permission.
 Related: [progress](IPTV-PROGRESS.md), [draft release notes](IPTV-RELEASE-NOTES-DRAFT.md),
 [device test checklist](IPTV-DEVICE-TEST-CHECKLIST.md), [sports design pass 2](IPTV-SPORTS-DESIGN-PASS-2.md),
@@ -14,6 +14,19 @@ under "Earlier session notes" and the dated sections is history kept for referen
 
 ### State
 
+- 12 October: the fork release `1.1.0-nt.5` (tag; the fork's `main`, upstream 1.1.0-beta.5
+  plus the Nuvio Arc work) is merged into this branch with a merge commit (no rebase: the
+  branch history is never rewritten). Nine conflicts, all resolved keeping both sides:
+  Live TV next to Calendar in the sidebar and root routes (`appRootRoutes` in
+  `MainActivity.kt` adds `Screen.IptvLive` when `FEATURE_IPTV_ENABLED`), the Calendar route
+  next to the IPTV routes in `NuvioNavHost.kt`, Live TV Home rows after Coming up
+  (Classic, as in Grid), the Live TV row key guard before the new vertical-move code
+  (Modern), the playback-purpose and IPTV user-agent rules next to the new slow-start
+  server handling in `PlayerPlaybackNetworking`/`PlayerMediaSourceFactory`, no watch party
+  for recordings next to the new Speed button. The prototype manifest names the ten new
+  launcher icon choices "Nuvio IPTV Prototype" too. Host tests unchanged in count and
+  green on the merge; the rest of the upstream changes (V2 settings, player, calendar,
+  media servers, watch party) need a regression look on the device.
 - All work is committed and pushed to `iptv/player-binding`. Build for the next device pass:
   CI debug green at `85fe99dce` (run 38171196925), app "Nuvio IPTV Prototype", file
   `app-iptvPrototype-arm64-v8a-debug.apk`. Minified release (R8) was last built at

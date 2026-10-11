@@ -1338,6 +1338,15 @@ private fun PlaybackNavHost(
                     }
                 }) }
         }
+        composable(Screen.Calendar.route) {
+            com.nuvio.tv.ui.screens.calendar.CalendarScreen(
+                showBuiltInHeader = !hideBuiltInHeaders,
+                onOpenTitle = { row ->
+                    val itemId = row.contentId ?: return@CalendarScreen
+                    navController.navigate(Screen.Detail.createRoute(itemId, row.apiType))
+                }
+            )
+        }
 
         composable(Screen.Settings.route) {
             SettingsScreen(

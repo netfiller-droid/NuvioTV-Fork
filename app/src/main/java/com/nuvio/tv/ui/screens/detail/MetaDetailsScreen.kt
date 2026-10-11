@@ -67,6 +67,7 @@ import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRestorer
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.foundation.focusGroup
+import androidx.compose.foundation.focusable
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.graphics.Color
@@ -77,6 +78,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onSizeChanged
@@ -528,6 +530,8 @@ fun MetaDetailsScreen(
     )
 
     val childOverlayVisible = LocalDetailChildOverlayVisible.current
+    val focusManager = LocalFocusManager.current
+    val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
     BackHandler(enabled = !childOverlayVisible) {
         if (selectedComment != null) {
             commentOverlayDirection = 0
@@ -546,6 +550,7 @@ fun MetaDetailsScreen(
 
     val currentIsTrailerPlaying by rememberUpdatedState(uiState.isTrailerPlaying)
     val currentShowTrailerControls by rememberUpdatedState(uiState.showTrailerControls)
+    val trailerControllerFocusRequester = remember { FocusRequester() }
     var trailerSeekOverlayVisible by remember { mutableStateOf(false) }
     val trailerSeekOverlayState = remember { TrailerSeekOverlayState() }
     var trailerSeekToken by remember { mutableIntStateOf(0) }
@@ -555,6 +560,12 @@ fun MetaDetailsScreen(
         { position: Long, duration: Long ->
             trailerSeekOverlayState.positionMs = position
             trailerSeekOverlayState.durationMs = duration
+        }
+    }
+
+    LaunchedEffect(uiState.isTrailerPlaying, uiState.showTrailerControls) {
+        if (uiState.isTrailerPlaying && uiState.showTrailerControls) {
+            trailerControllerFocusRequester.requestFocusAfterFrames()
         }
     }
 
@@ -678,6 +689,17 @@ fun MetaDetailsScreen(
                     }
                 }
                 false
+            }
+            .onKeyEvent { keyEvent ->
+                val native = keyEvent.nativeKeyEvent
+                val overlayOpen = childOverlayVisible || selectedComment != null ||
+                    uiState.isSharedTrailerOverlayVisible || uiState.isTrailerPlaying
+                if (!isDetailEdgeBackPress(native.action, native.keyCode, native.repeatCount, isRtl, overlayOpen)) {
+                    return@onKeyEvent false
+                }
+                val moved = focusManager.moveFocus(if (isRtl) FocusDirection.Right else FocusDirection.Left)
+                if (!moved) onBackPress()
+                true
             }
     ) {
         PersistentDetailBackdrop(
@@ -1065,7 +1087,11 @@ fun MetaDetailsScreen(
                         }
                     },
                     onTrailerProgressChanged = onTrailerProgressChanged,
-                    onTrailerEnded = { viewModel.onEvent(MetaDetailsEvent.OnTrailerEnded) },
+                    onTrailerEnded = {
+                        restorePlayFocusAfterTrailerBackToken += 1
+                        isTrailerPaused = false
+                        viewModel.onEvent(MetaDetailsEvent.OnTrailerEnded)
+                    },
                     onTrailerButtonClick = { viewModel.onEvent(MetaDetailsEvent.OnTrailerButtonClick) },
                     onSharedTrailerSelected = { viewModel.onEvent(MetaDetailsEvent.OnSharedTrailerSelected(it)) },
                     onDismissSharedTrailer = { viewModel.onEvent(MetaDetailsEvent.OnDismissSharedTrailer) },
@@ -1159,6 +1185,15 @@ fun MetaDetailsScreen(
                     color = NuvioTheme.colors.TextPrimary
                 )
             }
+        }
+
+        if (uiState.isTrailerPlaying && uiState.showTrailerControls) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .focusRequester(trailerControllerFocusRequester)
+                    .focusable()
+            )
         }
 
         TrailerSeekOverlayHost(
@@ -3205,6 +3240,18 @@ private fun MetaDetailsContent(
             PlaybackHandoffBackdrop(backdropUrl = meta.backdropUrl ?: meta.poster)
         }
     }
+}
+
+/** A fresh press towards the start edge, which leaves Details when nothing further that way takes focus. */
+internal fun isDetailEdgeBackPress(
+    action: Int,
+    keyCode: Int,
+    repeatCount: Int,
+    isRtl: Boolean,
+    overlayOpen: Boolean
+): Boolean {
+    val backKey = if (isRtl) KeyEvent.KEYCODE_DPAD_RIGHT else KeyEvent.KEYCODE_DPAD_LEFT
+    return action == KeyEvent.ACTION_DOWN && keyCode == backKey && repeatCount == 0 && !overlayOpen
 }
 
 @Composable

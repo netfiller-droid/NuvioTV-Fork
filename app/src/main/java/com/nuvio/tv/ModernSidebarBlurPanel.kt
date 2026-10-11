@@ -41,6 +41,11 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.selected
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.Card
@@ -160,7 +165,7 @@ internal fun ModernSidebarBlurPanel(
             .padding(horizontal = NuvioTheme.spacing.md, vertical = NuvioTheme.spacing.lg - NuvioTheme.spacing.xxs)
     ) {
         if (v2Glass != null) {
-            BrandWordmark(Modifier.padding(horizontal = 12.dp, vertical = 8.dp).fillMaxWidth(.78f).height(32.dp), contentDescription = "Nuvio")
+            BrandWordmark(Modifier.padding(horizontal = 12.dp, vertical = 8.dp).fillMaxWidth(.78f).height(32.dp), contentDescription = stringResource(R.string.cd_nuvio_logo))
         }
         if (showProfileSelector && activeProfileName.isNotEmpty()) {
             Box(
@@ -324,6 +329,11 @@ private fun SidebarNavigationItem(
     ) {
         Row(
             modifier = Modifier
+                .semantics {
+                    contentDescription = label
+                    role = Role.Tab
+                    this.selected = selected
+                }
                 .fillMaxWidth()
                 .padding(horizontal = NuvioTheme.spacing.lg - NuvioTheme.spacing.xxs, vertical = NuvioTheme.spacing.sm + NuvioTheme.spacing.xxs),
             verticalAlignment = Alignment.CenterVertically
@@ -374,7 +384,7 @@ private fun SidebarNavigationItem(
                 .weight(1f)
                 .graphicsLayer { alpha = labelAlpha }
         )
-    }
+        }
     }
 }
 
@@ -445,6 +455,10 @@ private fun SidebarProfileItem(
     ) {
         Row(
             modifier = Modifier
+                .semantics {
+                    contentDescription = profileName
+                    role = Role.Button
+                }
                 .fillMaxWidth()
                 .padding(horizontal = NuvioTheme.spacing.lg - NuvioTheme.spacing.xxs, vertical = NuvioTheme.spacing.sm + NuvioTheme.spacing.xxs),
             verticalAlignment = Alignment.CenterVertically
@@ -473,7 +487,7 @@ private fun SidebarProfileItem(
                 textDirection = profileName.contentTextDirection()
             )
         )
-    }
+        }
     }
 }
 

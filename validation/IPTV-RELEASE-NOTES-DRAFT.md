@@ -1,7 +1,7 @@
 # Nuvio IPTV — draft release notes
 
-Unreleased. Branch `iptv/player-binding` (includes `main` as of 6 October 2026,
-1.1.0-beta-nt4.2 / build 1461). IPTV is enabled only in the `iptvPrototype`
+Unreleased. Branch `iptv/player-binding` (includes the fork release 1.1.0-nt.5 / build 1485,
+merged on 12 October 2026). IPTV is enabled only in the `iptvPrototype`
 flavour (package `com.nuvio.iptv.prototype`, shown as "Nuvio IPTV Prototype", installs
 alongside the normal app); the `full` flavour hides it. Nothing published.
 Decided: IPTV will ship as part of the full app after a clean device pass, merged into
@@ -979,6 +979,11 @@ Phone setup (security review)
   rejection; the address shown skips VPN interfaces; finished drafts drop passwords.
 
 ## Known limitations
+
+- Based on the fork release 1.1.0-nt.5 since 12 October (merged, not rebased). Live TV
+  sits next to the new Calendar in the sidebar and its Home rows follow Coming up; the
+  rest of that release (V2 settings, player changes, calendar, media servers, watch
+  party, new launcher icons) has not been tried together with Live TV on a device.
 
 - Device testing so far: the user's passes on 8 October (builds `f29cbe2`, `24d6868`), 9 October
   (`374e1f6`, `8354d89`), 10 October (`01f19bbed`, `e7e1d17b5`) and a ~3 hour recording to an

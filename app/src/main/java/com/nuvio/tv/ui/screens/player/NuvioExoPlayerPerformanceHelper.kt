@@ -46,6 +46,15 @@ object NuvioExoPlayerPerformanceHelper {
         java.util.concurrent.TimeUnit.MINUTES
     ).also(com.nuvio.tv.core.network.ServerTrust::closeConnectionsOnWithdrawal)
 
+    private val extraLanePools: List<okhttp3.ConnectionPool> = List(HttpLanes.MAX_LANES - 1) {
+        okhttp3.ConnectionPool(NUVIO_LANE_POOL_MAX_IDLE, 3, java.util.concurrent.TimeUnit.MINUTES)
+            .also(com.nuvio.tv.core.network.ServerTrust::closeConnectionsOnWithdrawal)
+    }
+
+    /** Pool for HTTP/2 lane [index]; lane 0 is [sharedConnectionPool]. */
+    fun lanePool(index: Int): okhttp3.ConnectionPool =
+        if (index == 0) sharedConnectionPool else extraLanePools[index - 1]
+
     // ─── Constants ────────────────────────────────────────────────────────────
     const val DEFAULT_NUVIO_ALLOCATOR_SEGMENT_SIZE = 64 * 1024        // 64 KB
 
@@ -62,6 +71,7 @@ object NuvioExoPlayerPerformanceHelper {
     // Parallel chunk fetching keeps more sockets alive than the old cap of 8, which was evicting
     // live chunk connections mid playback and forcing cold reopens.
     const val NUVIO_SHARED_POOL_MAX_IDLE = 32
+    const val NUVIO_LANE_POOL_MAX_IDLE = 8
     private const val BACK_BUFFER_TARGET_SHARE_NUM = 1L
     private const val BACK_BUFFER_TARGET_SHARE_DEN = 2L
 
@@ -84,6 +94,15 @@ object NuvioExoPlayerPerformanceHelper {
     @Volatile
     var targetBufferSizeMb: Int = 250
 
+    /** Back buffer of the last load control built, the one the player runs with; -1 before the first build. */
+    @Volatile
+    var builtBackBufferMs: Int = -1
+        private set
+
+    /** True when the target is the app's own size, not one the user set. */
+    @Volatile
+    var targetIsAutomatic: Boolean = true
+
     // The allocator recycles internally, so only its own counters show what is actually held.
     @Volatile
     var liveAllocator: DefaultAllocator? = null
@@ -94,16 +113,12 @@ object NuvioExoPlayerPerformanceHelper {
     @Volatile
     var connectionPoolSize: Int = DEFAULT_NUVIO_CONNECTION_POOL_SIZE
 
-    @Volatile
-    var enableHttp2: Boolean = false
-
     /**
      * Updates the performance helper with customized settings from PlayerSettings.
      */
     fun updateSettings(settings: PlayerSettings, context: Context) {
         val customBuffers = settings.bufferEngineEnabled
         val bufferSettings = settings.bufferSettings
-        enableHttp2 = settings.enableHttp2
         
         minBufferMs = if (customBuffers) bufferSettings.minBufferMs else DEFAULT_NUVIO_MIN_BUFFER_MS
         maxBufferMs = if (customBuffers) bufferSettings.maxBufferMs else DEFAULT_NUVIO_MAX_BUFFER_MS
@@ -112,7 +127,9 @@ object NuvioExoPlayerPerformanceHelper {
         backBufferMs = if (customBuffers) bufferSettings.backBufferDurationMs else DEFAULT_NUVIO_BACK_BUFFER_MS
 
         val safeLimitMb = getSafeNativeMemoryLimitMb(context)
-        targetBufferSizeMb = if (customBuffers && !settings.bufferBudgetManaged) {
+        val autoMb = getAutoBufferMb(context)
+        targetIsAutomatic = !(customBuffers && !settings.bufferBudgetManaged)
+        targetBufferSizeMb = if (!targetIsAutomatic) {
             val storedSize = bufferSettings.targetBufferSizeMb
             if (!settings.allowLargeTargetBuffer && storedSize > safeLimitMb) {
                 safeLimitMb
@@ -120,7 +137,7 @@ object NuvioExoPlayerPerformanceHelper {
                 storedSize
             }
         } else {
-            safeLimitMb
+            autoMb
         }
 
         val effectiveBufferMb = when {
@@ -128,11 +145,11 @@ object NuvioExoPlayerPerformanceHelper {
                 if (customBuffers && !settings.bufferBudgetManaged) {
                     MemoryBudget.effectiveBufferMb(bufferSettings.targetBufferSizeMb)
                 } else {
-                    safeLimitMb
+                    autoMb
                 }
             }
             customBuffers -> {
-                if (settings.bufferBudgetManaged) MemoryBudget.budgetMb
+                if (settings.bufferBudgetManaged) MemoryBudget.autoBudgetMb
                 else MemoryBudget.effectiveBufferMb(bufferSettings.targetBufferSizeMb)
             }
             else -> MemoryBudget.defaultBufferSizeMb
@@ -160,7 +177,7 @@ object NuvioExoPlayerPerformanceHelper {
     /**
      * Helper to read system memory directly from /proc/meminfo as a reliable fallback.
      */
-    private fun getRamFromMemInfo(): Long {
+    internal fun getRamFromMemInfo(): Long {
         return try {
             val file = java.io.File("/proc/meminfo")
             if (file.exists()) {
@@ -246,8 +263,10 @@ object NuvioExoPlayerPerformanceHelper {
     /**
      * Calculates the safe ExoPlayer native target buffer size limit in MB based on RAM tier thresholds.
      */
-    fun getSafeNativeMemoryLimitMb(context: Context): Int {
-        val totalMem = getDevicePhysicalRamBytes(context)
+    fun getSafeNativeMemoryLimitMb(context: Context): Int =
+        safeNativeMemoryLimitMbForRam(getDevicePhysicalRamBytes(context))
+
+    fun safeNativeMemoryLimitMbForRam(totalMem: Long): Int {
         val gb = 1024L * 1024L * 1024L
         return when {
             totalMem <= 0L -> 250 // Safe default
@@ -259,6 +278,23 @@ object NuvioExoPlayerPerformanceHelper {
             totalMem < 6.8 * gb -> 1600
             else -> 2000
         }
+    }
+
+    /** The automatic buffer for this box: what the app uses unless the user sets a size. */
+    fun getAutoBufferMb(context: Context): Int =
+        com.nuvio.tv.core.player.BufferSizing.autoBufferMbForRam(getDevicePhysicalRamBytes(context))
+
+    /** Lowers an automatic target to what the box has free; returns the sizing line for the log. */
+    fun sizeTargetFromFreeMemory(
+        free: com.nuvio.tv.core.player.BufferSizing.FreeMemory?,
+        chunkWindowMb: Int,
+        heldMb: Int
+    ): String {
+        val boxMb = targetBufferSizeMb
+        if (!targetIsAutomatic) return "boxMb=$boxMb sizedMb=$boxMb user=true"
+        val sized = com.nuvio.tv.core.player.BufferSizing.sizedBudgetMb(boxMb, free, chunkWindowMb, heldMb)
+        targetBufferSizeMb = sized
+        return com.nuvio.tv.core.player.BufferSizing.describe(boxMb, sized, free, chunkWindowMb, heldMb)
     }
 
     /**
@@ -308,9 +344,12 @@ object NuvioExoPlayerPerformanceHelper {
             }
             val allocator = DefaultAllocator(true, DEFAULT_NUVIO_ALLOCATOR_SEGMENT_SIZE, 0, enabled)
             liveAllocator = allocator
+            val fittedBackBufferMs = com.nuvio.tv.core.player.BufferSizing
+                .backBufferMsForTarget(effectiveBackBufferMs(), targetBufferBytes.toLong())
+            builtBackBufferMs = fittedBackBufferMs
             android.util.Log.i(
                 "ExoPerformance",
-                "buildLoadControl: targetBufferSizeMb=$targetBufferSizeMb, chunkOverheadMb=$chunkOverheadMb, effectiveTargetBufferMb=$effectiveTargetBufferMb, targetBytes=$targetBufferBytes, backBufferMs=${effectiveBackBufferMs()} (set=$backBufferMs)"
+                "buildLoadControl: targetBufferSizeMb=$targetBufferSizeMb, chunkOverheadMb=$chunkOverheadMb, effectiveTargetBufferMb=$effectiveTargetBufferMb, targetBytes=$targetBufferBytes, backBufferMs=$fittedBackBufferMs (set=$backBufferMs)"
             )
             // Same parameters the Builder took; the subclass adds the seek-thumbnail read-ahead reserve (4K-E).
             com.nuvio.tv.core.player.ReservableLoadControl(
@@ -325,7 +364,7 @@ object NuvioExoPlayerPerformanceHelper {
                 prioritizeTimeOverSizeThresholds = false,
                 // Forward buffer protects playback and the back buffer only protects a seek back,
                 // so the back buffer is the side that gives way when both cannot fit the target.
-                backBufferDurationMs = effectiveBackBufferMs(),
+                backBufferDurationMs = fittedBackBufferMs,
                 retainBackBufferFromKeyframe = true,
             )
         } else {
@@ -374,7 +413,8 @@ object NuvioExoPlayerPerformanceHelper {
         if (!enabled) return false
         val bufferedPos = player.bufferedPosition
         val currentPos = player.currentPosition
-        val backBufferStart = (currentPos - effectiveBackBufferMs().toLong() - SEEK_BACKWARD_TOLERANCE_MS)
+        val backMs = builtBackBufferMs.takeIf { it >= 0 } ?: effectiveBackBufferMs()
+        val backBufferStart = (currentPos - backMs.toLong() - SEEK_BACKWARD_TOLERANCE_MS)
             .coerceAtLeast(0L)
         return positionMs in backBufferStart..bufferedPos
     }
@@ -402,21 +442,9 @@ object NuvioExoPlayerPerformanceHelper {
 
     // ─── Networking ───────────────────────────────────────────────────────────
 
-    /**
-     * Applies the shared playback pool and the requested HTTP/2 policy.
-     * Warm-up passes a settings snapshot because it runs before player initialization.
-     */
-    fun applyNetworkOptimizations(
-        builder: okhttp3.OkHttpClient.Builder,
-        http2Enabled: Boolean = enableHttp2
-    ): okhttp3.OkHttpClient.Builder {
-        val withPool = builder.connectionPool(sharedConnectionPool)
-        return if (http2Enabled) {
-            withPool.protocols(listOf(okhttp3.Protocol.HTTP_2, okhttp3.Protocol.HTTP_1_1))
-        } else {
-            withPool.protocols(listOf(okhttp3.Protocol.HTTP_1_1))
-        }
-    }
+    /** Shared playback pool, HTTP/1.1 only: HTTP/2 brought no speed for video and many times the garbage. */
+    fun applyNetworkOptimizations(builder: okhttp3.OkHttpClient.Builder): okhttp3.OkHttpClient.Builder =
+        builder.connectionPool(sharedConnectionPool).protocols(listOf(okhttp3.Protocol.HTTP_1_1))
 
     // ─── Audio Renderer ───────────────────────────────────────────────────────
 

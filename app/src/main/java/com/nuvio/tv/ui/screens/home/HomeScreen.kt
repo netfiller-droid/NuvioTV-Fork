@@ -48,8 +48,10 @@ import com.nuvio.tv.domain.model.LibraryListTab
 import com.nuvio.tv.domain.model.localizedMembershipTitle
 import com.nuvio.tv.domain.model.LibrarySourceMode
 import com.nuvio.tv.domain.model.MetaPreview
+import com.nuvio.tv.domain.model.WatchedTitlesMode
 import com.nuvio.tv.ui.components.ErrorState
 import com.nuvio.tv.ui.components.LoadingIndicator
+import com.nuvio.tv.ui.components.LocalDimWatchedPosters
 import com.nuvio.tv.ui.components.LocalLandscapePosterMode
 import com.nuvio.tv.ui.components.LocalStartupLoadingState
 import com.nuvio.tv.ui.components.LocalStartupSplashEnabled
@@ -61,6 +63,7 @@ import com.nuvio.tv.ui.components.PosterCardDefaults
 import com.nuvio.tv.ui.components.PosterCardStyle
 import androidx.compose.ui.res.stringResource
 import com.nuvio.tv.R
+import com.nuvio.tv.ui.support.SupporterThanksNote
 import com.nuvio.tv.core.tracking.LOCAL_LIBRARY_LIST_KEY
 import com.nuvio.tv.core.tracking.supportsMembershipFor
 import com.nuvio.tv.data.local.StartupAuthNotice
@@ -125,6 +128,10 @@ fun HomeScreen(
             lifecycleOwner.lifecycle.removeObserver(observer)
             viewModel.setTrailerPreviewActive(false)
         }
+    }
+    DisposableEffect(viewModel) {
+        viewModel.onHomeShown()
+        onDispose { viewModel.onHomeLeft() }
     }
     val modernPresentation by viewModel.modernHomePresentation.collectAsStateWithLifecycle()
     val initialCwResolved by viewModel.initialCwResolved.collectAsStateWithLifecycle()
@@ -267,7 +274,9 @@ fun HomeScreen(
             }
         }
     }
+    LaunchedEffect(profileEntry?.pending) { viewModel.setTrailerIntroHold(profileEntry?.pending == true) }
     ReportDrawnWhen { !showStartupLoader && profileEntry?.pending != true }
+    com.nuvio.tv.ui.screens.calendar.CalendarHomeSignal(contentShown = !showStartupLoader)
 
     val startupLoadingState = LocalStartupLoadingState.current
     val showHomeLoader = shouldShowHomeStartupLoader(
@@ -392,7 +401,9 @@ fun HomeScreen(
                     ) {
                         CompositionLocalProvider(
                             LocalLandscapePosterMode provides
-                                (LocalLandscapePosterMode.current || uiState.modernLandscapePostersEnabled)
+                                (LocalLandscapePosterMode.current || uiState.modernLandscapePostersEnabled),
+                            LocalDimWatchedPosters provides
+                                (uiState.watchedTitlesMode != WatchedTitlesMode.SHOW)
                         ) {
                         IptvHomeRowsProvider(
                             onOpenLive = onOpenLiveTv,
@@ -482,6 +493,8 @@ fun HomeScreen(
                 )
             }
         }
+
+        SupporterThanksNote(enabled = !showHomeLoader, modifier = Modifier.align(Alignment.TopEnd))
     }
 
     val selectedPoster = posterOptionsTarget
@@ -663,8 +676,14 @@ private fun GridHomeRoute(
             }
         },
         onSaveGridFocusState = remember(viewModel) {
-            { vi, vo, key ->
-                viewModel.saveGridFocusState(vi, vo, focusedItemKey = key)
+            { vi, vo, key, slot ->
+                viewModel.saveGridFocusState(
+                    vi,
+                    vo,
+                    focusedItemIndex = slot?.index ?: 0,
+                    focusedItemKey = key,
+                    focusedRowKey = slot?.sectionKey
+                )
             }
         },
         // Focus-dwell stream prefetch for CW cards.
@@ -690,10 +709,10 @@ private fun ModernHomeRoute(
     val focusState by viewModel.focusState.collectAsStateWithLifecycle()
     val scrollToTopTrigger by viewModel.scrollToTopTrigger.collectAsStateWithLifecycle()
     val modernPresentation by viewModel.modernHomePresentation.collectAsStateWithLifecycle()
-    val enrichingItemId by viewModel.enrichingItemId.collectAsStateWithLifecycle()
-    val lastEnrichedPreview by viewModel.lastEnrichedPreview.collectAsStateWithLifecycle()
-    val enrichedPreviews by viewModel.enrichedPreviews.collectAsStateWithLifecycle()
-    val failedEnrichmentIds by viewModel.failedEnrichmentIds.collectAsStateWithLifecycle()
+    // Only the hero and the cards' ratings use these, so they are read there and not here.
+    val enrichingItemId = viewModel.enrichingItemId.collectAsStateWithLifecycle()
+    val enrichedPreviews = viewModel.enrichedPreviews.collectAsStateWithLifecycle()
+    val failedEnrichmentIds = viewModel.failedEnrichmentIds.collectAsStateWithLifecycle()
     val requestTrailerPreview = remember(viewModel) {
         { itemId: String, title: String, releaseInfo: String?, apiType: String ->
             viewModel.requestTrailerPreview(itemId, title, releaseInfo, apiType)
@@ -726,10 +745,9 @@ private fun ModernHomeRoute(
         modernPresentation = modernPresentation,
         focusState = focusState,
         scrollToTopTrigger = scrollToTopTrigger,
-        enrichingItemId = enrichingItemId,
-        lastEnrichedPreview = lastEnrichedPreview,
-        enrichedPreviews = enrichedPreviews,
-        failedEnrichmentIds = failedEnrichmentIds,
+        enrichingItemId = { enrichingItemId.value },
+        enrichedPreviews = { enrichedPreviews.value },
+        failedEnrichmentIds = { failedEnrichmentIds.value },
         trailerPreviewUrls = viewModel.trailerPreviewUrls,
         trailerPreviewAudioUrls = viewModel.trailerPreviewAudioUrls,
         onNavigateToDetail = onNavigateToDetail,
@@ -748,6 +766,9 @@ private fun ModernHomeRoute(
         },
         onPreloadAdjacentItem = preloadAdjacentItem,
         onSaveFocusState = saveModernFocusState,
+        onSaveRowScrollOffsets = remember(viewModel) {
+            { offsets: Map<String, Int> -> viewModel.saveCatalogRowScrollOffsets(offsets) }
+        },
         onFocusedRowKeyChanged = remember(viewModel) {
             { key: String? -> viewModel.setLiveFocusedRowKey(key) }
         },

@@ -45,6 +45,8 @@ internal fun PlayerRuntimeController.autoSyncExtractorsFactory(
     url: String,
     headers: Map<String, String>,
 ): ExtractorsFactory {
+    AutoSyncPreferences.ensureLoaded(context)
+    if (!AutoSyncPreferences.isEnabled(context)) return delegate
     val factory = AutoSyncExtractorsFactory(delegate = delegate, sourceKey = url)
     prefetchAutoSyncIndex(url, headers)
     return factory
@@ -134,6 +136,7 @@ internal fun PlayerRuntimeController.maybeRunAutomaticSubtitleSync(
                 AutomaticSubtitleSync.downloadSubtitleBody(
                     url = selectedUrl,
                     headers = selectedSubtitle.headers.orEmpty(),
+                    languageHint = selectedSubtitle.lang,
                 )
             } catch (cancel: CancellationException) {
                 throw cancel
@@ -293,13 +296,14 @@ internal fun PlayerRuntimeController.maybeRunAutomaticSubtitleSync(
 
 /** Why AutoSync kept the original timing, in the fewest words that still help the viewer. */
 private fun Context.buildAutoSyncFailureToast(analysisOutcome: AutoSyncAnalysisOutcome?): String =
-    getString(
-        when (analysisOutcome) {
-            AutoSyncAnalysisOutcome.NO_SUBTITLE_TRACKS,
-            AutoSyncAnalysisOutcome.NO_USABLE_REFERENCE,
-            -> R.string.autosync_toast_failed_no_reference
-            AutoSyncAnalysisOutcome.SUBTITLE_UNAVAILABLE,
-            null,
-            -> R.string.autosync_toast_failed
-        },
-    )
+    getString(autoSyncFailureMessage(analysisOutcome))
+
+/** "No embedded subtitles" only when the video's track list was read and has none. */
+internal fun autoSyncFailureMessage(analysisOutcome: AutoSyncAnalysisOutcome?): Int =
+    when (analysisOutcome) {
+        AutoSyncAnalysisOutcome.NO_SUBTITLE_TRACKS -> R.string.autosync_toast_failed_no_reference
+        AutoSyncAnalysisOutcome.NO_USABLE_REFERENCE,
+        AutoSyncAnalysisOutcome.SUBTITLE_UNAVAILABLE,
+        null,
+        -> R.string.autosync_toast_failed
+    }

@@ -12,6 +12,16 @@
         <activity android:name=".launcher.AppIconRoseGold" android:label="@string/iptv_prototype_name" tools:replace="android:label" />
         <activity android:name=".launcher.AppIconCopper" android:label="@string/iptv_prototype_name" tools:replace="android:label" />
         <activity android:name=".launcher.AppIconGraphite" android:label="@string/iptv_prototype_name" tools:replace="android:label" />
+        <activity android:name=".launcher.AppIconGold" android:label="@string/iptv_prototype_name" tools:replace="android:label" />
+        <activity android:name=".launcher.AppIconJade" android:label="@string/iptv_prototype_name" tools:replace="android:label" />
+        <activity android:name=".launcher.AppIconGlass" android:label="@string/iptv_prototype_name" tools:replace="android:label" />
+        <activity android:name=".launcher.AppIconCrimson" android:label="@string/iptv_prototype_name" tools:replace="android:label" />
+        <activity android:name=".launcher.AppIconOcean" android:label="@string/iptv_prototype_name" tools:replace="android:label" />
+        <activity android:name=".launcher.AppIconViolet" android:label="@string/iptv_prototype_name" tools:replace="android:label" />
+        <activity android:name=".launcher.AppIconEmeraldGreen" android:label="@string/iptv_prototype_name" tools:replace="android:label" />
+        <activity android:name=".launcher.AppIconAmber" android:label="@string/iptv_prototype_name" tools:replace="android:label" />
+        <activity android:name=".launcher.AppIconRose" android:label="@string/iptv_prototype_name" tools:replace="android:label" />
+        <activity android:name=".launcher.AppIconWhite" android:label="@string/iptv_prototype_name" tools:replace="android:label" />
         <service
             android:name="com.nuvio.tv.core.recording.IptvRecordingService"
             android:exported="false"

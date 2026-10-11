@@ -64,7 +64,11 @@ fun GridContinueWatchingSection(
     blurUnwatchedEpisodes: Boolean = false,
     useEpisodeThumbnails: Boolean = true,
     cardStyle: ContinueWatchingCardStyle = ContinueWatchingCardStyle.CARD,
-    cornerRadius: Dp = NuvioTheme.radii.md
+    cornerRadius: Dp = NuvioTheme.radii.md,
+    posterCardWidth: Dp? = null,
+    posterCardHeight: Dp? = null,
+    /** Replaces the options dialog on a long press when set. */
+    onLongPress: ((ContinueWatchingItem) -> Unit)? = null
 ) {
     if (items.isEmpty()) return
 
@@ -147,7 +151,9 @@ fun GridContinueWatchingSection(
                 val requester = focusRequesters.getOrPut(index) { FocusRequester() }
                 val focusModifier = Modifier.focusRequester(requester)
                 val stableOnClick = remember(progress) { { onItemClick(progress) } }
-                val stableOnLongPress = remember(progress) { { optionsItem = progress } }
+                val stableOnLongPress = remember(progress, onLongPress) {
+                    { if (onLongPress != null) onLongPress(progress) else { optionsItem = progress } }
+                }
                 var isCardFocused by remember { mutableStateOf(false) }
 
                 ContinueWatchingCard(
@@ -170,12 +176,12 @@ fun GridContinueWatchingSection(
                             }
                         },
                     cardWidth = when (cardStyle) {
-                        ContinueWatchingCardStyle.POSTER -> 120.dp
+                        ContinueWatchingCardStyle.POSTER -> posterCardWidth ?: posterCardHeight?.let { it * (2f / 3f) } ?: 120.dp
                         ContinueWatchingCardStyle.WIDE -> 320.dp
                         ContinueWatchingCardStyle.CARD -> 220.dp
                     },
                     imageHeight = when (cardStyle) {
-                        ContinueWatchingCardStyle.POSTER -> 180.dp
+                        ContinueWatchingCardStyle.POSTER -> posterCardHeight ?: posterCardWidth?.let { it * 1.5f } ?: 180.dp
                         ContinueWatchingCardStyle.WIDE -> 128.dp
                         ContinueWatchingCardStyle.CARD -> 124.dp
                     }

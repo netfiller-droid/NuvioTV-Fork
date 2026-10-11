@@ -80,6 +80,7 @@ fun GridContentCard(
     upFocusRequester: FocusRequester? = null,
     downFocusRequester: FocusRequester? = null,
     depthSurface: CardDepthSurface = CardDepthSurface.POSTERS,
+    showReleaseInfo: Boolean = false,
     onLongPress: (() -> Unit)? = null,
     onFocused: () -> Unit = {}
 ) {
@@ -94,21 +95,30 @@ fun GridContentCard(
     // This ensures grids and rows display landscape/square shapes correctly.
     val cardHeight = when (effectivePosterShape) {
         PosterShape.POSTER -> posterCardStyle.height
-        PosterShape.LANDSCAPE -> posterCardStyle.width / PosterShape.LANDSCAPE.aspectRatio()
+        PosterShape.LANDSCAPE -> {
+            val landscapeWidth = if (globalLandscape) posterCardStyle.height else posterCardStyle.width
+            landscapeWidth / PosterShape.LANDSCAPE.aspectRatio()
+        }
         PosterShape.SQUARE -> posterCardStyle.width
     }
 
-    val requestCardWidth = if (globalLandscape) posterCardStyle.height else posterCardStyle.width
+    // Items that are already landscape (e.g. More Like This, Collections, Trailers)
+    // keep their explicit posterCardStyle width even in global landscape mode.
+    // fillMaxWidth only makes sense inside a grid where cells constrain width.
+    val isNativelyLandscape = item.posterShape == PosterShape.LANDSCAPE
+
+    val landscapeCardWidth = if (globalLandscape && !isNativelyLandscape) posterCardStyle.height else posterCardStyle.width
+
+    val requestCardWidth = landscapeCardWidth
     val requestWidthPx = remember(density, requestCardWidth) { with(density) { requestCardWidth.roundToPx() }.coerceAtLeast(1) }
     val requestHeightPx = remember(density, cardHeight) { with(density) { cardHeight.roundToPx() }.coerceAtLeast(1) }
     var isFocused by remember { mutableStateOf(false) }
     var longPressTriggered by remember { mutableStateOf(false) }
     val longPressKeyTracker = rememberLongPressKeyTracker()
 
-
     Column(
         modifier = modifier
-            .then(if (globalLandscape) Modifier.fillMaxWidth() else Modifier.width(posterCardStyle.width))
+            .width(landscapeCardWidth)
             .recompositionHighlighter()
     ) {
         Card(
@@ -242,12 +252,13 @@ fun GridContentCard(
                 if (effectiveImageUrl.isNullOrBlank()) {
                     MonochromePosterPlaceholder()
                 } else {
+                    val watchedDim = watchedPosterDim(isWatched, isFocused)
                     AsyncImage(
                         model = imageModel,
                         contentDescription = item.name,
-                        modifier = Modifier.fillMaxSize().portraitArtworkBackdrop(fitPortraitArtwork),
+                        modifier = Modifier.fillMaxSize().portraitArtworkBackdrop(fitPortraitArtwork).watchedPosterFade(watchedDim),
                         contentScale = ContentScale.Crop,
-                        colorFilter = portraitArtworkBackdropFilter(fitPortraitArtwork),
+                        colorFilter = portraitArtworkBackdropFilter(fitPortraitArtwork) ?: watchedPosterFilter(watchedDim.value),
                         placeholder = bgPainter,
                         error = bgPainter,
                         fallback = bgPainter,
@@ -263,7 +274,12 @@ fun GridContentCard(
                             portraitArtwork.onFailed()
                         }
                     )
-                    if (fitPortraitArtwork) FittedPortraitArtwork(imageModel, contentDescription = null)
+                    if (fitPortraitArtwork) FittedPortraitArtwork(
+                        imageModel,
+                        contentDescription = null,
+                        modifier = Modifier.watchedPosterFade(watchedDim),
+                        colorFilter = watchedPosterFilter(watchedDim.value)
+                    )
                 }
 
                 // Landscape clearlogo overlay on backdrop cards
@@ -367,6 +383,14 @@ fun GridContentCard(
                     )
                 }
 
+                if (isWatched && LocalDimWatchedPosters.current) {
+                    WatchedPosterVeil(
+                        focused = isFocused,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .zIndex(1.9f)
+                    )
+                }
                 if (isWatched) {
                     WatchedMarker(
                         modifier = Modifier
@@ -388,6 +412,17 @@ fun GridContentCard(
                     .then(if (globalLandscape) Modifier.fillMaxWidth() else Modifier.width(posterCardStyle.width))
                     .padding(top = NuvioTheme.spacing.sm, start = NuvioTheme.spacing.xxs, end = NuvioTheme.spacing.xxs)
             )
+            item.releaseInfo?.takeIf { showReleaseInfo }?.let { info ->
+                FocusMarqueeText(
+                    text = info,
+                    focused = isFocused,
+                    style = MaterialTheme.typography.labelMedium,
+                    color = NuvioTheme.extendedColors.textSecondary,
+                    modifier = Modifier
+                        .then(if (globalLandscape) Modifier.fillMaxWidth() else Modifier.width(posterCardStyle.width))
+                        .padding(top = 2.dp, start = NuvioTheme.spacing.xxs, end = NuvioTheme.spacing.xxs)
+                )
+            }
         }
     }
 }

@@ -62,6 +62,8 @@ fun NuvioDialog(
     contentPadding: Dp = NuvioTheme.spacing.xl,
     contentSpacing: Dp = NuvioTheme.spacing.lg,
     backgroundContent: @Composable BoxScope.() -> Unit = {},
+    /** V2 only: a near solid surface when the box draws no blur, for dialogs that appear over busy pages. */
+    solidWithoutBlur: Boolean = false,
     content: @Composable ColumnScope.() -> Unit
 ) {
     var isReady by remember { mutableStateOf(!suppressFirstKeyUp) }
@@ -73,8 +75,9 @@ fun NuvioDialog(
     } else resources.displayMetrics.heightPixels
     val maxDialogHeight = (with(dialogDensity) { dialogWindowHeightPx.toDp() } - NuvioTheme.spacing.xxxl).coerceAtLeast(320.dp)
     val containerShape = RoundedCornerShape(containerCornerRadius)
+    val solid = solidWithoutBlur && !com.nuvio.tv.ui.v2.quality.LocalGlassTokens.current.liveBlur
     val backgroundModifier = if (v2) {
-        Modifier.nuvioGlass(GlassRole.MODAL, shape = containerShape)
+        Modifier.nuvioGlass(GlassRole.MODAL, shape = containerShape, neutralBackdrop = solid)
     } else if (containerBrush == null) {
         Modifier.background(Color.Black.copy(alpha = maxOf(0.85f, LocalGlassBodyFloor.current)), containerShape)
     } else {

@@ -1,6 +1,7 @@
 package com.nuvio.tv.ui.screens.player
 
 import com.nuvio.tv.core.iptv.VodRef
+import com.nuvio.tv.core.player.thumbnail.CopyChoice
 import com.nuvio.tv.domain.model.Stream
 import com.nuvio.tv.domain.model.StreamDebridCacheState
 
@@ -10,7 +11,7 @@ import com.nuvio.tv.domain.model.StreamDebridCacheState
  * Entries with a playable http(s) link or an IPTV movie/episode reference qualify, media server entries
  * (their link is made when they are opened), and debrid entries the service reports as cached: those are added only if cached, so
  * no download starts. Plain torrents and magnets are skipped (they would play peer to peer), as are
- * uncached entries and external links (they open a browser).
+ * uncached entries, external links (they open a browser) and Usenet entries (they fetch the release).
  */
 internal object SourceFailoverSelection {
 
@@ -25,6 +26,7 @@ internal object SourceFailoverSelection {
 
     fun isAutoFailoverPlayable(stream: Stream, season: Int?, episode: Int?): Boolean {
         if (stream.isExternal()) return false
+        if (isUsenet(stream)) return false
         if (stream.serverTarget != null) return true
         when (stream.debridCacheStatus?.state) {
             null, StreamDebridCacheState.CACHED -> Unit
@@ -46,6 +48,15 @@ internal object SourceFailoverSelection {
         }
         return true
     }
+
+    /** A Usenet entry, by its add-on's marking, its link or its name (an NZB indexer or "Usenet"). */
+    fun isUsenet(stream: Stream): Boolean {
+        stream.clientResolve?.let { if (CopyChoice.usenetMarked(it.type, it.service)) return true }
+        if (SlowStartServer.isUsenet(stream.getStreamUrl())) return true
+        return USENET_NAME.containsMatchIn(stream.name?.lineSequence()?.firstOrNull().orEmpty())
+    }
+
+    private val USENET_NAME = Regex("(?<![a-z])(usenet|nzb)", RegexOption.IGNORE_CASE)
 
     /**
      * The first playable entry after [currentIndex] (or from the top when the playing entry is not
@@ -71,4 +82,11 @@ internal object SourceFailoverSelection {
         }
         return null
     }
+
+    /**
+     * Where the next source opens after an automatic switch: the failed source's position, so it does
+     * not load from the start first and then seek. Null for a pick by the user or nothing to carry.
+     */
+    fun startPositionMs(automatic: Boolean, carriedPositionMs: Long?): Long? =
+        carriedPositionMs?.takeIf { automatic && it > 0L }
 }
