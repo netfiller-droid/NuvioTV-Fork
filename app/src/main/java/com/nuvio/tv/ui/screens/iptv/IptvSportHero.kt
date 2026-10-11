@@ -1,7 +1,6 @@
 @file:OptIn(androidx.tv.material3.ExperimentalTvMaterial3Api::class)
 package com.nuvio.tv.ui.screens.iptv
 
-import android.icu.text.RuleBasedNumberFormat
 import android.view.KeyEvent as AndroidKeyEvent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -434,8 +433,13 @@ private fun MeetingRow(first: FixtureTeam, second: FixtureTeam, meeting: SportsM
     SportFitText(variants, MaterialTheme.typography.labelMedium.copy(fontFeatureSettings = "tnum"), strong, Modifier.fillMaxWidth().height(FACT_LINE))
 }
 
-private fun ordinal(value: Int): String = runCatching { RuleBasedNumberFormat(Locale.getDefault(), RuleBasedNumberFormat.ORDINAL).format(value.toLong()) }
-    .getOrDefault(value.toString())
+private fun ordinal(value: Int): String = if (Locale.getDefault().language != "en") value.toString() else value.toString() + when {
+    value % 100 in 11..13 -> "th"
+    value % 10 == 1 -> "st"
+    value % 10 == 2 -> "nd"
+    value % 10 == 3 -> "rd"
+    else -> "th"
+}
 
 @Composable
 private fun LedgerTeam(team: FixtureTeam, sport: String, scheduled: Boolean, compact: Boolean, possession: Boolean, modifier: Modifier) {
