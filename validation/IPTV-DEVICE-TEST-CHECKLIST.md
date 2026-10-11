@@ -1,6 +1,6 @@
 # Nuvio IPTV — device test checklist (build `7741e4029`, run 38101462318)
 
-For this build start with section 7j, then 7i, 7h, 7g, 7f, 7e, 7d, 7c (fixes from the second 9 October pass), then 7b, 7 (Sport) and the rest.
+For this build start with section 7k, then 7j, 7i, 7h, 7g, 7f, 7e, 7d, 7c (fixes from the second 9 October pass), then 7b, 7 (Sport) and the rest.
 
 Mark each item pass / fail / not tested. For failures, note what happened and keep a
 logcat (`adb logcat -s NuvioIptv:V *:E`). Do not share logs that contain addresses.
@@ -83,6 +83,42 @@ logcat (`adb logcat -s NuvioIptv:V *:E`). Do not share logs that contain address
 11. Press Home on the remote with Game Centre open: logcat should show sports requests
    stop (`sports fetch` lines cease).
 12. Useful logs: `sports fetch service=`, `sports links`, `sports fixtures`.
+
+## 7k. Sport page, multiview and schedule look (build `7bf9f8b5a`; try on the 4K TV and a 1080p one if you can)
+Sport page:
+1. On a quiet day the row fills with "Earlier today" results, tomorrow's games and "Your
+   teams next", each with a small label; no single card left on its own; the D-pad moves
+   through them without getting stuck on the labels.
+2. No text ends in "…": hero broadcaster line (e.g. "USA Net +1"), the "+5 feeds" button,
+   "Watch on …", card footers ("in 7 h 26 min").
+3. Pre-game hero (football, NRL, rugby): stay on a game for a second; each team shows five
+   form marks (latest on the right), table position and points, and a "Last met" line
+   with date and score. Compare one team with the league table.
+4. Game cards all the same height; live dot and clock, kick-off time or FT always top
+   right; scores aligned on the right; about 4 cards across; crests sharp on the 4K TV.
+5. The hero's top line shows both teams' colours, visible with Pure black on and off.
+Multiview:
+6. A picture showing a live game has a slim strip: crests, short names, score (trailing
+   team dimmed), clock or kick-off. With hidden scores the score is a grey bar.
+7. Tile menu → Hide score on this picture / Show score on this picture works per picture.
+8. Tile menu → Channel and programme: Always / Selected picture only / Off. Channel name and
+   programme with a progress line along the bottom of every picture, non-sport too; on a
+   game both share one strip.
+9. Strips readable in 2×2 and in the small pictures of other layouts; long names cut
+   cleanly.
+All scores:
+10. Day strip above the list (Yesterday, Today, days ahead) with counts ("3 live",
+    "6 games", "4 results", "No games"); Today selected when it opens.
+11. Pick a past day: "Loading results…", then the results; hidden scores stay hidden (Hold
+    OK reveals); going back to that day is instant.
+12. The Live, My teams and sport filters work on other days.
+League picker:
+13. Live TV settings → Sport → Leagues opens a full screen: sports down the left with
+    chosen/total counts; leagues as tiles with badge, name, source and a tick.
+14. OK toggles a league; Left from the first column goes to the sport list; Back saves and
+    returns to the Leagues row; games of a newly picked league appear on the Sport page.
+15. "Add a league" still opens the TheSportsDB search; the "not linked to any league" note
+    is shown.
 
 ## 7j. Second and third 11 October sport captures (build `7741e4029`)
 1. Live baseball (Game Centre and multiview score tile): count, outs and bases show during
