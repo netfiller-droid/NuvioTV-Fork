@@ -1,4 +1,4 @@
-# Nuvio IPTV — device test checklist (build `1cafb6dab`, run 38100231762)
+# Nuvio IPTV — device test checklist (build `7741e4029`, run 38101462318)
 
 For this build start with section 7j, then 7i, 7h, 7g, 7f, 7e, 7d, 7c (fixes from the second 9 October pass), then 7b, 7 (Sport) and the rest.
 
@@ -84,7 +84,7 @@ logcat (`adb logcat -s NuvioIptv:V *:E`). Do not share logs that contain address
    stop (`sports fetch` lines cease).
 12. Useful logs: `sports fetch service=`, `sports links`, `sports fixtures`.
 
-## 7j. Second 11 October sport capture (build `1cafb6dab`)
+## 7j. Second and third 11 October sport captures (build `7741e4029`)
 1. Live baseball (Game Centre and multiview score tile): count, outs and bases show during
    an at-bat; between innings ("End"/"Mid") the score shows no "0 outs · 0–0" and the
    multiview tile hides the empty bases; last plays list at-bat results, not every pitch;
@@ -97,6 +97,13 @@ logcat (`adb logcat -s NuvioIptv:V *:E`). Do not share logs that contain address
 5. New competitions (e.g. J1 League, Brasileirão, Copa Libertadores, Copa del Rey, League
    One): turn one or two on; their games appear (ids checked against both providers'
    lists in the capture).
+6. Baseball: after a hit or walk the count shows 0–0 and the runner is not shown as the
+   batter.
+7. Basketball: at the end of a quarter the score shows "End of 3rd" (not "Q3 · 0.0").
+8. UFC: before a bout starts the score and the Sport hero show "Walkouts" or "Pre-fight",
+   not "Round 1".
+9. College football last plays: conversions read e.g. "Extra Point Good (… KICK)";
+   touchdowns read as a short line.
 
 ## 7i. Recording playback and guide catch-up (build `4d0c61b39`)
 Recordings (use last night's NAS recording and a new one):

@@ -996,6 +996,9 @@ Phone setup (security review)
 
 ## Validation
 
+- Third 11 October capture (11:03; baseball count after an at-bat, end of quarter, UFC
+  walkouts, college football last plays): CI debug green at `7741e4029` (run
+  38101462318); 895 core and 293 data-layer JVM tests on the host. Not device-tested.
 - Second 11 October sport capture (live baseball, NBA, NHL, college football) and 14 more
   football competitions: CI debug green at `1cafb6dab` (run 38100231762); 890 core and 293
   data-layer JVM tests on the host. Not device-tested.
