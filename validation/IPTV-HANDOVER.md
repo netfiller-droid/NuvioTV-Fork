@@ -374,6 +374,8 @@ both 1080p and 4K TVs (layouts sized from the available width; images loaded at 
 7. All scores: a day strip with counts (live, games, no games), including past days with results.
 8. League picker as its own screen: sports down the side, leagues as crest tiles with a tick, a
    short "not affiliated" note in our own words.
+9. Multiview, all tiles (not only sport): an option to show the channel name and the programme
+   now playing along the bottom of each tile; combined with the score strip on matched games.
 Not yet decided: the channel-matching ideas (event and team channel names, confidence labels,
 remembering the chosen feed, grouping HD/4K versions, "My countries", more cricket).
 
