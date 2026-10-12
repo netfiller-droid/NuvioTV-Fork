@@ -1,6 +1,6 @@
 # Nuvio IPTV — device test checklist (build `98d520804`, run 38186968485)
 
-For this build start with section 7p, then 7o, 7n, 7m, 7l, 7k, 7j, 7i, 7h, 7g and 7f (not yet tried on a device). 7e and earlier passed on earlier builds; repeat them only as a regression check. After the 1.1.0-nt.5 merge, also repeat sections 1 and 2.
+For this build start with section 7q, then 7p, 7o, 7n, 7m, 7l, 7k, 7j, 7i, 7h, 7g and 7f (not yet tried on a device). 7e and earlier passed on earlier builds; repeat them only as a regression check. After the 1.1.0-nt.5 merge, also repeat sections 1 and 2.
 
 Mark each item pass / fail / not tested. For failures, note what happened and keep a
 logcat (`adb logcat -s NuvioIptv:V *:E`). Do not share logs that contain addresses.
@@ -83,6 +83,13 @@ logcat (`adb logcat -s NuvioIptv:V *:E`). Do not share logs that contain address
 11. Press Home on the remote with Game Centre open: logcat should show sports requests
    stop (`sports fetch` lines cease).
 12. Useful logs: `sports fetch service=`, `sports links`, `sports fixtures`.
+
+## 7q. 11:26 12 October capture: baseball count and last plays (build pending)
+1. During a live MLB game, the Sport hero shows outs and the count (e.g. "2 outs · 3–2")
+   with no "Pitch N : Ball N." text below; that line shows the last at-bat result, the
+   at-bat starting, or nothing.
+2. In Game Centre or the multiview tile last plays for a live MLB game, a balk (or another
+   runner play) appears once.
 
 ## 7p. 9:40 12 October capture: NHL empty net (build `98d520804`)
 1. A live NHL game where the trailing team pulls its goalie late in the 3rd: the Sport hero

@@ -1045,3 +1045,76 @@ change or full count; tennis point score and the server in a tie-break; NASCAR s
 stops and fastest lap; a UFC bout in progress; live cricket; AFL/NRL live clock (off season); golf
 after a cut or a playoff; football own goals, penalties and extra time on ESPN; a refreshed
 TheSportsDB shoot-out row (`P` with a progress).
+
+## Sixteenth pass (12 October, 11:26)
+
+ESPN and TheSportsDB responses captured at 11:26 Brisbane time on Monday 12 October (01:26Z), 106
+minutes after the fifteenth pass; TheSportsDB `updated` reads 02:26 London time. In play: the NFL
+Sunday night game (Ravens at Falcons, 7–6 to Atlanta with 4:34 left in the 2nd), Game 1 of the NLCS
+(Dodgers at Brewers, 1–0 to Los Angeles in the top of the 4th), the last NHL game of the evening
+(Hurricanes at Flyers in the 3rd, 3–1 to Carolina with 6:59 left) and an NBA preseason game in the 1st
+quarter (Bulls at Nuggets, 13–12). Now final: 49ers 32–29 Seahawks, Kraken 5–3 Capitals (the empty
+net of the fifteenth pass brought no goal), Rangers 6–2 Canucks, Cavaliers 119–105 Magic and Hornets
+105–90 Bucks. The NFL Monday night game, A-League, URC and Champions League were still to start; every
+other league showed the same finals as before. New summaries: `nfl-summary-LIVE.json` (the Falcons
+game), `mlb-summary-LIVE.json` (the NLCS game), `nhl-summary-LIVE.json` (the Flyers game) and
+`nba-summary-LIVE.json` (the Nuggets game); the other summaries differ from the previous upload only
+in `news`, `odds` and ticket fields, and 19 of the 41 files are byte-for-byte the previous upload
+(tennis, golf, F1, UFC, cricket, AFL, NRL, NBL and Premier League scoreboards among them). The
+multi-sport header is again a cached copy, from about 22:01Z. The nested `espn-pass.zip` is the
+seventh-pass capture again. The TheSportsDB calls folder holds the 01:26Z livescore and four new
+`lookuptv` files; the coverage folder's generic `v2-livescore-*` files are from 01:26Z but its
+`v2-livescore-app-*` files are the fifteenth-pass set from 23:40Z, and the league lists, `eventsday`
+and search files in both folders are unchanged. Every scoreboard and summary parses without errors.
+Trimmed copies are in `app/src/test/resources/sports/*-real-20261012e.json` (`SportsRealDataPlayoffTest`).
+
+| Shape | What the real response showed | Parser change |
+|---|---|---|
+| MLB full count (live) | Scoreboard `Top 4th` (`periodPrefix` `Top` in the summary), `situation` with `balls` 3, `strikes` 2, `outs` 2, `onSecond` true, and `pitcher` and `batter` with names and a game line (`3.2 IP, ER, 5 H, 4 K, 2 BB`; `0-0, BB`). Line scores `0 0 0` for the home side and `0 1 0 0` for the side batting. | none for the count (`▲4`, `2 outs · 3–2`, runner on second) |
+| MLB scoreboard last play | The first pitch seen as the scoreboard's `lastPlay`: `summaryType` `P`, text `Pitch 5 : Ball 3`, type `Ball` with `alternativeText` `Walk`, its `team` the fielding side; no win probability. | The scoreboard's last play is left out when it is a pitch (`summaryType` `P`), as the summary already does; the Sport hero read `Pitch 5 : Ball 3.` under the count |
+| MLB summary (top 4th) | One pitch behind the scoreboard (`situation` 2–2, its `onSecond` an object with `playerId`, pitcher and batter as ids only, named in the box score). A balk is two plays with the same text (`T. Hernández to second on a balk.`): a `balk` play without `summaryType` and a `play-result` (`N`), both with `resultCount` 0–0 although the count stayed 1–1. Two challenged pitch calls appear as pitch types `Ball - Overturned` and `Strike Looking - Overturned` (`summaryType` `P`). Both starters were still pitching (no pitching change). Top of the 1st 16.8 minutes after the listed start; the first three innings took 16.2, 26.7 and 18.4 minutes. The one run has `wallclock`. | Last plays leave out a play whose text repeats the next one; the list showed the balk twice |
+| NFL defensive touchdown | Summary `scoringPlays`: `Fumble Return Touchdown` (type 39, `scoringType` `touchdown`), `team` the Falcons, who were on defence; in `drives` it closes a Ravens drive with `result` `FUMBLE RETURN TD`, and the drive play has no `team`, `start` the Ravens and `end` the Falcons. Kick-off 3.5 minutes after the listed start, the 1st quarter ended at +42 minutes. | none: the touchdown goes to the side in `scoringPlays`, with the drive play's `wallclock` |
+| NFL 2nd quarter (live) | `4:34 - 2nd`, `3rd & 6 at BAL 42`, `possession` the Falcons, `lastPlay` a rush with its drive `5 plays, 36 yards, 2:47` and no result, timeouts 3 and 3, `isRedZone` false, win probability 0.6463. | none (`Q2 · 4:34`, the drive shown, `65%`) |
+| NHL power play ending (live) | Flyers game summary at 13:01 of the 3rd: a cross-checking minor at 10:18 (`penaltyMinutes` 2, `Minor`), `Power Play` for Carolina on their plays and `Shorthanded` on the Flyers' until 12:10, then `Even Strength` from 12:24; scoreboard `situation` again holds only `lastPlay` (a face-off). Both goalies are in `onIce`. | none: power play from the penalty, gone once the strength is even again; no empty net |
+| NHL timing | 1st period began 9.5 minutes after the listed start and lasted 40.0 real minutes (four minors), intermissions both 18.7 minutes, the 2nd 36.5 minutes; 13:01 of the 3rd came 22.4 minutes into it. Every goal has `wallclock`. | none |
+| NBA live (1st quarter) | `7:04 - 1st`, `lastPlay` `Bulls Full timeout` with win probability. Summary header `timeoutsUsed` 0 and 1 and `timeoutsRemaining` 7 and 6 (this time matching the plays), `fouls` with `teamFouls` 2 and 5, `foulsToGive` 2 and 0, `bonusState` `DOUBLE` on the side shooting in the bonus. | none (team fouls and timeouts are not stored) |
+
+TheSportsDB at 01:26Z: livescore returned Soccer (22), Ice Hockey (36), Basketball (27), American
+Football (13) and Baseball (5, the first baseball rows since 10 October); every other sport answered
+`{"Message":"No data found"}`. The baseball rows were all `NS` with an empty progress: three KBO
+games, a Venezuelan league game and an MLB Brewers–Dodgers row (`2616724`) timed 21:00Z on 12 October,
+while ESPN had Game 1 of that series in the 4th inning; no row was live. The NFL rows read `4:34 -
+2nd` (matching ESPN), eleven `Final` and `Final/OT` for the tie, all with `strStatus` null. NBA: `Q1`
+`5` for the Nuggets game (ESPN 7:04 left) with the scores the wrong way round (Denver 12, Chicago 13;
+ESPN had Denver 13–12 and never 12–13), and the two finals `FT` `12`. NHL: `P3` `13` for the Flyers
+game (ESPN 13:01 elapsed), the Rangers game `FT`. An AHL row read `AOT` `20` at 2–2, last refreshed 52
+minutes earlier (a tie after overtime, which the AHL settles by a shoot-out; it parses as a 2–2
+final); a WHL row was `P3` `20` at 1–4 146 minutes after its start and refreshed each minute, and an
+FPHL row `P2` `8`. Rows not yet finished carry the current `updated` time even when nothing changed
+(`NS` rows too), so `updated` shows whether TheSportsDB still refreshes a row, not whether it moved.
+The two DEL `P3` rows from 14:30Z were last refreshed 8.6 hours earlier (skipped as before).
+`lookuptv` returned channels for the Ravens–Falcons game (38 rows: Sky Sports NFL and Main Event in
+the United Kingdom, ESPN Australia and Kayo Sports, ESPN New Zealand, NFL Sunday Ticket, NBC (listed
+for one Philadelphia station only), Universo and three local stations in the United States, CTV, TSN
+and RDS in Canada, DAZN in Spain, Brazil and Turkey, also France, the Netherlands, South Africa,
+Slovenia, Bosnia and Herzegovina, Germany, Qatar, Serbia and Greece) and none for the three KBO games.
+Every country named resolves.
+
+Parser changes: the ESPN scoreboard's last play is left out when it is a pitch; repeated play texts
+are dropped from the baseball last plays (see the table).
+
+Checked again on this data: NFL possession, drive, timeouts and line scores; MLB count, outs, runners,
+pitcher and batter from the summary `situation` and box score; NHL goals, strength after a penalty,
+goalies and `onIce`; NBA last play and win probability; TheSportsDB quarter clocks, period minutes,
+`Final/OT`, stale rows, Canadian and United States channels.
+
+Confirmed now: an MLB full count on the scoreboard and a balk in the summary; challenged pitch calls
+in the MLB plays; an NFL defensive touchdown in the summary; an NHL power play ending on time in the
+summary.
+
+Still unconfirmed: the NFL two-minute warning on the scoreboard; NBA overtime; an NHL power play,
+empty net or shootout in progress on the scoreboard, and a shootout in the summary; an MLB pitching
+change; a live TheSportsDB baseball row; tennis point score and the server in a tie-break; NASCAR
+stages; F1 gaps, pit stops and fastest lap; a UFC bout in progress; live cricket; AFL/NRL live clock
+(off season); golf after a cut or a playoff; football own goals, penalties and extra time on ESPN; a
+refreshed TheSportsDB shoot-out row (`P` with a progress).

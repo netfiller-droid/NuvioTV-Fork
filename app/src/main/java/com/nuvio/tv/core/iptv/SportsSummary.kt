@@ -120,7 +120,7 @@ object EspnSummary {
 
     private fun batting(plays: List<JSONObject>): List<JSONObject> {
         val texted = plays.filter { it.str("summaryType") != "P" && it.str("text") != null }
-        return texted.filterIndexed { index, play -> play.str("summaryType") != "A" || index == texted.lastIndex }
+        return texted.filterIndexed { index, play -> (play.str("summaryType") != "A" || index == texted.lastIndex) && play.str("text") != texted.getOrNull(index + 1)?.str("text") }
     }
 
     private fun awards(status: JSONObject?, sides: Sides): List<SummaryAward> = status?.optJSONArray("featuredAthletes")?.let(::objs).orEmpty().mapNotNull { item ->

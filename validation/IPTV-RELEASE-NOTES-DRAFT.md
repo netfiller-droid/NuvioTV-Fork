@@ -855,6 +855,11 @@ Sport data (capture of 12 October, 09:40; first NHL empty net):
   hero goalie line, the Game Centre summary and the multiview game tile say "<team> empty
   net" while the net is empty (hidden with the score when spoilers are off).
 
+Sport data (capture of 12 October, 11:26; MLB playoffs, a full count and a balk):
+- During a baseball game, the Sport hero no longer shows the raw pitch text (for example
+  "Pitch 5 : Ball 3.") under the count.
+- A balk or similar runner play appears once in the baseball last plays, not twice.
+
 ## Second pass over the untested work (12 October 2026, not device-tested)
 
 Sport screens and multiview:

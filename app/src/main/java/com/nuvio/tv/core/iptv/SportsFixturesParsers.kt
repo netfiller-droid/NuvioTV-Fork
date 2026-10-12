@@ -501,7 +501,7 @@ object EspnScoreboard {
             owner in ids(away) -> FixtureSide.AWAY
             else -> null
         }
-        val lastPlay = last?.text("text")?.replace(SPACES, " ")?.replaceFirst(SNAP, "")?.let(::sportsPlay)?.let { text ->
+        val lastPlay = last?.takeIf { it.text("summaryType") != "P" }?.text("text")?.replace(SPACES, " ")?.replaceFirst(SNAP, "")?.let(::sportsPlay)?.let { text ->
             last.optJSONObject("type")?.text("text")?.takeIf { text.startsWith("(") && text.endsWith(")") }?.let { "$it $text" } ?: text }?.take(MAX_PLAY)
         val probability = last?.optJSONObject("probability") ?: json.optJSONObject("probability")
         val homeWin = probability?.let { if (it.isNull("homeWinPercentage")) null else it.optDouble("homeWinPercentage", Double.NaN) }
