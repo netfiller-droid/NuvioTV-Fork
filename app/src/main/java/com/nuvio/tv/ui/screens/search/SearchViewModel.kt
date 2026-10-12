@@ -28,6 +28,7 @@ import com.nuvio.tv.domain.model.ContentType
 import com.nuvio.tv.domain.model.MetaPreview
 import com.nuvio.tv.domain.model.PosterShape
 import com.nuvio.tv.domain.model.enabledAddons
+import com.nuvio.tv.domain.model.searchEnabledAddons
 import com.nuvio.tv.domain.model.PLACEHOLDER_IMAGE_URL
 import com.nuvio.tv.domain.repository.CatalogRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -1032,11 +1033,17 @@ class SearchViewModel @Inject constructor(
         return if (ready) catalogOrder[firstReal] else null
     }
 
-    private suspend fun searchAddons(): List<Addon> =
-        addonRepository.getInstalledAddons().first().searchEnabledAddons() + serverCatalog.searchAddons.first()
+    private suspend fun searchAddons(): List<Addon> = {
+        val installed = addonRepository.getInstalledAddons().first().searchEnabledAddons()
+        val server = serverCatalog.searchAddons.first()
+        installed + server
+    }()
 
-    private suspend fun discoverAddons(): List<Addon> =
-        addonRepository.getInstalledAddons().first().enabledAddons() + serverCatalog.searchAddons.first()
+    private suspend fun discoverAddons(): List<Addon> = {
+        val installed = addonRepository.getInstalledAddons().first().enabledAddons()
+        val server = serverCatalog.searchAddons.first()
+        installed + server
+    }()
 
     private suspend fun loadDiscoverCatalogs() {
         if (_uiState.value.discoverLocation == DiscoverLocation.OFF) return

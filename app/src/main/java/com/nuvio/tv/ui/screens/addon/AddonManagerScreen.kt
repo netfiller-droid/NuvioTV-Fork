@@ -1425,8 +1425,8 @@ private fun AddonCardContent(
                         }
                     }
                     Column(
-                        horizontalArrangement = Arrangement.spacedBy(NuvioTheme.spacing.xs),
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalArrangement = Arrangement.spacedBy(NuvioTheme.spacing.xs),
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Surface(
                             onClick = { onEnabledChange(!addon.enabled) },

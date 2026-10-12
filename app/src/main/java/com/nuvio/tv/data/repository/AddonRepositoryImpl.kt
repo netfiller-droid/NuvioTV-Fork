@@ -50,6 +50,13 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
  * the AddonRepository *interface*; anything injecting AddonRepositoryImpl directly would otherwise
  * get its own instance, with its own manifest cache, refresh clock and stateIn collector.
  */
+private data class UrlNamesEnabledSearch(
+    val urls: List<String>,
+    val names: Map<String, String>,
+    val enabledStates: Map<String, Boolean>,
+    val searchEnabledStates: Map<String, Boolean>
+)
+
 @Singleton
 class AddonRepositoryImpl(
     private val api: AddonApi,
@@ -295,8 +302,14 @@ class AddonRepositoryImpl(
             preferences.addonEnabledStates,
             preferences.addonSearchEnabledStates,
             manifestCacheRevision
-        ) { urls, names, enabledStates, searchEnabledStates, _ -> Triple(urls, names, enabledStates, searchEnabledStates) }
-        .flatMapLatest { (urls, userNames, enabledStates, searchEnabledStates) ->
+        ) { urls, names, enabledStates, searchEnabledStates, _ ->
+            UrlNamesEnabledSearch(urls, names, enabledStates, searchEnabledStates)
+        }
+        .flatMapLatest { data ->
+            val urls = data.urls
+            val userNames = data.names
+            val enabledStates = data.enabledStates
+            val searchEnabledStates = data.searchEnabledStates
             flow {
                 if (urls.isEmpty()) {
                     emit(emptyList())
