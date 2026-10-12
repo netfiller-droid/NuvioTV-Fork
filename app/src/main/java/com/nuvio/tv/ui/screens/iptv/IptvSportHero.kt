@@ -604,12 +604,14 @@ private fun heroClock(fixture: SportsFixture, item: IptvFixtureItem, hidden: Boo
 private fun goalieSentence(fixture: SportsFixture, summary: SportsSummary?): String? {
     if (fixture.sport != "ice-hockey") return null
     val goalies = summary?.goalies?.takeIf { it.isNotEmpty() } ?: return null
-    return SportsGoalies.inNet(goalies, SportsFixtureText.awayFirst(fixture)).mapNotNull { goalie ->
+    val empty = SportsGoalies.emptyNet(goalies)?.let { side -> (if (side == FixtureSide.HOME) fixture.home else fixture.away)?.let(SportsFixtureText::code) }
+        ?.let { stringResource(R.string.iptv_ui28_sport_empty_net, it) }
+    return (SportsGoalies.inNet(goalies, SportsFixtureText.awayFirst(fixture)).mapNotNull { goalie ->
         val saves = goalie.saves ?: return@mapNotNull null
         val text = pluralStringResource(R.plurals.iptv_ui12_sport_saves, saves, saves)
         val name = SportsGoalies.surname(goalie.name)
         SportsGoalies.savePct(goalie.savePct)?.let { stringResource(R.string.iptv_ui12_sport_goalie_line, name, text, it) } ?: "$name $text"
-    }.joinToString(" · ").takeIf(String::isNotEmpty)?.let { if (it.endsWith('.')) it else "$it." }
+    } + listOfNotNull(empty)).joinToString(" · ").takeIf(String::isNotEmpty)?.let { if (it.endsWith('.')) it else "$it." }
 }
 
 @Composable

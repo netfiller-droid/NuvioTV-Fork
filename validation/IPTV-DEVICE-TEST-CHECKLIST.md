@@ -91,6 +91,9 @@ logcat (`adb logcat -s NuvioIptv:V *:E`). Do not share logs that contain address
    tab lists both throughout.
 2. The same game at the end of a period, and an NHL game with both goalies in: both
    goalies are shown.
+3. While the net is empty, the hero goalie line, the Game Centre summary (under Goalies) and
+   the multiview game tile read e.g. "SEA empty net"; it can lag by up to about 30 s, and it
+   goes away when the goalie returns. With scores hidden it does not show.
 
 ## 7o. 8:01 12 October capture: NFL half-time and overtime finals (build `2d693cada`)
 1. NFL at half-time: the score bug reads Halftime with no timeout marks; they come back in

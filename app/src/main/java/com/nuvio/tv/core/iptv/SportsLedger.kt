@@ -95,6 +95,9 @@ object SportsGoalies {
         (if (awayFirst) listOf(FixtureSide.AWAY, FixtureSide.HOME) else listOf(FixtureSide.HOME, FixtureSide.AWAY))
             .mapNotNull { side -> goalies.filter { it.side == side && !it.pulled }.maxByOrNull { it.shotsAgainst ?: -1 } }
 
+    fun emptyNet(goalies: List<SummaryGoalie>): FixtureSide? =
+        goalies.groupBy { it.side }.entries.firstOrNull { (_, side) -> side.all { it.pulled } }?.key
+
     fun savePct(text: String?): String? {
         val value = text?.trim()?.takeIf { it.isNotEmpty() } ?: return null
         val number = value.toDoubleOrNull() ?: return value

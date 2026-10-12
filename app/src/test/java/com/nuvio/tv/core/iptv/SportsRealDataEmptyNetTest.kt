@@ -50,6 +50,7 @@ class SportsRealDataEmptyNetTest {
         val daccord = SummaryGoalie(FixtureSide.AWAY, "Joey Daccord", 30, 33, ".909")
         assertEquals(listOf(thompson, daccord), summary.goalies.sortedBy { it.side })
         assertEquals(listOf(daccord), SportsGoalies.inNet(summary.goalies, true))
+        assertEquals(FixtureSide.HOME, SportsGoalies.emptyNet(summary.goalies))
         fun goalies(change: (JSONObject) -> Unit) = EspnSummary.parse(JSONObject(root.toString()).also(change), "ice-hockey").goalies
         fun ice(json: JSONObject, team: String) = (0 until json.getJSONArray("onIce").length()).map { json.getJSONArray("onIce").getJSONObject(it) }
             .first { it.getString("teamId") == team }.getJSONArray("entries")

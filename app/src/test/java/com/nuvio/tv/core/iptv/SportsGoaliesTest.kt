@@ -48,6 +48,14 @@ class SportsGoaliesTest {
         assertTrue(SportsGoalies.inNet(emptyList(), true).isEmpty())
     }
 
+    @Test fun emptyNetNamesTheSideWithEveryGoalieOff() {
+        val home = SummaryGoalie(FixtureSide.HOME, "A Starter", 20, 22, ".909", pulled = true)
+        val away = SummaryGoalie(FixtureSide.AWAY, "C Only", 30, 33, ".909")
+        assertEquals(FixtureSide.HOME, SportsGoalies.emptyNet(listOf(home, away)))
+        assertNull(SportsGoalies.emptyNet(listOf(home.copy(pulled = false), away)))
+        assertNull(SportsGoalies.emptyNet(emptyList()))
+    }
+
     @Test fun savePercentageReadsLikeHockey() {
         assertEquals(".944", SportsGoalies.savePct("0.944"))
         assertEquals(".900", SportsGoalies.savePct(".9"))

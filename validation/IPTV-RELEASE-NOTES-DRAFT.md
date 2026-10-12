@@ -851,7 +851,9 @@ Sport data (capture of 12 October, 08:01; NFL half-time and an overtime tie):
 
 Sport data (capture of 12 October, 09:40; first NHL empty net):
 - In an NHL game, a goalie pulled for an extra attacker is no longer shown as the goalie in
-  net in the Sport hero and the Game Centre summary; the Stats tab still lists both.
+  net in the Sport hero and the Game Centre summary; the Stats tab still lists both. The
+  hero goalie line, the Game Centre summary and the multiview game tile say "<team> empty
+  net" while the net is empty (hidden with the score when spoilers are off).
 
 ## Second pass over the untested work (12 October 2026, not device-tested)
 

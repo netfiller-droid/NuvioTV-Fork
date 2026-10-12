@@ -337,6 +337,7 @@ private fun centreItems(tab: CentreTab, fixture: SportsFixture, summary: SportsS
                 SportsGoalies.savePct(goalie.savePct)).joinToString(" · ").takeIf(String::isNotEmpty), false, "goalie:$i") to goalie
         }
     val inNet = summary?.let { SportsGoalies.inNet(it.goalies, awayFirst) }.orEmpty()
+    val emptyNet = summary?.let { SportsGoalies.emptyNet(it.goalies) }?.let { team(it) }?.let { stringResource(R.string.iptv_ui28_sport_empty_net, it) }
     val pointsText = summary?.let { endsNow(it, fixture.sport) }?.let { (home, away) ->
         stringResource(R.string.iptv_sport5p_ends_now_points, homeName.orEmpty(), home, awayName.orEmpty(), away)
     }
@@ -354,6 +355,7 @@ private fun centreItems(tab: CentreTab, fixture: SportsFixture, summary: SportsS
             if (stats.isNotEmpty()) { add(CentreItem.Heading(R.string.iptv_sport5p_team_stats, "h:stats")); addAll(stats.take(4)) }
             goalies.filter { (_, goalie) -> goalie in inNet }.takeIf { it.isNotEmpty() }?.let { list ->
                 add(CentreItem.Heading(R.string.iptv_ui12_sport_goalies, "h:goalies")); addAll(list.map { it.first })
+                emptyNet?.let { add(CentreItem.Line(it, null, true, "emptynet")) }
             }
             if (pointsText != null) { add(CentreItem.Heading(R.string.iptv_sport5p_ends_now, "h:ends")); add(CentreItem.Line(pointsText, null, true, "ends")) }
         }

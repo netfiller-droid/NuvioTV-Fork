@@ -518,7 +518,9 @@ private fun GameScreen(fixture: SportsFixture, hidden: Boolean, modifier: Modifi
         } else {
             val run = summary?.run?.let { run -> (if (run.side == com.nuvio.tv.core.iptv.FixtureSide.HOME) fixture.home else fixture.away)?.let {
                 stringResource(R.string.iptv_sport5p_run, SportsFixtureText.code(it), run.text) } }
-            listOfNotNull(bug.extra, summary?.strength?.text, run, fixture.situation?.downDistance?.takeIf { bug.extra == null }).distinct().take(2).forEach {
+            val emptyNet = summary?.goalies?.let(com.nuvio.tv.core.iptv.SportsGoalies::emptyNet)?.let { side ->
+                (if (side == com.nuvio.tv.core.iptv.FixtureSide.HOME) fixture.home else fixture.away)?.let { stringResource(R.string.iptv_ui28_sport_empty_net, SportsFixtureText.code(it)) } }
+            listOfNotNull(bug.extra, emptyNet, summary?.strength?.text, run, fixture.situation?.downDistance?.takeIf { bug.extra == null }).distinct().take(2).forEach {
                 Text(it, style = MaterialTheme.typography.labelLarge, color = NuvioTheme.colors.TextPrimary, maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
         }
