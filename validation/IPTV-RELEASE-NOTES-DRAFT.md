@@ -863,6 +863,11 @@ Sport data (capture of 12 October, 11:26; MLB playoffs, a full count and a balk)
   Sport hero, instead of the game summary, which can be a pitch behind; pitcher and batter
   names show only while both agree on the inning.
 
+Sport data (capture of 12 October, 11:43):
+- Basketball last plays that come without a player's name (missed free throws, team
+  violations) start with a capital letter, and the tip-off reads "Jump Ball" instead of
+  "vs.".
+
 ## Second pass over the untested work (12 October 2026, not device-tested)
 
 Sport screens and multiview:

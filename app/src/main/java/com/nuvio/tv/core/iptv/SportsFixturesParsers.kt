@@ -69,7 +69,7 @@ object EspnScoreboard {
             blankHalf(league.sport, homePeriods, awayPeriods, events)
         val homeLine = if (started) FixtureLine(homeScore, if (unfilled) emptyList() else homePeriods) else null
         val awayLine = if (started) FixtureLine(awayScore, if (unfilled) emptyList() else awayPeriods) else null
-        val situation = if (paired && status == FixtureStatus.LIVE) competition?.optJSONObject("situation")?.let { situation(it, home!!, away!!, name == "STATUS_HALFTIME") } else null
+        val situation = if (paired && status == FixtureStatus.LIVE) competition?.optJSONObject("situation")?.let { situation(it, home!!, away!!, name == "STATUS_HALFTIME", league.sport == "basketball") } else null
         val extra = when {
             !started -> null
             league.sport == "cricket" -> cricket(listOf(home!! to homeTeam!!, away!! to awayTeam!!),
@@ -488,7 +488,7 @@ object EspnScoreboard {
         return SportsLines.perPeriod(values, total)
     }
 
-    private fun situation(json: JSONObject, home: JSONObject, away: JSONObject, halfTime: Boolean): FixtureSituation? {
+    private fun situation(json: JSONObject, home: JSONObject, away: JSONObject, halfTime: Boolean, court: Boolean): FixtureSituation? {
         val short = json.text("shortDownDistanceText")
         val spot = json.text("possessionText")?.takeIf { it.any(Char::isLetter) }
         val downDistance = (if (short != null && spot != null) "$short · $spot" else json.text("downDistanceText") ?: short)?.take(MAX_TEXT)
@@ -502,7 +502,8 @@ object EspnScoreboard {
             else -> null
         }
         val lastPlay = last?.takeIf { it.text("summaryType") != "P" }?.text("text")?.replace(SPACES, " ")?.replaceFirst(SNAP, "")?.let(::sportsPlay)?.let { text ->
-            last.optJSONObject("type")?.text("text")?.takeIf { text.startsWith("(") && text.endsWith(")") }?.let { "$it $text" } ?: text }?.take(MAX_PLAY)
+            last.optJSONObject("type")?.text("text")?.takeIf { text.startsWith("(") && text.endsWith(")") }?.let { "$it $text" } ?: text }
+            ?.let { if (court) sportsCourtPlay(it, last.optJSONObject("type")?.text("text")) else it }?.take(MAX_PLAY)
         val probability = last?.optJSONObject("probability") ?: json.optJSONObject("probability")
         val homeWin = probability?.let { if (it.isNull("homeWinPercentage")) null else it.optDouble("homeWinPercentage", Double.NaN) }
             ?.takeIf { !it.isNaN() && it >= 0 }?.let { if (it <= 1.0) it * 100 else it }?.takeIf { it <= 100.0 }?.let { Math.round(it).toInt() }
@@ -644,6 +645,10 @@ object SportsDbEvents {
 }
 
 internal fun sportsPlay(text: String): String = text.replaceFirst(FORMATION, "")
+
+internal fun sportsCourtPlay(text: String, type: String?): String? = text.trim().let { if (VERSUS.matches(it)) type else it.replaceFirstChar(Char::uppercaseChar) }
+
+private val VERSUS = Regex("vs\\.?", RegexOption.IGNORE_CASE)
 
 private val FORMATION = Regex("^(?:\\((?:(?:no huddle|shotgun|pistol|under center|wildcat|[a-z ]{1,20}formation)(?:,\\s*)?)+\\)|(?:no huddle-)?(?:shotgun|pistol|no huddle)(?=\\s+#))\\s+",
     RegexOption.IGNORE_CASE)

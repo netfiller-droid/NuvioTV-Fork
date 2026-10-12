@@ -1118,3 +1118,69 @@ change; a live TheSportsDB baseball row; tennis point score and the server in a 
 stages; F1 gaps, pit stops and fastest lap; a UFC bout in progress; live cricket; AFL/NRL live clock
 (off season); golf after a cut or a playoff; football own goals, penalties and extra time on ESPN; a
 refreshed TheSportsDB shoot-out row (`P` with a progress).
+
+## Seventeenth pass (12 October, 11:43)
+
+ESPN and TheSportsDB responses captured at 11:43 Brisbane time on Monday 12 October (01:43Z), 17
+minutes after the sixteenth pass; TheSportsDB `updated` reads 02:43 London time. In play: the NFL
+Sunday night game (Ravens at Falcons, 14–6 to Atlanta with 0:12 left in the 2nd), Game 1 of the NLCS
+(Dodgers at Brewers, 1–1 in the top of the 5th) and the NBA preseason game (Bulls at Nuggets, 26–25
+with 55.4 left in the 1st). Hurricanes at Flyers finished 4–1 to Carolina, so no NHL game was live.
+Every other league showed the same finals or the same schedule as before. New summaries:
+`nfl-summary-LIVE.json`, `mlb-summary-LIVE.json` and `nba-summary-LIVE.json` (the same three games);
+`nhl-summary.json` is now the final of the Capitals game (the scoreboard's first event). The other
+summaries differ from the previous upload only in `news`, `odds` and ticket fields, and 23 of the 41
+files are byte-for-byte the previous upload (tennis, golf, F1, NASCAR, UFC, cricket, AFL, NRL, NBL,
+A-League, URC, Premier League and Champions League scoreboards among them). The multi-sport header is
+again a cached copy, from about 23:40Z. The nested `espn-pass.zip` is the seventh-pass capture again.
+The TheSportsDB calls folder holds the 01:43Z livescore and one new `lookuptv` file; the coverage
+folder's generic `v2-livescore-*` files are from 01:43Z but its `v2-livescore-app-*` files are the
+sixteenth-pass set from 01:26Z, and the league lists, `eventsday` and search files in both folders
+are unchanged apart from trailing blank lines. Every scoreboard and summary parses without errors.
+Trimmed copies are in `app/src/test/resources/sports/*-real-20261012f.json`
+(`SportsRealDataFreeThrowTest`).
+
+| Shape | What the real response showed | Parser change |
+|---|---|---|
+| NBA scoreboard last play | `55.4 - 1st`, `situation` with only `lastPlay`: type `Free Throw - 2 of 2`, text `misses free throw 2 of 2`, no `team` and no athlete, win probability 0.531. This is the third free-throw last play seen on the scoreboard (also 11 October, twice) and each had lost the player's name; the summary had not yet reached the free throws. | Basketball last plays (scoreboard and summary) whose text has no subject start with a capital (`Misses free throw 2 of 2`); the Sport hero read `misses free throw 2 of 2.` |
+| NBA summary plays without a player | 127 `plays`. The tip-off is `vs. ` (type `Jumpball`, `shortDescription` `Jump Ball`, no team or participants) with a `wallclock` 20 minutes before the first play; `delay of game violation` (`shortDescription` `Violation`) has no team either. Earlier captures held `shot clock turnover `, `foul` and `makes 6-foot shot` with a team but no player. Every play carries `shortDescription` (`Turnover`, `+3 Points`, `Missed 3PT`, `Rebound`, `Timeout`). First play 13.6 minutes after the listed start; 11:50 to 0:55 of the 1st quarter took 29.3 minutes (two full timeouts). Header `timeoutsUsed` 1 and 1, `timeoutsRemaining` 6 and 6, `teamFouls` 5 and 9, both `bonusState` `DOUBLE`. | The same capital; a bare `vs.` reads as the play's `shortDescription` (`Jump Ball`), or its type on the scoreboard |
+| NFL timeout late in the half | `0:12 - 2nd`, `2nd & 10 at ATL 26`, `possession` the Ravens, `lastPlay` type `Timeout`, text `Timeout #1 by ATL at 00:12.`, its `team` the Ravens (the side with the ball, not the side that called it) and its drive `8 plays, 54 yards, 2:12` with no result; `homeTimeouts` 2 and `awayTimeouts` 2 (summary header `timeoutsUsed` 1 and 1); win probability 0.7366. The two-minute warning is again only in the summary (`Two-minute warning` at 2:00 of the 2nd, wallclock 01:33:26Z, the next snap 2 m 42 s later); the scoreboard showed the timeout instead. | none: `Q2 · 0:12`, the Ravens drive shown, timeouts 2 and 2 |
+| NFL summary (end of 2nd quarter) | 10 `drives.previous` plus `drives.current` (the Ravens drive from the kick-off after the Falcons touchdown at 2:24, 13 plays including both timeouts and the warning); four `scoringPlays`. | none |
+| MLB scoreboard last play (new at-bat) | `Top 5th`, `outs` 1, count 0–0, `onFirst` true; `lastPlay` type `Start Batter/Pitcher` (`summaryType` `A`), text `Jacob Misiorowski pitches to Freddie Freeman`, `team` the batting side; pitcher line `4.1 IP, ER, 5 H, 5 K, 3 BB`. Line scores `0 0 0 1` and `0 1 0 0 0`. | none: kept as the last play (it names pitcher and batter); `▲5`, `1 out · 0–0` |
+| MLB summary (top 5th) | 268 plays. Both starters still pitching, no pitching change. A home run (`Turang homered to left center (384 feet).`, `scoringPlay`, `wallclock`) tied the game in the bottom of the 4th. A new pitch type `ball---confirmed` (a challenged ball upheld; `summaryType` `P`). The 4th inning took 21.9 minutes (top 8.9, break 3.1, bottom 6.9, break 3.0). `situation` matches the scoreboard this time. | none: the run is a moment with its real time, pitches stay out of the last plays |
+| NHL final summary | The Capitals game after the final: `onIce` still lists six Washington skaters and no goalie (the empty net at the horn), Seattle's six include their goalie; `featuredAthletes` names winning and losing goalies and three stars. The last goal (17:20 of the 3rd) came before the goalie was pulled, so the empty net brought no goal. | none: no goalie is marked as pulled once the game is final |
+
+TheSportsDB at 01:43Z: livescore returned Ice Hockey (34), Basketball (27), Soccer (20), American
+Football (13) and Baseball (5); every other sport answered `{"Message":"No data found"}`. The NFL
+night game read `0:12 - 2nd` at 14–6 (matching ESPN). The Nuggets game read `Q1` `11` at 25–25,
+one free throw behind the ESPN scoreboard (the summary was 25–25 too). The Flyers game was `FT` at
+1–4 (refreshed 01:42:30Z), and the WHL row that was `P3` `20` in the sixteenth pass finished `FT`
+1–4, 150 minutes after its start; an FPHL row was `P2` `16`. The AHL `AOT` row and the USHL and AHL
+rows from 10 October have gone; the two DEL `P3` rows from 14:30Z were last refreshed 8.9 hours
+earlier (skipped as before). The five baseball rows were still `NS` with an empty progress, the MLB
+row timed 21:00Z on 12 October while ESPN had Game 1 in the 5th; no row was live. The three 4pm NFL finals
+and the 1pm tie still carry the current `updated` time; the other 1pm finals stopped at 22:59Z and the
+London game at 19:29Z.
+`lookuptv` for the WHL game returned `{"tvevent":null}`; the coverage folder's three KBO files were
+null too and its Ravens–Falcons file is the sixteenth-pass 38 rows.
+
+Parser changes: basketball last plays without a subject start with a capital, and a bare `vs.`
+tip-off reads as `Jump Ball` (see the table).
+
+Checked again on this data: NFL possession, drive, timeouts, line scores and win probability after a
+timeout; scoring-play times; MLB count, outs, runners, pitcher and batter, the home run moment;
+NBA win probability and line score; NHL final goalies and awards; TheSportsDB quarter clocks, period
+minutes, hockey finals, stale rows.
+
+Confirmed now: an NFL timeout as the scoreboard's last play (credited to the side with the ball);
+the NFL two-minute warning in the summary for the second time (still never on the scoreboard); an
+MLB new at-bat as the scoreboard's last play; a challenged pitch call upheld; the empty-net `onIce`
+state kept after the final.
+
+Still unconfirmed: the NFL two-minute warning on the scoreboard; NBA overtime; an NHL power play,
+empty net or shootout in progress on the scoreboard, and a shootout in the summary; an MLB pitching
+change; a live TheSportsDB baseball row; tennis point score and the server in a tie-break; NASCAR
+stages; F1 gaps, pit stops and fastest lap; a UFC bout in progress; live cricket; AFL/NRL live clock
+(off season); golf after a cut or a playoff; football own goals, penalties and extra time on ESPN; a
+refreshed TheSportsDB shoot-out row (`P` with a progress); an NBA free throw on the scoreboard with
+the player's name.

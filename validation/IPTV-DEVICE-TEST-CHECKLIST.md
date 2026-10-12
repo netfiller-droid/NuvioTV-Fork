@@ -1,6 +1,6 @@
 # Nuvio IPTV — device test checklist (build `98d520804`, run 38186968485)
 
-For this build start with section 7q, then 7p, 7o, 7n, 7m, 7l, 7k, 7j, 7i, 7h, 7g and 7f (not yet tried on a device). 7e and earlier passed on earlier builds; repeat them only as a regression check. After the 1.1.0-nt.5 merge, also repeat sections 1 and 2.
+For this build start with section 7r, then 7q, 7p, 7o, 7n, 7m, 7l, 7k, 7j, 7i, 7h, 7g and 7f (not yet tried on a device). 7e and earlier passed on earlier builds; repeat them only as a regression check. After the 1.1.0-nt.5 merge, also repeat sections 1 and 2.
 
 Mark each item pass / fail / not tested. For failures, note what happened and keep a
 logcat (`adb logcat -s NuvioIptv:V *:E`). Do not share logs that contain addresses.
@@ -83,6 +83,13 @@ logcat (`adb logcat -s NuvioIptv:V *:E`). Do not share logs that contain address
 11. Press Home on the remote with Game Centre open: logcat should show sports requests
    stop (`sports fetch` lines cease).
 12. Useful logs: `sports fetch service=`, `sports links`, `sports fixtures`.
+
+## 7r. 11:43 12 October capture: basketball last plays (build pending)
+1. A live NBA or NBL game whose last play is a free throw: the Sport hero sentence starts
+   with a capital ("Misses free throw 2 of 2."), not lower case.
+2. The multiview game tile at an NBA tip-off: the last plays show "Jump Ball", not "vs.".
+3. Team plays without a player (e.g. "Delay of game violation", "Shot clock turnover") start
+   with a capital in the multiview tile's last plays.
 
 ## 7q. 11:26 12 October capture: baseball count and last plays (build pending)
 1. During a live MLB game, the Sport hero shows outs and the count (e.g. "2 outs · 3–2")

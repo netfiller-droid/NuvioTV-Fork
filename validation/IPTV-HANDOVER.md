@@ -72,7 +72,10 @@ under "Earlier session notes" and the dated sections is history kept for referen
    a finished NASCAR race (`winner` false on every car). The sixteenth pass (12 October
    11:26) showed an MLB full count on the scoreboard, a balk in the summary (two plays with
    the same text), challenged pitch calls, an NFL defensive touchdown, an NHL power play
-   ending on time, and TheSportsDB baseball rows (none live).
+   ending on time, and TheSportsDB baseball rows (none live). The seventeenth pass (12
+   October 11:43) showed NBA scoreboard free throws without the player (three of three so
+   far), a bare `vs.` tip-off in the summary, an NFL timeout as the scoreboard's last play
+   (credited to the side with the ball) and an MLB home run moment.
    Still not seen in real data (see the latest pass in `IPTV-SPORTS-DATA-FIELDS.md` for
    the full list): the NFL two-minute warning on the scoreboard; NBA overtime; an NHL power
    play, empty net or shootout on the scoreboard, and a shootout in the summary; an MLB

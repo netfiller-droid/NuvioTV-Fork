@@ -58,7 +58,7 @@ class SportsRealDataLateMorningTest {
         assertEquals("Q4 · 5:40", SportsFixtureText.periodClock(raptors))
         assertEquals(FixtureLine("95", listOf("24", "33", "32", "6")), raptors.homeLine)
         assertEquals(FixtureLine("89", listOf("18", "27", "27", "17")), raptors.awayLine)
-        assertEquals(FixtureSituation(null, null, "misses free throw 1 of 2", 78), raptors.situation)
+        assertEquals(FixtureSituation(null, null, "Misses free throw 1 of 2", 78), raptors.situation)
         val game = EspnSummary.parse(sample("nba-summary"), league("nba"))
         assertEquals(4, game.period)
         assertEquals("5:55", game.clock)

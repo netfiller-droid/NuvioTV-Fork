@@ -113,7 +113,7 @@ object EspnSummary {
             moments, stats(teamStats, sport), leaders(root, sides, sport), rosters(root, sides, sport),
             tables(root, sides), headToHead(root, sides), probability(root),
             if (sport == "baseball" && status == FixtureStatus.LIVE) count(root, plays, names, statusJson?.str("periodPrefix")) else null,
-            if (sport == "ice-hockey") strength(plays, sides) else null, lastPlays(root, if (sport == "baseball") batting(plays) else plays), if (sport == "basketball") run(plays) else null,
+            if (sport == "ice-hockey") strength(plays, sides) else null, lastPlays(root, if (sport == "baseball") batting(plays) else plays, sport), if (sport == "basketball") run(plays) else null,
             if (cricket) innings(competitors, sides) else emptyList(), if (sport == "ice-hockey") goalies(root, sides, inPlay) else emptyList(),
             statusJson?.str("summary")?.takeIf { status == FixtureStatus.FINAL }?.take(120), awards(statusJson, sides))
     }
@@ -465,10 +465,12 @@ object EspnSummary {
         return when { home > away -> FixtureSide.AWAY; away > home -> FixtureSide.HOME; else -> null }
     }
 
-    private fun lastPlays(root: JSONObject, plays: List<JSONObject>): List<SummaryPlay> {
+    private fun lastPlays(root: JSONObject, plays: List<JSONObject>, sport: String): List<SummaryPlay> {
         val scored = root.optJSONArray("scoringPlays")?.let(::objs).orEmpty().mapNotNull { s -> s.str("id")?.let { id -> s.str("text")?.let { id to it } } }.toMap()
-        val fromPlays = plays.filter { it.str("text") != null }.takeLast(3).map {
-            SummaryPlay(sportsPlay(plain(it.str("id")?.let(scored::get) ?: it.str("text")!!).replaceFirst(SNAP, "")).take(MAX_TEXT), it.optJSONObject("period")?.int("number"), clock(it))
+        val fromPlays = plays.filter { it.str("text") != null }.takeLast(3).mapNotNull {
+            val text = sportsPlay(plain(it.str("id")?.let(scored::get) ?: it.str("text")!!).replaceFirst(SNAP, ""))
+            (if (sport == "basketball") sportsCourtPlay(text, it.str("shortDescription") ?: it.optJSONObject("type")?.str("text")) else text)
+                ?.let { shown -> SummaryPlay(shown.take(MAX_TEXT), it.optJSONObject("period")?.int("number"), clock(it)) }
         }
         if (fromPlays.isNotEmpty()) return fromPlays.reversed()
         return root.optJSONArray("commentary")?.let(::objs).orEmpty().filter { it.str("text") != null }.takeLast(3).map {

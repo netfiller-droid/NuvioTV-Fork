@@ -59,7 +59,7 @@ class SportsRealDataSundayTest {
         assertEquals("24.7", heat.clock)
         assertEquals("Q1 · 24.7", SportsFixtureText.periodClock(heat))
         assertEquals(FixtureLine("24", listOf("23")), heat.awayLine)
-        assertEquals("misses free throw 2 of 2", heat.situation?.lastPlay)
+        assertEquals("Misses free throw 2 of 2", heat.situation?.lastPlay)
         assertEquals(31.42, SportsMarkers.minutes("basketball", heat.period, heat.clock)!!, 0.01)
         val game = EspnSummary.parse(sample("nba-summary"), league("nba"))
         assertEquals(FixtureStatus.LIVE, game.status)
