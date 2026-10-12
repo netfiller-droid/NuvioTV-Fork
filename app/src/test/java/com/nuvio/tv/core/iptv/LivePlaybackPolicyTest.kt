@@ -36,6 +36,12 @@ class LivePlaybackPolicyTest {
         assertEquals(LiveRetryDecision.Retry(1_000), LiveRetry.decide(true, 0, null, null, null, now))
     }
 
+    @Test fun onlyLiveStreamsBehindTheWindowRejoin() {
+        assertTrue(LiveRetry.rejoin(true, 1002))
+        assertFalse(LiveRetry.rejoin(false, 1002))
+        for (code in listOf(null, 1000, 1001, 1003, 2001, 2004)) assertFalse("$code", LiveRetry.rejoin(true, code))
+    }
+
     @Test fun retryAfterIsHonouredWithinBounds() {
         assertEquals(LiveRetryDecision.Retry(30_000), LiveRetry.decide(true, 0, 2004, 503, "30", now))
         assertEquals(LiveRetryDecision.Retry(60_000), LiveRetry.decide(true, 0, 2004, 429, "86400", now))

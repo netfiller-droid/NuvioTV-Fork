@@ -86,5 +86,8 @@ object LocalTimeshiftPolicy {
         else -> LocalTimeshiftStep.Live
     }
 
+    fun held(positionMillis: Long?, oldestMillis: Long?, nowMillis: Long): Long? =
+        positionMillis?.let { maxOf(it, oldestMillis ?: it).coerceAtMost(nowMillis) }
+
     fun behind(positionMillis: Long?, nowMillis: Long): Boolean = positionMillis != null && positionMillis < nowMillis - LIVE_EDGE_MILLIS
 }

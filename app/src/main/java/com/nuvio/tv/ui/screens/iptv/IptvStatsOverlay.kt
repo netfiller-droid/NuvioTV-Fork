@@ -68,7 +68,7 @@ internal fun IptvStatsOverlay(playback: IptvLivePlayback, provider: String?, mod
                     buffered >= 1_500 -> StatsDot.WARN
                     else -> StatsDot.BAD
                 }),
-                playback.behindLiveMs()?.takeIf { it >= 1_000 }?.let { StatsRow("Behind live", seconds(it)) }
+                (playback.behindLiveMs() ?: playback.localPosition()?.let { System.currentTimeMillis() - it })?.takeIf { it >= 1_000 }?.let { StatsRow("Behind live", seconds(it)) }
                     ?: offset?.let { StatsRow("Live offset", seconds(it)) },
                 playbackSpeed.takeIf { it != 1f }?.let { StatsRow("Playback", String.format(Locale.US, "%.2f×", it), StatsDot.WARN) },
                 playback.protocol?.let { StatsRow("Protocol", it) },

@@ -36,8 +36,12 @@ under "Earlier session notes" and the dated sections is history kept for referen
   `2d693cada`, the fifteenth (09:40, NHL empty net) in `9d1c91585`, and "<team> empty net"
   in the hero, Game Centre and multiview game tile in `98d520804`. The sixteenth to
   eighteenth captures (11:26, 11:43, 12:06) are in `0238ba866`, `11b487e0b` (multiview
-  baseball count), `14945dbef` and `1e539a53a`. Checklist sections 7r, 7q, 7p, 7o and 7n
-  list what to try.
+  baseball count), `14945dbef` and `1e539a53a`. The live player changes (steady behind-live
+  figure on HLS, immediate rejoin behind the live window, local timeshift pause clamp) came
+  after; they were suggested by reading an unmerged upstream player change and are our own
+  design. Checklist sections 7s, 7r, 7q, 7p, 7o and 7n list what to try. Open question for
+  the user (7s.7): does a 5-minute pause with Safety buffer off leave TS channels behind
+  live? If so, offer Return to live there too.
 - All work is committed and pushed to `iptv/player-binding`. Build for the next device pass:
   CI debug green at `1e539a53a` (run 38196253340; `98d520804`, run 38186968485, `2d693cada`,
   run 38180390637, and `91e1e7f1b`, run 38178089678, were the builds before), app "Nuvio
@@ -1160,6 +1164,10 @@ Android-only differences (no `keySet`) and all Compose/Hilt code show only in CI
 
 ## Code map (app/src/main/java/com/nuvio/tv)
 
+- 12 October, live player: steady behind-live figure and its show/hide flag (hint, Return to
+  live, Stats) `core/iptv/LiveBehindGauge.kt`; behind-window rejoin `LiveRetry.rejoin` in
+  `LivePlaybackPolicy.kt` and `LiveRejoinGuard` in `LiveReconnect.kt`; local timeshift
+  display clamp `LocalTimeshiftPolicy.held` in `LocalTimeshift.kt`.
 - 11–12 October: recording playback `core/iptv/RecordingTimeline.kt` (time index),
   `RecordingVodPlaylist.kt` (HLS byte-range playlist), `data/iptv/IptvRecordingReader.kt`,
   `IptvRecordingStore.kt`, `IptvRecordingCopier.kt`, resume `IptvRecordingResume` in

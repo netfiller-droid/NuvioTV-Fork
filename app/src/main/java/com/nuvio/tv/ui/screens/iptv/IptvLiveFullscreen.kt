@@ -304,7 +304,8 @@ private fun Banner(state: IptvLiveState, now: Long, game: IptvFixtureItem? = nul
                     if (index >= 0) Text("${index + 1}", style = MaterialTheme.typography.titleMedium, color = NuvioTheme.colors.TextTertiary)
                     Text(row?.let(::channelName) ?: state.playingTitle.orEmpty(), style = MaterialTheme.typography.titleMedium,
                         color = NuvioTheme.colors.TextSecondary, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f, fill = false))
-                    Tag(stringResource(playbackTag(state, programme, now)), live = catchup == null)
+                    val tag = playbackTag(state, programme, now, position)
+                    Tag(stringResource(tag), live = tag == R.string.iptv_live_playing)
                     if (state.paused) Tag(stringResource(R.string.iptv_live_paused))
                     qualityBadges(state.player).takeIf { it.isNotEmpty() }?.let { Text(it.joinToString(" · "), style = MaterialTheme.typography.labelMedium,
                         color = NuvioTheme.colors.TextTertiary, maxLines = 1, overflow = TextOverflow.Ellipsis) }
@@ -358,14 +359,12 @@ private fun rememberBehindLive(state: IptvLiveState): Int? {
     var seconds by remember(playback) { mutableStateOf<Int?>(null) }
     LaunchedEffect(playback) {
         while (playback != null) {
-            seconds = playback.behindLiveMs()?.takeIf { it >= BEHIND_HINT_MS && playback.bufferTargetMs > 0 }?.let { (it / 1_000).toInt() }
+            seconds = playback.behindLiveMs()?.takeIf { playback.behindLive && playback.bufferTargetMs > 0 }?.let { (it / 1_000).toInt() }
             delay(1_000)
         }
     }
     return seconds
 }
-
-private const val BEHIND_HINT_MS = 5_000L
 
 @Composable
 internal fun ChannelPanel(state: IptvLiveState, now: Long, onWatch: (IptvListedChannel) -> Unit, channels: List<IptvListedChannel> = state.channels,

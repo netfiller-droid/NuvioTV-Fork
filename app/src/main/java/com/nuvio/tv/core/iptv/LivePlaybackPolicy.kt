@@ -45,6 +45,8 @@ object LiveRetry {
         return millis.coerceIn(0, MAX_RETRY_AFTER_MS)
     }
 
+    fun rejoin(live: Boolean, errorCode: Int?): Boolean = live && errorCode == PlaybackException.ERROR_CODE_BEHIND_LIVE_WINDOW
+
     fun decide(live: Boolean, attempt: Int, errorCode: Int?, httpStatus: Int?, retryAfter: String?, nowMillis: Long): LiveRetryDecision {
         failure(errorCode, httpStatus)?.let { return LiveRetryDecision.Fail(it) }
         val base = delay(live, attempt) ?: return LiveRetryDecision.Fail(LiveFailure.EXHAUSTED)

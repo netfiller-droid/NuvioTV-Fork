@@ -28,6 +28,21 @@ class LiveReconnectTest {
         for (status in listOf(500, 502, 504)) assertFalse("$status", LiveReconnect.handOver(status))
     }
 
+    @Test fun rejoinsAreLimitedWithinTheSpan() {
+        val guard = LiveRejoinGuard()
+        assertTrue(guard.allow(0)); assertTrue(guard.allow(1_000)); assertTrue(guard.allow(2_000))
+        assertFalse(guard.allow(3_000))
+        assertFalse(guard.allow(29_999))
+        assertTrue(guard.allow(30_000))
+        assertFalse(guard.allow(30_500))
+        assertTrue(guard.allow(31_000))
+        guard.reset()
+        assertTrue(guard.allow(31_500)); assertTrue(guard.allow(31_600)); assertTrue(guard.allow(31_700))
+        assertFalse(guard.allow(31_800))
+        val spaced = LiveRejoinGuard()
+        assertTrue((0 until 20).all { spaced.allow(it * 11_000L) })
+    }
+
     @Test fun syncNeedsThreeAlignedPackets() {
         val bytes = ByteArray(1_000)
         bytes[10] = 0x47; bytes[100] = 0x47; bytes[288] = 0x47; bytes[476] = 0x47; bytes[664] = 0x47

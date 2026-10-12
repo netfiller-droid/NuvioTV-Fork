@@ -967,6 +967,7 @@ class IptvLiveViewModel @Inject constructor(@ApplicationContext private val cont
         val playback = state.playback?.takeIf { it.localTimeshift } ?: return false
         val now = System.currentTimeMillis()
         val target = ((state.scrubTarget ?: playback.localPosition() ?: now) + step).coerceAtMost(now)
+            .let { if (hasArchive(row) && livePreferences.timeshift) it else LocalTimeshiftPolicy.held(it, playback.localOldest(), now) ?: it }
         scrubJob?.cancel()
         mutable.update { it.copy(scrubTarget = target) }
         scrubJob = viewModelScope.launch {

@@ -1,6 +1,6 @@
 # Nuvio IPTV — device test checklist (build `1e539a53a`, run 38196253340)
 
-For this build start with section 7r, then 7q, 7p, 7o, 7n, 7m, 7l, 7k, 7j, 7i, 7h, 7g and 7f (not yet tried on a device). 7e and earlier passed on earlier builds; repeat them only as a regression check. After the 1.1.0-nt.5 merge, also repeat sections 1 and 2.
+For this build start with section 7s, then 7r, 7q, 7p, 7o, 7n, 7m, 7l, 7k, 7j, 7i, 7h, 7g and 7f (not yet tried on a device). 7e and earlier passed on earlier builds; repeat them only as a regression check. After the 1.1.0-nt.5 merge, also repeat sections 1 and 2.
 
 Mark each item pass / fail / not tested. For failures, note what happened and keep a
 logcat (`adb logcat -s NuvioIptv:V *:E`). Do not share logs that contain addresses.
@@ -83,6 +83,30 @@ logcat (`adb logcat -s NuvioIptv:V *:E`). Do not share logs that contain address
 11. Press Home on the remote with Game Centre open: logcat should show sports requests
    stop (`sports fetch` lines cease).
 12. Useful logs: `sports fetch service=`, `sports links`, `sports fixtures`.
+
+## 7s. Behind-live figure, HLS rejoin and local timeshift pause (build pending)
+1. An HLS channel with Safety buffer on: watch 2 minutes at live with Stats open. "Behind
+   live" and Return to live do not appear or flicker; Stats shows no "Behind live" row, or
+   one that stays under 3 s. (A "Live offset" row in Stats means the stream carries
+   programme date-times.)
+2. The same channel: pause 30 s and resume. The hint and Return to live show and stay shown
+   (no blinking), focus stays on Return to live, and Stats "Behind live" reads about 30 s
+   and holds steady. Press Return to live: both go away and stay away.
+3. HLS: pause longer than the provider keeps (several minutes) and resume, or pull the
+   network briefly: playback returns to live within a second or two without
+   "Reconnecting…", and Stats "Reconnects" does not go up.
+4. Multiview with an HLS tile: the same long pause rejoins the tile without an error picture.
+5. Local timeshift on (TS, full screen): pause for longer than the buffer length. The
+   timeline knob and "behind" time stop at the oldest buffered point instead of the pause
+   time, and the tag reads "Behind live" (no red dot). On resume, playback starts from the
+   oldest point; Return to live goes to live and the tag reads "Live" again.
+6. Local timeshift on a channel without catch-up: scrub back past the start of the buffer;
+   the target stops at the oldest point.
+7. Open question, please note the result: a TS channel with Safety buffer Off and local
+   timeshift off. Pause for 5 minutes, resume, and note what Stats "Behind live" shows
+   (about 300 s, a small number, or nothing), whether Return to live is offered (with the
+   buffer off it is not expected to be), and whether the picture continues from the pause
+   point or jumps to live.
 
 ## 7r. 11:43 12 October capture: basketball last plays (build `1e539a53a`)
 1. A live NBA or NBL game whose last play is a free throw: the Sport hero sentence starts

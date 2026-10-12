@@ -285,8 +285,9 @@ internal fun catchupShown(state: IptvLiveState, position: Long): GuideProgramme?
     return com.nuvio.tv.core.iptv.CatchupScrub.programmeAt(catchupProgrammes(state, id), position) ?: catchup
 }
 
-internal fun playbackTag(state: IptvLiveState, shown: GuideProgramme?, now: Long): Int = when {
-    state.catchup == null -> com.nuvio.tv.R.string.iptv_live_playing
+internal fun playbackTag(state: IptvLiveState, shown: GuideProgramme?, now: Long, position: Long? = null): Int = when {
+    state.catchup == null -> if (state.localTimeshift && state.localBehind && com.nuvio.tv.core.iptv.LocalTimeshiftPolicy.behind(position, maxOf(now, System.currentTimeMillis())))
+        com.nuvio.tv.R.string.iptv_live_behind else com.nuvio.tv.R.string.iptv_live_playing
     state.catchupFrom != null && shown != null && airing(shown, now) -> com.nuvio.tv.R.string.iptv_live_behind
     else -> com.nuvio.tv.R.string.iptv_live_catchup
 }

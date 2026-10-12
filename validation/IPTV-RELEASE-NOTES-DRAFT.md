@@ -926,6 +926,22 @@ Sport data:
   panel says so.
 - Alert headlines on the sport pop-up are in sentence case.
 
+Live player (behind live, rejoin, local timeshift):
+- HLS channels: the "behind live" hint and Return to live are steadier. They use the
+  stream's own clock when it carries programme date-times and otherwise smooth out the
+  jumps at each playlist refresh; they show from 5 s behind and go away below 3 s, so
+  Return to live no longer flickers or pulls focus away. The Stats "Behind live" row shows
+  the same figure.
+- HLS channels that fall behind the provider's live window (after a long pause or stall)
+  jump straight back to live, without "Reconnecting…" and without counting a reconnect;
+  repeated jumps within 30 s fall back to the normal retry.
+- Experimental local timeshift: during a pause longer than the buffer, the timeline and
+  "behind" time stop at the oldest point still held, the tag reads "Behind live" instead of
+  "Live" while more than 10 s behind, scrubbing back on channels without catch-up stops at
+  the oldest point, and Stats shows "Behind live" here too.
+- Known limitation: on HLS without programme date-times, a growing delay takes up to about
+  one and a half segments (at most 15 s) to show.
+
 ## Reliability
 
 - A stream is replaced only after the previous decoder and HTTP connections have

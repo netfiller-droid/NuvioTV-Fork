@@ -26,6 +26,7 @@ import androidx.media3.exoplayer.DecoderReuseEvaluation
 import androidx.media3.exoplayer.DefaultRenderersFactory
 import androidx.media3.exoplayer.Renderer
 import androidx.media3.exoplayer.analytics.AnalyticsListener
+import androidx.media3.exoplayer.hls.HlsManifest
 import androidx.media3.common.TrackGroup
 import androidx.media3.decoder.ffmpeg.FfmpegAudioRenderer
 import androidx.media3.exoplayer.RendererCapabilities
@@ -130,6 +131,9 @@ class IptvLivePlayback(context: Context, private val locator: String, purpose: P
     private val cushionSpeed = LiveCushionSpeed()
     private var cushionCleared = false
     private val behind = LiveBehindClock()
+    private val gauge = LiveBehindGauge()
+    private val rejoins = LiveRejoinGuard()
+    private val window = Timeline.Window()
     @Volatile private var bufferedSnapshot = 0L
     @Volatile private var resilientUrl: String? = null
     @Volatile private var streamOpen = true
@@ -171,7 +175,7 @@ class IptvLivePlayback(context: Context, private val locator: String, purpose: P
             val local = ring
             if (local != null) playRing(local, local.liveAnchor())
             else {
-                behind.reset()
+                behind.reset(); gauge.reset()
                 if (isLive) player.seekToDefaultPosition() else player.seekTo(position)
                 player.prepare()
             }
@@ -198,6 +202,7 @@ class IptvLivePlayback(context: Context, private val locator: String, purpose: P
             if (frozen.frozen(android.os.SystemClock.elapsedRealtime(), active, progress)) { frozen.reset(); retry() }
             bufferedSnapshot = player.totalBufferedDuration
             tickCushion(android.os.SystemClock.elapsedRealtime())
+            sampleBehind(android.os.SystemClock.elapsedRealtime())
             mainHandler.postDelayed(this, WATCH_MS)
         }
     }
@@ -274,6 +279,7 @@ class IptvLivePlayback(context: Context, private val locator: String, purpose: P
             override fun onPlayerError(error: PlaybackException) {
                 if (released) return
                 if (localError(error)) return
+                if (ring == null && LiveRetry.rejoin(isLive, error.errorCode) && rejoin()) return
                 val response = generateSequence<Throwable>(error) { it.cause }.take(8).filterIsInstance<HttpDataSource.InvalidResponseCodeException>().firstOrNull()
                 retry(error.errorCode, response?.responseCode,
                     response?.headerFields?.entries?.firstOrNull { it.key.equals("Retry-After", ignoreCase = true) }?.value?.firstOrNull())
@@ -321,6 +327,14 @@ class IptvLivePlayback(context: Context, private val locator: String, purpose: P
                 mainHandler.postDelayed(reconnect, decision.delayMs)
             }
         }
+    }
+    private fun rejoin(): Boolean {
+        if (failed || !rejoins.allow(android.os.SystemClock.elapsedRealtime())) return false
+        IptvLog.info("live rejoin reason=behind-window")
+        behind.reset(); gauge.reset()
+        player.seekToDefaultPosition()
+        player.prepare()
+        return true
     }
     private fun fail(failure: LiveFailure) {
         mainHandler.removeCallbacks(reconnect); mainHandler.removeCallbacks(startCheck)
@@ -404,7 +418,7 @@ class IptvLivePlayback(context: Context, private val locator: String, purpose: P
         }
     }
     private fun play(url: String, format: IptvStreamFormat) {
-        current = url; readyReported = false; firstFrame = false; currentFormat = format; behind.reset()
+        current = url; readyReported = false; firstFrame = false; currentFormat = format; behind.reset(); gauge.reset(); rejoins.reset()
         resilientUrl = if (isLive && format == IptvStreamFormat.MPEG_TS) url else null
         mainHandler.removeCallbacks(startCheck)
         if (isLive && format == IptvStreamFormat.MPEG_TS && url == locator && localConfig != null && ring == null) { player.playWhenReady = true; startLocal(url); return }
@@ -423,14 +437,20 @@ class IptvLivePlayback(context: Context, private val locator: String, purpose: P
     val altSvcH3: Boolean? get() = network.h3(current)
     val playbackSpeed: Float get() = player.playbackParameters.speed
     val bufferTargetMs: Long get() = if (currentFormat == IptvStreamFormat.HLS && isLive && ring == null && !cushionCleared) plan?.cushionMs ?: 0L else cushionTargetMs()
-    fun behindLiveMs(): Long? {
-        if (released || !isLive || ring != null || player.playbackState == Player.STATE_IDLE) return null
-        if (currentFormat != IptvStreamFormat.HLS) return behind.behindMs(android.os.SystemClock.elapsedRealtime(), player.currentPosition)
+    private fun behindReadable(): Boolean = !released && isLive && ring == null && player.playbackState != Player.STATE_IDLE
+    fun behindLiveMs(): Long? = if (behindReadable()) gauge.millis else null
+    val behindLive: Boolean get() = behindReadable() && gauge.shown
+    private fun sampleBehind(now: Long) {
+        if (!behindReadable()) { gauge.reset(); return }
+        if (currentFormat != IptvStreamFormat.HLS) { gauge.steady(now, behind.behindMs(now, player.currentPosition)); return }
         val timeline = player.currentTimeline
-        if (timeline.isEmpty) return null
-        val window = timeline.getWindow(player.currentMediaItemIndex, Timeline.Window())
-        if (window.isPlaceholder || !window.isLive() || window.defaultPositionMs == C.TIME_UNSET) return null
-        return (window.defaultPositionMs - player.currentPosition).coerceAtLeast(0)
+        val live = if (timeline.isEmpty) null else timeline.getWindow(player.currentMediaItemIndex, window)
+            .takeIf { !it.isPlaceholder && it.isLive() && it.defaultPositionMs != C.TIME_UNSET }
+        if (live == null) { gauge.steady(now, null); return }
+        val offset = player.currentLiveOffset
+        if (offset != C.TIME_UNSET) gauge.clock(now, offset, live.liveConfiguration?.targetOffsetMs?.takeIf { it != C.TIME_UNSET }, player.playbackState == Player.STATE_READY)
+        else gauge.playlist(now, live.defaultPositionMs - player.currentPosition,
+            (player.currentManifest as? HlsManifest)?.mediaPlaylist?.targetDurationUs?.takeIf { it > 0 }?.let { it / 1_000 })
     }
     fun startSummary(): String {
         fun since(at: Long) = if (at == 0L || startedAt == 0L) "-" else (at - startedAt).toString()
@@ -438,11 +458,11 @@ class IptvLivePlayback(context: Context, private val locator: String, purpose: P
     }
     fun goLive(): Boolean {
         if (released || failed || !isLive || ring != null || currentFormat == null) return false
-        if (bufferTargetMs <= 0 || (behindLiveMs() ?: 0L) < GO_LIVE_MIN_MS) return false
+        if (bufferTargetMs <= 0 || (behindLiveMs() ?: 0L) < LiveBehindGauge.HIDE_MILLIS) return false
         cushionCleared = true
         cushionSpeed.reset()
         if (player.playbackParameters.speed != 1f) player.playbackParameters = PlaybackParameters.DEFAULT
-        if (currentFormat == IptvStreamFormat.HLS) player.seekToDefaultPosition()
+        if (currentFormat == IptvStreamFormat.HLS) { gauge.reset(); player.seekToDefaultPosition() }
         else { mainHandler.removeCallbacks(reconnect); mainHandler.post(reconnect) }
         IptvLog.info("live go live format=${currentFormat?.name?.lowercase()}")
         return true
@@ -471,7 +491,10 @@ class IptvLivePlayback(context: Context, private val locator: String, purpose: P
         IptvLiveWifiLock.hold(appContext, this, wanted)
     }
     val localTimeshift: Boolean get() = ring != null
-    fun localPosition(): Long? = if (ring == null) null else localAnchorTime?.let { it + player.currentPosition.coerceAtLeast(0) }
+    fun localPosition(): Long? {
+        val local = ring ?: return null
+        return LocalTimeshiftPolicy.held(localAnchorTime?.let { it + player.currentPosition.coerceAtLeast(0) }, local.oldestTime(), System.currentTimeMillis())
+    }
     fun localOldest(): Long? = ring?.oldestTime()
     fun localSeek(timeMillis: Long): Boolean {
         val local = ring ?: return false
@@ -531,7 +554,7 @@ class IptvLivePlayback(context: Context, private val locator: String, purpose: P
     }
     private fun playRing(session: IptvLocalTimeshiftSession, anchor: Long) {
         mainHandler.removeCallbacks(reconnect); mainHandler.removeCallbacks(startCheck)
-        firstFrame = false; behind.reset()
+        firstFrame = false; behind.reset(); gauge.reset()
         localAnchorTime = session.timeAt(anchor) ?: System.currentTimeMillis()
         if (player.playbackState != Player.STATE_IDLE) player.stop()
         player.setMediaItem(MediaItem.Builder().setUri(session.uri(anchor)).setMimeType(MimeTypes.VIDEO_MP2T).build())
@@ -771,7 +794,6 @@ class IptvLivePlayback(context: Context, private val locator: String, purpose: P
         const val LIVE_MIN_SPEED = 0.97f
         const val LIVE_MAX_SPEED = 1.03f
         const val RATE_MS = 5_000L
-        const val GO_LIVE_MIN_MS = 3_000L
         const val RELEASE_BLOCK_MS = 250L
         const val CLOSE_WAIT_MS = 500L
         const val CLOSE_POLL_MS = 25L

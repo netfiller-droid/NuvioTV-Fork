@@ -64,7 +64,7 @@ internal fun goLiveRoute(state: IptvLiveState, now: Long): GoLiveRoute {
     if (state.player == null || state.playingRow == null) return GoLiveRoute.NONE
     val playback = state.playback
     return LiveGoLive.route(state.catchup != null, state.catchupFrom != null, state.catchup?.stop?.epochMillis, now,
-        state.localTimeshift, state.localBehind, state.paused, playback?.behindLiveMs(), playback?.bufferTargetMs ?: 0L)
+        state.localTimeshift, state.localBehind, state.paused, playback?.behindLive == true, playback?.bufferTargetMs ?: 0L)
 }
 
 @Composable
@@ -115,7 +115,8 @@ internal fun LiveControls(state: IptvLiveState, now: Long, layout: PlayerControl
                     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                         Text(row?.let(::channelName) ?: state.playingTitle.orEmpty(), style = MaterialTheme.typography.titleMedium,
                             color = Color.White.copy(alpha = .8f), maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f, fill = false))
-                        Tag(stringResource(playbackTag(state, programme, now)), live = state.catchup == null)
+                        val tag = playbackTag(state, programme, now, position)
+                        Tag(stringResource(tag), live = tag == R.string.iptv_live_playing)
                         qualityBadges(state.player).forEach { Tag(it) }
                     }
                     Text(programme?.let(::title) ?: stringResource(R.string.iptv_live_no_programme), style = MaterialTheme.typography.titleLarge,

@@ -85,6 +85,20 @@ class LocalTimeshiftTest {
         assertEquals(LocalTimeshiftStep.Live, LocalTimeshiftPolicy.step(now - 60_000, now, now - 2_000, archive = false))
     }
 
+    @Test fun pausedPositionIsHeldToWhatTheRingStillHolds() {
+        val now = 1_800_000_000_000L
+        val paused = now - 45 * 60_000
+        val oldest = now - 30 * 60_000
+        assertEquals(oldest, LocalTimeshiftPolicy.held(paused, oldest, now))
+        assertTrue(LocalTimeshiftPolicy.behind(LocalTimeshiftPolicy.held(paused, oldest, now), now))
+        assertEquals(now - 60_000, LocalTimeshiftPolicy.held(now - 60_000, oldest, now))
+        assertEquals(paused, LocalTimeshiftPolicy.held(paused, null, now))
+        assertEquals(now, LocalTimeshiftPolicy.held(now + 2_000, oldest, now))
+        assertEquals(now, LocalTimeshiftPolicy.held(now - 60_000, now + 1_000, now))
+        assertNull(LocalTimeshiftPolicy.held(null, oldest, now))
+        assertFalse(LocalTimeshiftPolicy.behind(LocalTimeshiftPolicy.held(now - 8_000, oldest, now), now))
+    }
+
     @Test fun behindLiveNeedsMoreThanTheLiveEdge() {
         val now = 1_800_000_000_000L
         assertFalse(LocalTimeshiftPolicy.behind(null, now))

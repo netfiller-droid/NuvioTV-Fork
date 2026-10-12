@@ -21,6 +21,26 @@ object LiveReconnect {
     fun handOver(httpStatus: Int): Boolean = httpStatus !in TRANSIENT_STATUS
 }
 
+class LiveRejoinGuard(private val limit: Int = MAX_REJOINS, private val spanMillis: Long = SPAN_MILLIS) {
+    private val times = LongArray(limit)
+    private var next = 0
+    private var used = 0
+
+    @Synchronized fun allow(nowMillis: Long): Boolean {
+        if (used == limit && nowMillis - times[next] < spanMillis) return false
+        times[next] = nowMillis; next = (next + 1) % limit
+        if (used < limit) used++
+        return true
+    }
+
+    @Synchronized fun reset() { next = 0; used = 0 }
+
+    companion object {
+        const val MAX_REJOINS = 3
+        const val SPAN_MILLIS = 30_000L
+    }
+}
+
 object LiveTsSync {
     const val PACKET = 188
     const val SYNC = 0x47.toByte()
