@@ -1,6 +1,6 @@
 # Nuvio IPTV — device test checklist (build `2d693cada`, run 38180390637)
 
-For this build start with section 7o, then 7n, 7m, 7l, 7k, 7j, 7i, 7h, 7g and 7f (not yet tried on a device). 7e and earlier passed on earlier builds; repeat them only as a regression check. After the 1.1.0-nt.5 merge, also repeat sections 1 and 2.
+For this build start with section 7p, then 7o, 7n, 7m, 7l, 7k, 7j, 7i, 7h, 7g and 7f (not yet tried on a device). 7e and earlier passed on earlier builds; repeat them only as a regression check. After the 1.1.0-nt.5 merge, also repeat sections 1 and 2.
 
 Mark each item pass / fail / not tested. For failures, note what happened and keep a
 logcat (`adb logcat -s NuvioIptv:V *:E`). Do not share logs that contain addresses.
@@ -83,6 +83,14 @@ logcat (`adb logcat -s NuvioIptv:V *:E`). Do not share logs that contain address
 11. Press Home on the remote with Game Centre open: logcat should show sports requests
    stop (`sports fetch` lines cease).
 12. Useful logs: `sports fetch service=`, `sports links`, `sports fixtures`.
+
+## 7p. 9:40 12 October capture: NHL empty net (build pending)
+1. A live NHL game where the trailing team pulls its goalie late in the 3rd: the Sport hero
+   goalie line and the Game Centre summary "Goalies" show only the other team's goalie while
+   the net is empty, and both again once the goalie returns (within about 30 s). The Stats
+   tab lists both throughout.
+2. The same game at the end of a period, and an NHL game with both goalies in: both
+   goalies are shown.
 
 ## 7o. 8:01 12 October capture: NFL half-time and overtime finals (build `2d693cada`)
 1. NFL at half-time: the score bug reads Halftime with no timeout marks; they come back in

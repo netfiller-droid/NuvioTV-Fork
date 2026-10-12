@@ -849,6 +849,10 @@ Sport data (capture of 12 October, 08:01; NFL half-time and an overtime tie):
 - Games from TheSportsDB that end in overtime or a shoot-out ("Final/OT", "Final/SO") show
   as finished with that text, instead of staying live or going back to not started.
 
+Sport data (capture of 12 October, 09:40; first NHL empty net):
+- In an NHL game, a goalie pulled for an extra attacker is no longer shown as the goalie in
+  net in the Sport hero and the Game Centre summary; the Stats tab still lists both.
+
 ## Second pass over the untested work (12 October 2026, not device-tested)
 
 Sport screens and multiview:
