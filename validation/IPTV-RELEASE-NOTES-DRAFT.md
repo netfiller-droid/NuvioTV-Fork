@@ -1144,6 +1144,11 @@ Phone setup (security review)
 
 ## Validation
 
+- Sixteenth to eighteenth sport captures (12 October 11:26, 11:43, 12:06; MLB full count,
+  balk and pitching changes, basketball plays without a player, TheSportsDB extra time) and
+  the multiview baseball count from the scoreboard: CI debug green at `1e539a53a` (run
+  38196253340); 995 core and 305 data-layer JVM tests on the host. Not device-tested.
+
 - Fifteenth sport capture (12 October 09:40; first NHL empty net, the last NFL minute, a
   NASCAR final) and the "empty net" line: CI debug green at `98d520804` (run 38186968485);
   980 core and 305 data-layer JVM tests on the host. Not device-tested.
