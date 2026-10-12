@@ -981,3 +981,67 @@ point score and the server in a tie-break; NASCAR stages; F1 gaps, pit stops and
 bout in progress; live cricket; AFL/NRL live clock (off season); golf after a cut or a playoff;
 football own goals, penalties and extra time on ESPN; a refreshed TheSportsDB shoot-out row (`P`
 with a progress).
+
+## Fifteenth pass (12 October, 09:40)
+
+ESPN and TheSportsDB responses captured at 09:40 Brisbane time on Monday 12 October (23:40Z on
+11 October), 99 minutes after the fourteenth pass; TheSportsDB `updated` reads 00:40 London time on
+12 October. In play: the last NFL 4pm game (49ers at Seahawks, 32–29 with 0:47 left in the 4th), three
+NHL games (Kraken at Capitals in the 3rd, 5–3 with 1:35 left; Canucks at Rangers at the end of the
+2nd; Hurricanes at Flyers in the 1st) and two NBA preseason games in the 2nd quarter (Magic at
+Cavaliers 41–51, Bucks at Hornets 31–37). Broncos at Chargers (23–17) and Lions at Cardinals (45–21)
+are now final, and the NASCAR Cup race at Charlotte finished. MLB, the NFL Sunday night game, the
+later NBA game, A-League, URC and Champions League were still to start; every other league showed
+the same finals as before. New summaries: `nfl-summary-LIVE.json` (the Seahawks game),
+`nhl-summary-LIVE.json` (the Capitals game) and `nba-summary-LIVE.json` (the Cavaliers game); the
+other summaries differ from the previous upload only in `news`, `odds` and ticket fields, and 18 of
+the 41 files are byte-for-byte the previous upload (tennis, golf, UFC, cricket, AFL, NRL, NBL and
+A-League scoreboards among them). The multi-sport header is again a cached copy, from about 20:42Z.
+The nested `espn-pass.zip` is the seventh-pass capture again. The TheSportsDB calls folder holds the
+23:40Z livescore and five new `lookuptv` files; the coverage folder's generic `v2-livescore-*` files
+are from 23:39Z but its `v2-livescore-app-*` files are the fourteenth-pass set from 22:01Z, and the
+league lists, `eventsday` and search files in both folders are unchanged (where the bytes differ, only
+in trailing blank lines). Every scoreboard and summary parses without errors. Trimmed copies are in
+`app/src/test/resources/sports/*-real-20261012d.json` (`SportsRealDataEmptyNetTest`).
+
+| Shape | What the real response showed | Parser change |
+|---|---|---|
+| NHL empty net (live) | Summary of the Capitals game at 18:22 of the 3rd (scoreboard `1:35 - 3rd`), Capitals two goals down: `onIce` (one entry per team: `teamId` and six `entries` with `athleteid` and `whereabouts` `ROSTER_WHEREABOUTS_IN_PLAY`) lists four forwards and two defencemen for Washington and no goalie, while Seattle's six include their goalie. The goalie lines in `boxscore.players` (`goalies` group) still show Logan Thompson with 57:42 on ice; no play, strength or scoreboard field says empty net (`strength` stays `Even Strength`, the last play is `Goalie Stopped` with no team). At the end of the 1st in the fourteenth pass both goalies were on ice. | A goalie is marked as pulled while the game is in play (not at the end of a period, an intermission or a shootout) when his side has at least five players on ice, none of them a goalie from that side's goalie lines, and the other side's goalie is on ice; the goalie in net (hero sentence, Game Centre summary) is then only the other side's, the Stats tab still lists both |
+| NHL timing | 1st period began 9 m 47 s after the listed start and lasted 37.6 real minutes, intermissions 18.8 and 18.9 minutes, the 2nd 38.3 minutes; 18:22 of the 3rd came 35.8 minutes into it. Goals carry `wallclock`. | none (every goal has a real time; the 35-minute period and 18-minute break estimate fits) |
+| NHL scoreboard (live) | `1:35 - 3rd`, `End of 2nd` and `5:57 - 1st`; `situation` holds only `lastPlay` (`Goalie Stopped`, `Period End`, `TV Timeout`), no team, strength or goalie field | none (`P3 · 1:35`, `End of 2nd`, `P1 · 5:57`) |
+| NFL last minute | `0:47 - 4th` after a turnover on downs: `1st & 10 at SF 41`, `possession` the 49ers, `homeTimeouts` 1 and `awayTimeouts` 2; `lastPlay` is the Seahawks' failed 4th-down pass but its `team` is the 49ers (the side with the ball next), its drive `5 plays, 44 yards, 1:09` with `result` `DOWNS`; win probability 0.001 for the home side; `isRedZone` false. No two-minute warning on the scoreboard; the summary has a `Two-minute warning` play at 2:00 of the 4th (wallclock 23:29:02Z, the next snap 3 m 19 s later) and one in the 2nd. | none: `Q4 · 0:47`, the down and spot as the extra line, the finished drive is left out |
+| NFL summary (4th quarter) | 27 `drives.previous` plus `drives.current`, which is the finished Seahawks drive again (`result` `DOWNS`); 12 `scoringPlays`. Kick-off 19 s after the listed start; Q1 ended at +39 min, half-time at +95, Q3 ended at +153, the 4th-quarter two-minute warning at +184, 0:47 at +195. | none |
+| NBA live (2nd quarter) | Scoreboard as in the eighth pass (`3:15 - 2nd`, `situation` with only `lastPlay` and win probability). Summary header competitors carry `fouls` (`teamFouls`, `teamFoulsCurrent`, `foulsToGive`, `bonusState` `DOUBLE`), `timeoutsUsed` 0 and 1 and `timeoutsRemaining` 5 for both, although the plays have two full timeouts for each side; 234 `plays` with `wallclock`, tip-off 13 minutes after the listed start. | none (team fouls and timeouts are not stored; the header timeout counts would be wrong here) |
+| NASCAR race (final) | `STATUS_FINAL`, `period` 267 (laps), 39 cars in `order`, `winner` false on every car (F1 sets it on the winner); no competition `type`, stage or caution field | none: `Race · finished` with the top three from `order` |
+
+TheSportsDB at 23:40Z: livescore returned Soccer (37), Ice Hockey (15), American Football (12) and
+Basketball (4); every other sport answered `{"Message":"No data found"}`. The NFL rows read
+`0:47 - 4th` (matching ESPN), ten `Final` and `Final/OT` for the tie, all with `strStatus` null. The
+three NHL games were `P3` `19` (ESPN 18:25 elapsed), `BT` at the end of the 2nd and `P1` `15` (ESPN
+14:03 elapsed); the two NBA games `Q2` `3` and `Q2` `9`, the minute being played (one free throw ahead
+of ESPN in the Cavaliers game). A WHL shoot-out final was `AP`; an AHL `OT` `4` row from 05:04 on 10
+October, the two DEL `P3` rows from 14:30Z and the USHL and AHL `P3` rows from 10 October were still
+there (all skipped as before). The Copa Colombia `P` row has gone; no other shoot-out row. `lookuptv`
+returned channels for the Packers–Bears game (20 rows: ESPN Australia, NFL Sunday Ticket, Sky Sports
+Football, Main Event and NFL in the United Kingdom, CTV2 in Canada, DAZN in nine countries) and the
+Rangers game (4, Canada and Finland); two hockey games and a Honduran football match had none.
+Every country named resolves.
+
+Parser changes: an NHL goalie is marked as pulled from the summary's `onIce` list (see the table);
+`SportsGoalies.inNet` leaves him out.
+
+Checked again on this data: NFL possession after a turnover on downs, timeouts late in the 4th, the
+red-zone flag, finished drives, scoring-play times; NHL goals, strength and goalies; NBA last play and
+win probability; the NASCAR running order once final; TheSportsDB quarter clocks, period minutes,
+breaks, stale and stuck rows, worldwide and United Kingdom channels.
+
+Confirmed now: an NHL empty net (summary `onIce` only); the last NFL minute after a turnover on downs;
+the NFL two-minute warning in the summary plays; NBA team fouls and bonus in the summary; a finished
+NASCAR race; TheSportsDB NFL last-minute clock and NBA and NHL period minutes.
+
+Still unconfirmed: the NFL two-minute warning on the scoreboard; NBA overtime; an NHL power play,
+empty net or shootout in progress on the scoreboard, and a shootout in the summary; an MLB pitching
+change or full count; tennis point score and the server in a tie-break; NASCAR stages; F1 gaps, pit
+stops and fastest lap; a UFC bout in progress; live cricket; AFL/NRL live clock (off season); golf
+after a cut or a playoff; football own goals, penalties and extra time on ESPN; a refreshed
+TheSportsDB shoot-out row (`P` with a progress).

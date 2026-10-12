@@ -33,7 +33,7 @@ data class SummaryStrength(val text: String, val powerPlay: FixtureSide?)
 
 data class SummaryPlay(val text: String, val period: Int?, val clock: String?)
 
-data class SummaryGoalie(val side: FixtureSide, val name: String, val saves: Int?, val shotsAgainst: Int?, val savePct: String?)
+data class SummaryGoalie(val side: FixtureSide, val name: String, val saves: Int?, val shotsAgainst: Int?, val savePct: String?, val pulled: Boolean = false)
 
 data class SummaryRun(val side: FixtureSide, val points: Int) {
     val text: String get() = "$points–0"
@@ -107,13 +107,14 @@ object EspnSummary {
         val shownClock = statusJson?.str("displayClock")?.takeIf { it.length <= 12 }
         val stale = status == FixtureStatus.LIVE && shownClock != null && sport in MINUTE_SPORTS &&
             SportsLines.behind(shownClock, moments.filter { it.period == null || it.period == period }.mapNotNull { it.clock })
+        val inPlay = status == FixtureStatus.LIVE && type?.str("name")?.uppercase().orEmpty().let { name -> BREAK_STATES.none { it in name } }
         return SportsSummary(header?.str("id") ?: competition?.str("id"), sport, status, period, shownClock.takeIf { !stale },
             ((if (stale) type?.str("description") else null) ?: type?.str("shortDetail") ?: type?.str("detail"))?.take(80), team(home), team(away), homeLine, awayLine,
             moments, stats(teamStats, sport), leaders(root, sides, sport), rosters(root, sides, sport),
             tables(root, sides), headToHead(root, sides), probability(root),
             if (sport == "baseball" && status == FixtureStatus.LIVE) count(root, plays, names, statusJson?.str("periodPrefix")) else null,
             if (sport == "ice-hockey") strength(plays, sides) else null, lastPlays(root, if (sport == "baseball") batting(plays) else plays), if (sport == "basketball") run(plays) else null,
-            if (cricket) innings(competitors, sides) else emptyList(), if (sport == "ice-hockey") goalies(root, sides) else emptyList(),
+            if (cricket) innings(competitors, sides) else emptyList(), if (sport == "ice-hockey") goalies(root, sides, inPlay) else emptyList(),
             statusJson?.str("summary")?.takeIf { status == FixtureStatus.FINAL }?.take(120), awards(statusJson, sides))
     }
 
@@ -135,18 +136,32 @@ object EspnSummary {
         return list.flatMap { it.optJSONArray("plays")?.let(::objs).orEmpty() }.distinctBy { it.str("id") ?: it }
     }
 
-    private fun goalies(root: JSONObject, sides: Sides): List<SummaryGoalie> =
-        root.optJSONObject("boxscore")?.optJSONArray("players")?.let(::objs).orEmpty().flatMap { team ->
-            val side = sides.of(team) ?: return@flatMap emptyList()
-            val group = team.optJSONArray("statistics")?.let(::objs)?.firstOrNull { it.str("name") == "goalies" } ?: return@flatMap emptyList()
+    private fun goalies(root: JSONObject, sides: Sides, playing: Boolean): List<SummaryGoalie> {
+        val groups = root.optJSONObject("boxscore")?.optJSONArray("players")?.let(::objs).orEmpty().mapNotNull { team ->
+            val side = sides.of(team) ?: return@mapNotNull null
+            team.optJSONArray("statistics")?.let(::objs)?.firstOrNull { it.str("name") == "goalies" }?.let { side to it }
+        }
+        val ids = groups.associate { (side, group) -> side to group.optJSONArray("athletes")?.let(::objs).orEmpty().mapNotNull { it.optJSONObject("athlete")?.str("id") }.toSet() }
+        val ice = if (playing) onIce(root, sides) else emptyMap()
+        fun guarded(side: FixtureSide) = ice[side].orEmpty().any { it in ids[side].orEmpty() }
+        val empty = FixtureSide.entries.filter { side ->
+            ice[side].orEmpty().size >= 5 && ids[side].orEmpty().isNotEmpty() && !guarded(side) && guarded(if (side == FixtureSide.HOME) FixtureSide.AWAY else FixtureSide.HOME)
+        }.toSet()
+        return groups.flatMap { (side, group) ->
             val keys = group.optJSONArray("keys")?.let { array -> (0 until array.length()).map { if (array.isNull(it)) "" else array.optString(it) } }.orEmpty()
             group.optJSONArray("athletes")?.let(::objs).orEmpty().mapNotNull { entry ->
                 val name = entry.optJSONObject("athlete")?.let { it.str("displayName") ?: it.str("shortName") } ?: return@mapNotNull null
                 val stats = entry.optJSONArray("stats")
                 fun value(key: String) = keys.indexOf(key).takeIf { it >= 0 }?.let { index -> stats?.takeUnless { it.isNull(index) }?.optString(index) }?.trim()?.takeIf { it.isNotEmpty() && it != "-" }
-                SummaryGoalie(side, name.take(60), value("saves")?.toIntOrNull(), value("shotsAgainst")?.toIntOrNull(), value("savePct")?.take(8))
+                SummaryGoalie(side, name.take(60), value("saves")?.toIntOrNull(), value("shotsAgainst")?.toIntOrNull(), value("savePct")?.take(8), side in empty)
             }.take(2)
         }
+    }
+
+    private fun onIce(root: JSONObject, sides: Sides): Map<FixtureSide, Set<String>> = root.optJSONArray("onIce")?.let(::objs).orEmpty().mapNotNull { team ->
+        val side = sides.of(team) ?: return@mapNotNull null
+        side to team.optJSONArray("entries")?.let(::objs).orEmpty().mapNotNull { it.str("athleteid") ?: it.str("athleteId") }.toSet()
+    }.toMap()
 
     private fun team(c: JSONObject?): String? = c?.optJSONObject("team")?.let { it.str("displayName") ?: it.str("name") }?.take(80)
 
@@ -512,6 +527,7 @@ object EspnSummary {
     )
     private val BENCH = setOf("replacement", "reserve", "interchange", "substitute")
     private val MINUTE_SPORTS = setOf("soccer", "rugby", "rugby-league")
+    private val BREAK_STATES = listOf("END", "INTERMISSION", "SHOOTOUT")
     private val POWER_PLAY_PENALTIES = setOf("minor", "major", "double minor", "bench minor")
     private val SNAP = Regex("^\\(\\d{1,2}:\\d{2}\\)\\s+")
     private val BENCH_LABELS = setOf("sub", "substitute")

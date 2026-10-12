@@ -93,7 +93,7 @@ object SportsLedger {
 object SportsGoalies {
     fun inNet(goalies: List<SummaryGoalie>, awayFirst: Boolean): List<SummaryGoalie> =
         (if (awayFirst) listOf(FixtureSide.AWAY, FixtureSide.HOME) else listOf(FixtureSide.HOME, FixtureSide.AWAY))
-            .mapNotNull { side -> goalies.filter { it.side == side }.maxByOrNull { it.shotsAgainst ?: -1 } }
+            .mapNotNull { side -> goalies.filter { it.side == side && !it.pulled }.maxByOrNull { it.shotsAgainst ?: -1 } }
 
     fun savePct(text: String?): String? {
         val value = text?.trim()?.takeIf { it.isNotEmpty() } ?: return null

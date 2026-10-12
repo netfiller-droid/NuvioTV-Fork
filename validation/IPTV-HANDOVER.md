@@ -63,7 +63,11 @@ under "Earlier session notes" and the dated sections is history kept for referen
    football second yellow (a yellow, then a red for the same player, no other wording).
    The fourteenth pass (12 October 08:01) showed NFL half-time, an NFL overtime tie
    (`Final/OT`) and the NFL summary after half-time, an NHL end of period live, and
-   TheSportsDB `Halftime`, `Final/OT` and a stuck penalty shoot-out (`P`).
+   TheSportsDB `Halftime`, `Final/OT` and a stuck penalty shoot-out (`P`). The fifteenth
+   pass (12 October 09:40) showed an NHL empty net (summary `onIce` only: six skaters and no
+   goalie for the trailing side), the last NFL minute after a turnover on downs (the
+   two-minute warning only in the summary plays), NBA 2nd quarter live with team fouls, and
+   a finished NASCAR race (`winner` false on every car).
    Still not seen in real data (see the latest pass in `IPTV-SPORTS-DATA-FIELDS.md` for
    the full list): the NFL two-minute warning on the scoreboard; NBA overtime; an NHL empty net or
    shootout in progress; an MLB pitching change or full count; tennis point score and the
