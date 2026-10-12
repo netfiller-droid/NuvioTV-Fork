@@ -1036,13 +1036,13 @@ class SearchViewModel @Inject constructor(
     private suspend fun searchAddons(): List<Addon> {
         val installed = addonRepository.getInstalledAddons().first().searchEnabledAddons()
         val server = serverCatalog.searchAddons.first()
-        installed + server
+        return installed + server
     }
 
     private suspend fun discoverAddons(): List<Addon> {
         val installed = addonRepository.getInstalledAddons().first().enabledAddons()
         val server = serverCatalog.searchAddons.first()
-        installed + server
+        return installed + server
     }
 
     private suspend fun loadDiscoverCatalogs() {
