@@ -75,11 +75,16 @@ under "Earlier session notes" and the dated sections is history kept for referen
    ending on time, and TheSportsDB baseball rows (none live). The seventeenth pass (12
    October 11:43) showed NBA scoreboard free throws without the player (three of three so
    far), a bare `vs.` tip-off in the summary, an NFL timeout as the scoreboard's last play
-   (credited to the side with the ball) and an MLB home run moment.
+   (credited to the side with the ball) and an MLB home run moment. The eighteenth pass (12
+   October 12:06) showed MLB pitching changes (mid-inning and between innings; the at-bat
+   start is rewritten in place with the new pitcher), NFL timeouts back to three after
+   half-time, TheSportsDB football extra time (`ET` with the minute) and a hockey interval
+   (`BT`); no parser change was needed.
    Still not seen in real data (see the latest pass in `IPTV-SPORTS-DATA-FIELDS.md` for
    the full list): the NFL two-minute warning on the scoreboard; NBA overtime; an NHL power
-   play, empty net or shootout on the scoreboard, and a shootout in the summary; an MLB
-   pitching change; a live TheSportsDB baseball row; tennis point score and the
+   play, empty net or shootout on the scoreboard, and a shootout in the summary; a pitching
+   change as the MLB scoreboard's last play; a live TheSportsDB baseball row; a TheSportsDB
+   penalty shoot-out after extra time; tennis point score and the
    server during a match tie-break; NASCAR stages; a UFC bout in progress; live cricket;
    AFL/NRL clocks (off season); football own goals, penalties, second yellows and extra
    time. ESPN sends no gaps, pit stops or fastest lap during an F1 race. Coverage ideas from
