@@ -71,6 +71,7 @@ object SportsDbLive {
         if (status == FixtureStatus.LIVE && nowMillis - fixture.startMillis > SportsRefresh.durationMillis(fixture) && score.updatedMillis?.let { nowMillis - it > STUCK_MILLIS } == true)
             return settled(fixture, nowMillis)
         val live = status == FixtureStatus.LIVE
+        val inning = SportsDbEvents.inning(fixture.sport, code)?.takeIf { live }
         val home = score.homeScore?.trim()?.takeIf { it.isNotEmpty() && it.length <= 8 }
         val away = score.awayScore?.trim()?.takeIf { it.isNotEmpty() && it.length <= 8 }
         val both = fixture.teams && home != null && away != null
@@ -80,9 +81,10 @@ object SportsDbLive {
             ?: score.progress?.trim()?.takeIf { live && it.isNotEmpty() && it.length <= 8 }?.let { if (it.matches(MINUTE)) "$it'" else it }
         val words = score.progress?.trim()?.takeIf { live && raw.isEmpty() && quarter == null && it.length in 9..24 && it.any(Char::isLetter) }
             ?: score.progress?.trim()?.takeIf { !live && raw.isEmpty() && SportsGuide.normalise(it).matches(SportsDbEvents.OVERTIME_FINAL) }
-        return fixture.copy(status = status, score = if (both) "$home–$away" else fixture.score, detail = raw.takeIf { live && it.isNotEmpty() && it.length <= 24 } ?: words,
-            period = if (live) quarterPeriod ?: SportsDbEvents.PERIODS[code] ?: OVERTIME[fixture.sport]?.takeIf { code == "ot" } ?: fixture.period else null,
-            clock = if (live) progress ?: fixture.clock else null,
+        return fixture.copy(status = status, score = if (both) "$home–$away" else fixture.score,
+            detail = inning?.let(SportsDbEvents::inningText) ?: raw.takeIf { live && it.isNotEmpty() && it.length <= 24 } ?: words,
+            period = if (live) inning ?: quarterPeriod ?: SportsDbEvents.PERIODS[code] ?: OVERTIME[fixture.sport]?.takeIf { code == "ot" } ?: fixture.period else null,
+            clock = if (live && inning == null) progress ?: fixture.clock else null,
             homeLine = if (both) FixtureLine(home) else fixture.homeLine, awayLine = if (both) FixtureLine(away) else fixture.awayLine)
     }
 }

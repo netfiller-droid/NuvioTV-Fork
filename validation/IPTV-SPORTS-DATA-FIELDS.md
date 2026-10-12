@@ -1251,3 +1251,70 @@ in a tie-break; NASCAR stages; F1 gaps, pit stops and fastest lap; a UFC bout in
 cricket; AFL/NRL live clock (off season); golf after a cut or a playoff; football own goals, penalties
 and extra time on ESPN; a TheSportsDB penalty shoot-out after extra time and a refreshed shoot-out row
 (`P` with a progress); an NBA free throw on the scoreboard with the player's name.
+
+## Nineteenth pass (12 October, 21:03)
+
+ESPN and TheSportsDB responses captured at 21:03 Brisbane time on Monday 12 October (11:03Z), 8 hours
+57 minutes after the eighteenth pass; TheSportsDB `updated` reads 12:02 London time. No team game was
+in play on ESPN: the NFL Sunday night game finished in overtime (Ravens 30–23 at Falcons), Game 1 of
+the NLCS finished 2–1 to Milwaukee and the Nuggets beat the Bulls 133–128 in regulation. In play were
+only tennis matches: two in Shanghai (ATP, 1st set) and nine in Wuhan, Mallorca, Rovereto and Lisbon
+(WTA). The NFL Monday night game, the Premier League Monday game, the Champions League, college
+football, the A-League, URC and a UFC Contender Series card were still to start, and every other
+league showed the same finals as before. New summaries: `mlb-summary.json` is the NLCS final, and the
+NFL, college football and Premier League summaries are pre-game files for the next games; the four
+`*-summary-LIVE.json` files are the eighteenth-pass files (nothing live to replace them), and 13 of
+the 41 files are byte-for-byte the previous upload. The multi-sport header is again a cached copy
+(nothing in play, the newest final from 06:30Z). The nested `espn-pass.zip` is the seventh-pass
+capture again. The TheSportsDB calls folder holds the 11:02Z livescore and five new `lookuptv` files;
+the coverage folder's generic `v2-livescore-*` files are from 11:02Z but its `v2-livescore-app-*`
+files are the eighteenth-pass set from 02:06Z. Both league lists gained six football leagues (1,553,
+none renamed or removed); `eventsday`, search and ESPN league files are unchanged apart from blank
+lines. Every scoreboard and summary parses without errors. Trimmed copies are in
+`app/src/test/resources/sports/*-real-20261012h.json` (`SportsRealDataInningTest`).
+
+| Shape | What the real response showed | Parser change |
+|---|---|---|
+| NFL overtime win (final) | `STATUS_FINAL`, `period` 5, `shortDetail` `Final/OT`, `altDetail` `OT`; fifth linescore `7` for Baltimore and `0` for Atlanta (8 points in the 4th to tie 23–23); `winner` true on the Ravens; no `situation`; records `4-1` and `2-3`. | none: `BAL 30–23 ATL`, `Final/OT`, an `OT` column |
+| MLB final (summary) | 545 plays. The home side did not bat in the 9th (8 home linescores, 9 away), as on 11 October. Seven pitching changes in all, each `summaryType` `C`; `Megill relieved Ashby` has a `wallclock` (03:00:40Z) before `Top of the 9th inning` (03:03:05Z) listed ahead of it, as in the eighteenth pass. A pinch hitter (`De Paula hit for E. Hernández`) and a pinch runner (`Edman ran for De Paula`) are `play-result` with `summaryType` `N` and `outs` 0. No end-of-game play: the plays stop at the last out's `end-batterpitcher`. The root `situation` is absent this time (the 11 October final still had the last count). `featuredAthletes` names the winning, losing and saving pitcher. First pitch 00:16:45Z, last out 03:11:56Z (2 h 55 min). | none: no count once final, the last plays end with `Betts flied out to center.`, awards read |
+| NBA, NHL finals | Nuggets 133–128 in four quarters (39–52 at 6:03 of the 2nd in the eighteenth pass). The Flyers game final now has five `featuredAthletes` (both goalies and three stars). | none |
+| NASCAR (final, next day) | The Charlotte race now has `winner` true on the first car (`order` 1); in the fifteenth pass, soon after the finish, every car had `winner` false. | none: the order comes from `order` |
+| Tennis (live) | Eleven live matches. Server (`possession`) on 9 of them, again only where the match also has a `situation` with `onFirst`… all false. A 3rd set after a set lost in a tie-break (`value` 6 with `tiebreak` 2 against 7 with `tiebreak` 7, `winner` true on the side that took it). Still no point score and no tie-break in progress. | none: `MCNALLY 2 7 4 / STARODUBTSEVA 6 6(2) 4`; `BERGS serving for the set` at 6–5 |
+| UFC (next card) | Dana White's Contender Series week 10 on 13 October 23:00Z, `STATUS_SCHEDULED`, bouts with records and weight classes. | none |
+
+TheSportsDB at 11:02Z: livescore returned Ice Hockey (31), Basketball (16), American Football (13),
+Baseball (6) and Soccer (3); every other sport answered `{"Message":"No data found"}`. The first live
+baseball rows: three KBO games listed at 09:30Z read `IN4` at 3–5 and `IN5` at 1–3 and 2–1, with
+`strProgress` the same code as `strStatus` (no half-inning, outs or count) and the current `updated` time; a
+CPBL game listed at 10:35Z read `IN2` with both scores null. Until now such a row showed `IN4` as its
+state on the score bug, the cards and the hero. The MLB row `2616724` (21:00Z on 12 October) and a
+Venezuelan game were still `NS`. Football: a European Under-17 game `HT` `45+3`, a Ukrainian game
+`1H` `10` 62 minutes after its listed start (a late kick-off; the live window still covers it) and a
+Tajik game `1H` `3`. A KHL game read `P3` `19` at 1–0, a KBL game `HT` with a null progress. The NFL
+night game reads `Final/OT` (in `strProgress`, `strStatus` null) at 23–30 and, like the Commanders–Giants
+tie, keeps the current `updated` time, while the regulation finals stopped refreshing (03:04 and 03:24
+London for the 4pm games, 23:59 for the 1pm games). The two DEL `P3` rows from 14:30Z on 11 October
+were last refreshed 18.2 hours earlier (skipped as before). `lookuptv` for the new KHL, KBL, Bulgarian
+and Serbian basketball and CPBL games returned `{"tvevent":null}`; the Packers–Bears file has the same
+20 channels with its `strTime` corrected from 20:25:00 to 17:00:00.
+
+Parser changes: a TheSportsDB baseball row `IN<n>` (livescore or `eventsday`) is live in inning `n`
+and reads `Inning n` (score bug, cards, hero and multiview), with the repeated code dropped as a clock.
+
+Checked again on this data: NFL overtime final, line score and records; TheSportsDB `Final/OT`
+progress; MLB final line score, awards and last plays; tennis sets, completed tie-break sets and
+server; football half-time and minutes, a late kick-off; hockey period minutes; stale rows; the
+schedules of the next NFL, college football, Premier League, Champions League and UFC events.
+
+Confirmed now: live TheSportsDB baseball rows (`IN<n>`, the inning only, scores sometimes null); an
+NFL overtime win on the scoreboard; NASCAR `winner` set on the winning car some hours after the race;
+an MLB final without the root `situation`.
+
+Still unconfirmed: the NFL two-minute warning on the scoreboard; NBA overtime; an NHL power play,
+empty net or shootout in progress on the scoreboard, and a shootout in the summary; a pitching change
+as the MLB scoreboard's last play; TheSportsDB baseball half-innings, extra innings or a finished
+baseball row; tennis point score and the server in a tie-break; NASCAR stages; F1 gaps, pit stops and
+fastest lap; a UFC bout in progress; live cricket; AFL/NRL live clock (off season); golf after a cut
+or a playoff; football own goals, penalties and extra time on ESPN; a TheSportsDB penalty shoot-out
+after extra time and a refreshed shoot-out row (`P` with a progress); an NBA free throw on the
+scoreboard with the player's name.

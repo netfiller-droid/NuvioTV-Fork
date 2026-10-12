@@ -925,6 +925,8 @@ Sport data:
   counts against other recordings once the game actually runs over. The Record every game
   panel says so.
 - Alert headlines on the sport pop-up are in sentence case.
+- Live baseball from TheSportsDB (e.g. KBO, CPBL) shows the inning ("Inning 4") instead of
+  the raw code "IN4" (capture of 12 October, 21:03).
 
 Live player (behind live, rejoin, local timeshift):
 - HLS channels: the "behind live" hint and Return to live are steadier. They use the

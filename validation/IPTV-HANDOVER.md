@@ -86,11 +86,16 @@ under "Earlier session notes" and the dated sections is history kept for referen
    October 12:06) showed MLB pitching changes (mid-inning and between innings; the at-bat
    start is rewritten in place with the new pitcher), NFL timeouts back to three after
    half-time, TheSportsDB football extra time (`ET` with the minute) and a hockey interval
-   (`BT`); no parser change was needed.
+   (`BT`); no parser change was needed. The nineteenth pass (12 October 21:03) showed an
+   NFL overtime win (`Final/OT` with a 7–0 overtime), the NLCS Game 1 final (pinch hitter
+   and runner plays, no root `situation`), the NASCAR `winner` flag set hours after the race,
+   and the first live TheSportsDB baseball rows (`IN4`, inning only, scores sometimes null),
+   now shown as "Inning 4".
    Still not seen in real data (see the latest pass in `IPTV-SPORTS-DATA-FIELDS.md` for
    the full list): the NFL two-minute warning on the scoreboard; NBA overtime; an NHL power
    play, empty net or shootout on the scoreboard, and a shootout in the summary; a pitching
-   change as the MLB scoreboard's last play; a live TheSportsDB baseball row; a TheSportsDB
+   change as the MLB scoreboard's last play; TheSportsDB baseball half-innings, extra
+   innings or a finished baseball row; a TheSportsDB
    penalty shoot-out after extra time; tennis point score and the
    server during a match tie-break; NASCAR stages; a UFC bout in progress; live cricket;
    AFL/NRL clocks (off season); football own goals, penalties, second yellows and extra
@@ -121,6 +126,8 @@ under "Earlier session notes" and the dated sections is history kept for referen
    - Recordings in the Movies folder store the MediaStore id rather than the file name.
    - Men's college basketball needs a halves timeline in Game Centre (UI work).
    - Ordinal table positions ("1st") are English only; other languages show the number.
+   - Baseball inning words built in core ("Inning 4" from TheSportsDB, "Mid 4"/"End 4" on the
+     score bug) are English only.
    - Not offered: ~200 minor football competitions, other golf tours, other MMA
      promotions, FIBA and minor sports. Pre-game NHL/MLB team stats are season figures.
 4. Waiting on the user (do not do these without them; give a recommendation and wait):

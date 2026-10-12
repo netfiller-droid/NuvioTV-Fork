@@ -615,10 +615,11 @@ object SportsDbEvents {
         val stations = event.text("strTVStation")?.split(',', ';', '/', '|')?.map(String::trim)?.filter { it.isNotEmpty() && it.length <= 80 }.orEmpty()
         val started = paired && status != FixtureStatus.SCHEDULED
         val live = status == FixtureStatus.LIVE
-        val period = PERIODS[code]?.takeIf { live }
-        val progress = event.text("strProgress")?.takeIf { live && it.length <= 8 }?.let { if (it.all(Char::isDigit)) "$it'" else it }
+        val inning = inning(league.sport, code)?.takeIf { live }
+        val period = inning ?: PERIODS[code]?.takeIf { live }
+        val progress = event.text("strProgress")?.takeIf { live && inning == null && it.length <= 8 }?.let { if (it.all(Char::isDigit)) "$it'" else it }
         return SportsFixture(id, league.id, league.sport, title, home.takeIf { paired }, away.takeIf { paired }, start, status, score,
-            raw.takeIf { live && it.isNotEmpty() && it.length <= 24 }, stations.distinct().take(12), event.text("strVenue")?.take(MAX_TEXT),
+            inning?.let(::inningText) ?: raw.takeIf { live && it.isNotEmpty() && it.length <= 24 }, stations.distinct().take(12), event.text("strVenue")?.take(MAX_TEXT),
             event.text("intRound")?.toIntOrNull()?.takeIf { it in 1..99 }, period, progress, if (started) FixtureLine(homeScore) else null,
             if (started) FixtureLine(awayScore) else null, null, event.text("strLeagueBadge")?.let(::sportsImage), source = SportsService.THESPORTSDB)
     }
@@ -636,6 +637,12 @@ object SportsDbEvents {
     private fun parseLocal(value: String): Long? = runCatching { LocalDateTime.parse(value).toInstant(ZoneOffset.UTC).toEpochMilli() }.getOrNull()
 
     internal fun finished(code: String): Boolean = code in FINISHED || OVERTIME_FINAL.matches(code)
+
+    internal fun inning(sport: String, code: String): Int? = if (sport == "baseball") INNING.matchEntire(code)?.groupValues?.get(1)?.toIntOrNull() else null
+
+    internal fun inningText(inning: Int): String = "Inning $inning"
+
+    private val INNING = Regex("in ?([1-9][0-9]?)")
 
     internal val OVERTIME_FINAL = Regex("final (?:[2-9]?ot|so)")
     internal val FINISHED = setOf("match finished", "ft", "aet", "pen", "ft pen", "aot", "final", "finished", "after over time", "after extra time", "after penalties", "ended", "full time", "ap")

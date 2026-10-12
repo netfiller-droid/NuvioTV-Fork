@@ -1,6 +1,6 @@
 # Nuvio IPTV — device test checklist (build `a7266ce95`, run 38201561490)
 
-For this build start with section 7s, then 7r, 7q, 7p, 7o, 7n, 7m, 7l, 7k, 7j, 7i, 7h, 7g and 7f (not yet tried on a device). 7e and earlier passed on earlier builds; repeat them only as a regression check. After the 1.1.0-nt.5 merge, also repeat sections 1 and 2.
+For this build start with section 7t, then 7s, 7r, 7q, 7p, 7o, 7n, 7m, 7l, 7k, 7j, 7i, 7h, 7g and 7f (not yet tried on a device). 7e and earlier passed on earlier builds; repeat them only as a regression check. After the 1.1.0-nt.5 merge, also repeat sections 1 and 2.
 
 Mark each item pass / fail / not tested. For failures, note what happened and keep a
 logcat (`adb logcat -s NuvioIptv:V *:E`). Do not share logs that contain addresses.
@@ -83,6 +83,14 @@ logcat (`adb logcat -s NuvioIptv:V *:E`). Do not share logs that contain address
 11. Press Home on the remote with Game Centre open: logcat should show sports requests
    stop (`sports fetch` lines cease).
 12. Useful logs: `sports fetch service=`, `sports links`, `sports fixtures`.
+
+## 7t. 21:03 12 October capture: TheSportsDB baseball innings (build pending)
+1. With a TheSportsDB key and a custom baseball league added (KBO, NPB or CPBL) during a
+   game: the Sport card, score bug, hero and multiview tile show "Inning N" (not "IN4"), the
+   score updates and no clock is shown. A game with no score yet shows the teams and
+   "Inning N".
+2. A finished NFL overtime game shows "Final/OT" and an OT column in the hero line score with
+   that period's points.
 
 ## 7s. Behind-live figure, HLS rejoin and local timeshift pause (build `a7266ce95`)
 1. An HLS channel with Safety buffer on: watch 2 minutes at live with Stats open. "Behind
