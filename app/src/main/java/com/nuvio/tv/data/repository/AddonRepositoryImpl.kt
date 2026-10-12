@@ -293,9 +293,10 @@ class AddonRepositoryImpl(
             preferences.installedAddonUrls,
             preferences.userSetNames,
             preferences.addonEnabledStates,
+            preferences.addonSearchEnabledStates,
             manifestCacheRevision
-        ) { urls, names, enabledStates, _ -> Triple(urls, names, enabledStates) }
-        .flatMapLatest { (urls, userNames, enabledStates) ->
+        ) { urls, names, enabledStates, searchEnabledStates, _ -> Triple(urls, names, enabledStates, searchEnabledStates) }
+        .flatMapLatest { (urls, userNames, enabledStates, searchEnabledStates) ->
             flow {
                 if (urls.isEmpty()) {
                     emit(emptyList())
@@ -308,15 +309,17 @@ class AddonRepositoryImpl(
                 diskCacheLoaded.await()
 
                 val enabledByUrl = enabledStates.mapKeys { (url, _) -> canonicalizeUrl(url) }
+                val searchEnabledByUrl = searchEnabledStates.mapKeys { (url, _) -> canonicalizeUrl(url) }
                 val cached = urls.mapNotNull { url ->
                     val canonical = canonicalizeUrl(url)
                     val enabled = enabledByUrl[canonical] ?: true
+                    val searchEnabled = searchEnabledByUrl[canonical] ?: true
                     getCachedManifest(canonical)
-                        ?.copy(enabled = enabled)
-                        ?: if (!enabled) placeholderAddon(canonical, userNames, enabled) else null
+                        ?.copy(enabled = enabled, searchEnabled = searchEnabled)
+                        ?: if (!enabled) placeholderAddon(canonical, userNames, enabled, searchEnabled) else null
                 }
                 if (cached.isNotEmpty()) {
-                    emit(applyDisplayNames(cached, userNames, enabledByUrl))
+                    emit(applyDisplayNames(cached, userNames, enabledByUrl, searchEnabledByUrl))
                 }
 
                 val hasCacheMiss = urls.any { url ->
@@ -330,16 +333,17 @@ class AddonRepositoryImpl(
                             async {
                                 val canonical = canonicalizeUrl(url)
                                 val enabled = enabledByUrl[canonical] ?: true
+                                val searchEnabled = searchEnabledByUrl[canonical] ?: true
                                 if (!enabled) {
                                     return@async getCachedManifest(canonical)
-                                        ?.copy(enabled = false)
-                                        ?: placeholderAddon(canonical, userNames, enabled = false)
+                                        ?.copy(enabled = false, searchEnabled = searchEnabled)
+                                        ?: placeholderAddon(canonical, userNames, enabled = false, searchEnabled = searchEnabled)
                                 }
                                 val cachedManifest = getCachedManifest(canonical)
                                 if (cachedManifest != null) {
-                                    cachedManifest.copy(enabled = enabled)
+                                    cachedManifest.copy(enabled = enabled, searchEnabled = searchEnabled)
                                 } else when (val result = fetchAddon(url)) {
-                                    is NetworkResult.Success -> result.data.copy(enabled = enabled)
+                                    is NetworkResult.Success -> result.data.copy(enabled = enabled, searchEnabled = searchEnabled)
                                     else -> {
                                         // Enabled addon whose manifest fetch failed: keep it
                                         // visible as a placeholder instead of dropping it, and
@@ -347,7 +351,7 @@ class AddonRepositoryImpl(
                                         // resource, so it stays inert in stream fetching until
                                         // the real manifest lands and bumps the cache revision.
                                         failedUrls.add(canonical)
-                                        placeholderAddon(canonical, userNames, enabled = true)
+                                        placeholderAddon(canonical, userNames, enabled = true, searchEnabled = searchEnabled)
                                     }
                                 }
                             }
@@ -355,7 +359,7 @@ class AddonRepositoryImpl(
                     }
 
                     if (fresh != cached) {
-                        emit(applyDisplayNames(fresh, userNames, enabledByUrl))
+                        emit(applyDisplayNames(fresh, userNames, enabledByUrl, searchEnabledByUrl))
                     }
                     if (failedUrls.isNotEmpty()) {
                         scheduleFailedManifestRetry(failedUrls.toList())
@@ -424,6 +428,12 @@ class AddonRepositoryImpl(
         triggerRemoteSync()
     }
 
+    override suspend fun setAddonSearchEnabled(url: String, enabled: Boolean) {
+        val cleanUrl = canonicalizeUrl(url)
+        if (!preferences.setAddonSearchEnabled(cleanUrl, enabled)) return
+        triggerRemoteSync()
+    }
+
     suspend fun reconcileWithRemoteAddonUrls(
         remoteUrls: List<String>,
         removeMissingLocal: Boolean = true
@@ -486,7 +496,8 @@ class AddonRepositoryImpl(
     private fun placeholderAddon(
         url: String,
         userSetNames: Map<String, String>,
-        enabled: Boolean
+        enabled: Boolean,
+        searchEnabled: Boolean
     ): Addon {
         val canonical = canonicalizeUrl(url)
         val displayName = (userSetNames[canonical] ?: userSetNames[url])?.takeIf { it.isNotBlank() }
@@ -503,23 +514,26 @@ class AddonRepositoryImpl(
             types = emptyList(),
             rawTypes = emptyList(),
             resources = emptyList(),
-            enabled = enabled
+            enabled = enabled,
+            searchEnabled = searchEnabled
         )
     }
 
     private fun applyDisplayNames(
         addons: List<Addon>,
         userSetNames: Map<String, String>,
-        enabledStates: Map<String, Boolean>
+        enabledStates: Map<String, Boolean>,
+        searchEnabledStates: Map<String, Boolean>
     ): List<Addon> {
         val withUserNames = addons.map { addon ->
             val canonical = canonicalizeUrl(addon.baseUrl)
             val userSetName = userSetNames[canonical] ?: userSetNames[addon.baseUrl]
             val enabled = enabledStates[canonical] ?: addon.enabled
+            val searchEnabled = searchEnabledStates[canonical] ?: addon.searchEnabled
             if (!userSetName.isNullOrBlank() && userSetName != addon.name) {
-                addon.copy(displayName = userSetName, enabled = enabled)
+                addon.copy(displayName = userSetName, enabled = enabled, searchEnabled = searchEnabled)
             } else {
-                addon.copy(enabled = enabled)
+                addon.copy(enabled = enabled, searchEnabled = searchEnabled)
             }
         }
 

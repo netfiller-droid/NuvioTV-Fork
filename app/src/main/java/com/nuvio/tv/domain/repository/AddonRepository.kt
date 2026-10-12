@@ -11,6 +11,7 @@ interface AddonRepository {
     suspend fun removeAddon(url: String)
     suspend fun setAddonOrder(urls: List<String>)
     suspend fun setAddonEnabled(url: String, enabled: Boolean)
+    suspend fun setAddonSearchEnabled(url: String, enabled: Boolean)
 
     /**
      * Force a manifest re-fetch of every installed, enabled addon, bypassing

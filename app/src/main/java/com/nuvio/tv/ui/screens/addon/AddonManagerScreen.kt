@@ -588,6 +588,7 @@ fun AddonManagerScreen(
                         },
                         onRemove = { addonUrlPendingDeletion = addon.baseUrl },
                         onEnabledChange = { enabled -> viewModel.setAddonEnabled(addon.baseUrl, enabled) },
+                        onSearchEnabledChange = { enabled -> viewModel.setAddonSearchEnabled(addon.baseUrl, enabled) },
                         isReadOnly = viewModel.isReadOnly,
                         showReorder = !isEssential,
                         healthLevel = uiState.healthByUrl[AddonHealthStore.addonKey(canonicalizeAddonUrl(addon.baseUrl))],
@@ -1277,6 +1278,7 @@ private fun AddonCard(
     onMoveDown: () -> Unit,
     onRemove: () -> Unit,
     onEnabledChange: (Boolean) -> Unit,
+    onSearchEnabledChange: (Boolean) -> Unit,
     isReadOnly: Boolean = false,
     showReorder: Boolean = true,
     toggleFocusRequester: FocusRequester? = null,
@@ -1326,6 +1328,7 @@ private fun AddonCard(
                 onMoveDown = onMoveDown,
                 onRemove = onRemove,
                 onEnabledChange = onEnabledChange,
+                onSearchEnabledChange = onSearchEnabledChange,
                 showReorder = showReorder,
                 healthLevel = healthLevel,
                 toggleFocusRequester = effectiveToggleFocusRequester
@@ -1345,6 +1348,7 @@ private fun AddonCardContent(
     onMoveDown: () -> Unit = {},
     onRemove: () -> Unit = {},
     onEnabledChange: (Boolean) -> Unit = {},
+    onSearchEnabledChange: (Boolean) -> Unit = {},
     showReorder: Boolean = true,
     toggleFocusRequester: FocusRequester? = null,
     healthLevel: AddonHealthLevel? = null
@@ -1403,39 +1407,97 @@ private fun AddonCardContent(
                     horizontalArrangement = Arrangement.spacedBy(NuvioTheme.spacing.sm),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Surface(
-                        onClick = { onEnabledChange(!addon.enabled) },
-                        modifier = Modifier
-                            .focusRequester(toggleFocusRequester ?: remember { FocusRequester() })
-                            .semantics {
-                                role = Role.Switch
-                                toggleableState = if (addon.enabled) ToggleableState.On else ToggleableState.Off
-                            },
-                        colors = ClickableSurfaceDefaults.colors(
-                            containerColor = Color.Transparent,
-                            focusedContainerColor = NuvioTheme.colors.FocusBackground
-                        ),
-                        border = ClickableSurfaceDefaults.border(
-                            focusedBorder = Border(
-                                border = NuvioTheme.focusRing.border(NuvioTheme.spacing.xxs),
-                                shape = settingsItemShape(NuvioTheme.radii.md)
-                            )
-                        ),
-                        shape = ClickableSurfaceDefaults.shape(settingsItemShape(NuvioTheme.radii.md)),
-                        scale = ClickableSurfaceDefaults.scale(focusedScale = 1f)
+                    Column(
+                        horizontalAlignment = Alignment.End,
+                        verticalArrangement = Arrangement.spacedBy(NuvioTheme.spacing.xs)
                     ) {
-                        Box(
-                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Switch(
-                                checked = addon.enabled,
-                                onCheckedChange = null,
-                                colors = SwitchDefaults.colors(
-                                    checkedThumbColor = NuvioTheme.colors.Secondary,
-                                    checkedTrackColor = NuvioTheme.colors.Secondary.copy(alpha = 0.3f)
-                                )
+                        Text(
+                            text = stringResource(R.string.addon_toggle_enabled),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = NuvioTheme.colors.TextSecondary
+                        )
+                        if (addon.enabled) {
+                            Text(
+                                text = stringResource(R.string.addon_toggle_search),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = NuvioTheme.colors.TextSecondary
                             )
+                        }
+                    }
+                    Column(
+                        horizontalArrangement = Arrangement.spacedBy(NuvioTheme.spacing.xs),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Surface(
+                            onClick = { onEnabledChange(!addon.enabled) },
+                            modifier = Modifier
+                                .focusRequester(toggleFocusRequester ?: remember { FocusRequester() })
+                                .semantics {
+                                    role = Role.Switch
+                                    toggleableState = if (addon.enabled) ToggleableState.On else ToggleableState.Off
+                                },
+                            colors = ClickableSurfaceDefaults.colors(
+                                containerColor = Color.Transparent,
+                                focusedContainerColor = NuvioTheme.colors.FocusBackground
+                            ),
+                            border = ClickableSurfaceDefaults.border(
+                                focusedBorder = Border(
+                                    border = NuvioTheme.focusRing.border(NuvioTheme.spacing.xxs),
+                                    shape = settingsItemShape(NuvioTheme.radii.md)
+                                )
+                            ),
+                            shape = ClickableSurfaceDefaults.shape(settingsItemShape(NuvioTheme.radii.md)),
+                            scale = ClickableSurfaceDefaults.scale(focusedScale = 1f)
+                        ) {
+                            Box(
+                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Switch(
+                                    checked = addon.enabled,
+                                    onCheckedChange = null,
+                                    colors = SwitchDefaults.colors(
+                                        checkedThumbColor = NuvioTheme.colors.Secondary,
+                                        checkedTrackColor = NuvioTheme.colors.Secondary.copy(alpha = 0.3f)
+                                    )
+                                )
+                            }
+                        }
+                        if (addon.enabled) {
+                            Surface(
+                                onClick = { onSearchEnabledChange(!addon.searchEnabled) },
+                                modifier = Modifier
+                                    .semantics {
+                                        role = Role.Switch
+                                        toggleableState = if (addon.searchEnabled) ToggleableState.On else ToggleableState.Off
+                                    },
+                                colors = ClickableSurfaceDefaults.colors(
+                                    containerColor = Color.Transparent,
+                                    focusedContainerColor = NuvioTheme.colors.FocusBackground
+                                ),
+                                border = ClickableSurfaceDefaults.border(
+                                    focusedBorder = Border(
+                                        border = NuvioTheme.focusRing.border(NuvioTheme.spacing.xxs),
+                                        shape = settingsItemShape(NuvioTheme.radii.md)
+                                    )
+                                ),
+                                shape = ClickableSurfaceDefaults.shape(settingsItemShape(NuvioTheme.radii.md)),
+                                scale = ClickableSurfaceDefaults.scale(focusedScale = 1f)
+                            ) {
+                                Box(
+                                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Switch(
+                                        checked = addon.searchEnabled,
+                                        onCheckedChange = null,
+                                        colors = SwitchDefaults.colors(
+                                            checkedThumbColor = NuvioTheme.colors.Secondary,
+                                            checkedTrackColor = NuvioTheme.colors.Secondary.copy(alpha = 0.3f)
+                                        )
+                                    )
+                                }
+                            }
                         }
                     }
                     if (showReorder) {

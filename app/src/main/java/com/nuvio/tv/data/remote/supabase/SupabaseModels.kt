@@ -32,6 +32,7 @@ data class SupabaseAddon(
     val url: String,
     val name: String? = null,
     val enabled: Boolean = true,
+    @SerialName("search_enabled") val searchEnabled: Boolean = true,
     @SerialName("sort_order") val sortOrder: Int = 0,
     @SerialName("profile_id") val profileId: Int = 1,
     @SerialName("created_at") val createdAt: String? = null,

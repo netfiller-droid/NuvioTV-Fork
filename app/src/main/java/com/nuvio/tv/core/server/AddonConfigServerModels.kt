@@ -27,7 +27,9 @@ enum class AddonWebConfigMode(
 data class AddonInfo(
     val url: String,
     val name: String,
-    val description: String?
+    val description: String?,
+    val enabled: Boolean = true,
+    val searchEnabled: Boolean = true
 )
 
 data class CatalogInfo(
