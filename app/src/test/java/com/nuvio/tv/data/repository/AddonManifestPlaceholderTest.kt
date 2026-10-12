@@ -255,6 +255,7 @@ class AddonManifestPlaceholderTest {
         every { preferences.installedAddonUrls } returns flowOf(listOf(addonUrl))
         every { preferences.userSetNames } returns userSetNames
         every { preferences.addonEnabledStates } returns flowOf(emptyMap())
+        every { preferences.addonSearchEnabledStates } returns flowOf(emptyMap())
         coEvery { preferences.removeAddon(any()) } returns true
 
         return Harness(

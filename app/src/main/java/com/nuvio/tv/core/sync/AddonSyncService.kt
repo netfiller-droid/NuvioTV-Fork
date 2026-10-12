@@ -54,6 +54,7 @@ class AddonSyncService @Inject constructor(
             val localUrls = addonPreferences.installedAddonUrls.first()
             val userSetNames = addonPreferences.userSetNames.first()
             val enabledStates = addonPreferences.addonEnabledStates.first()
+            val searchEnabledStates = addonPreferences.addonSearchEnabledStates.first()
             Log.d(TAG, "pushToRemote: localUrls count=${localUrls.size} for profile $profileId")
 
             val params = buildJsonObject {
@@ -64,6 +65,7 @@ class AddonSyncService @Inject constructor(
                             put("url", url)
                             put("sort_order", index)
                             put("enabled", enabledStates[canonicalUrl] ?: true)
+                            put("search_enabled", searchEnabledStates[canonicalUrl] ?: true)
                             val name = userSetNames[canonicalUrl] ?: userSetNames[url]
                             if (!name.isNullOrBlank()) {
                                 put("name", name)
@@ -119,16 +121,19 @@ class AddonSyncService @Inject constructor(
 
             val nameMap = mutableMapOf<String, String>()
             val enabledMap = mutableMapOf<String, Boolean>()
+            val searchEnabledMap = mutableMapOf<String, Boolean>()
             remoteAddons.forEach { addon ->
                 val canonicalUrl = canonicalizeUrl(addon.url)
                 if (!addon.name.isNullOrBlank()) {
                     nameMap[canonicalUrl] = addon.name
                 }
                 enabledMap[canonicalUrl] = addon.enabled
+                searchEnabledMap[canonicalUrl] = addon.searchEnabled
             }
             if (remoteAddons.isNotEmpty()) {
                 addonPreferences.setUserSetNames(nameMap)
                 addonPreferences.setAddonEnabledStates(enabledMap)
+                addonPreferences.setAddonSearchEnabledStates(searchEnabledMap)
             }
 
             Result.success(

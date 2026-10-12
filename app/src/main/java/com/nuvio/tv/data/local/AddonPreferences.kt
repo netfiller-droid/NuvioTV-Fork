@@ -49,6 +49,7 @@ class AddonPreferences @Inject constructor(
     private val legacyUrlsKey = stringSetPreferencesKey("installed_addon_urls")
     private val userSetNamesKey = stringPreferencesKey("addon_user_set_names")
     private val addonEnabledStatesKey = stringPreferencesKey("installed_addon_enabled_states")
+    private val addonSearchEnabledStatesKey = stringPreferencesKey("installed_addon_search_enabled_states")
     // Canonicalisation lives in core.util - one implementation
     // shared with AddonRepositoryImpl and AddonSyncService.
     private fun canonicalizeUrl(url: String): String = canonicalizeAddonUrl(url)
@@ -68,6 +69,14 @@ class AddonPreferences @Inject constructor(
     val addonEnabledStates: Flow<Map<String, Boolean>> = effectiveProfileIdFlow.flatMapLatest { pid ->
         factory.get(pid, FEATURE).data.map { preferences ->
             preferences[addonEnabledStatesKey]
+                ?.let(::parseEnabledStateMap)
+                .orEmpty()
+        }
+    }
+
+    val addonSearchEnabledStates: Flow<Map<String, Boolean>> = effectiveProfileIdFlow.flatMapLatest { pid ->
+        factory.get(pid, FEATURE).data.map { preferences ->
+            preferences[addonSearchEnabledStatesKey]
                 ?.let(::parseEnabledStateMap)
                 .orEmpty()
         }
@@ -97,6 +106,9 @@ class AddonPreferences @Inject constructor(
             val states = getCurrentEnabledStates(preferences).toMutableMap()
             states[normalizedUrl] = true
             preferences[addonEnabledStatesKey] = gson.toJson(states)
+            val searchStates = getCurrentSearchEnabledStates(preferences).toMutableMap()
+            searchStates[normalizedUrl] = true
+            preferences[addonSearchEnabledStatesKey] = gson.toJson(searchStates)
             changed = true
         }
         return changed
@@ -121,6 +133,9 @@ class AddonPreferences @Inject constructor(
             val states = getCurrentEnabledStates(preferences).toMutableMap()
             states.remove(normalizedUrl)
             preferences[addonEnabledStatesKey] = gson.toJson(states)
+            val searchStates = getCurrentSearchEnabledStates(preferences).toMutableMap()
+            searchStates.remove(normalizedUrl)
+            preferences[addonSearchEnabledStatesKey] = gson.toJson(searchStates)
             changed = true
         }
         return changed
@@ -138,6 +153,10 @@ class AddonPreferences @Inject constructor(
             val currentStates = getCurrentEnabledStates(preferences)
             preferences[addonEnabledStatesKey] = gson.toJson(
                 orderedUrls.associateWith { url -> currentStates[url] ?: true }
+            )
+            val currentSearchStates = getCurrentSearchEnabledStates(preferences)
+            preferences[addonSearchEnabledStatesKey] = gson.toJson(
+                orderedUrls.associateWith { url -> currentSearchStates[url] ?: true }
             )
             changed = true
         }
@@ -159,11 +178,36 @@ class AddonPreferences @Inject constructor(
         return changed
     }
 
+    suspend fun setAddonSearchEnabled(url: String, enabled: Boolean): Boolean {
+        val active = profileManager.activeProfile
+        if (active != null && !active.isPrimary && active.usesPrimaryAddons) return false
+        var changed = false
+        store().edit { preferences ->
+            val states = getCurrentSearchEnabledStates(preferences).toMutableMap()
+            val normalizedUrl = canonicalizeUrl(url)
+            if ((states[normalizedUrl] ?: true) == enabled) return@edit
+            states[normalizedUrl] = enabled
+            preferences[addonSearchEnabledStatesKey] = gson.toJson(states)
+            changed = true
+        }
+        return changed
+    }
+
     suspend fun setAddonEnabledStates(states: Map<String, Boolean>) {
         val active = profileManager.activeProfile
         if (active != null && !active.isPrimary && active.usesPrimaryAddons) return
         store().edit { preferences ->
             preferences[addonEnabledStatesKey] = gson.toJson(
+                states.mapKeys { (url, _) -> canonicalizeUrl(url) }
+            )
+        }
+    }
+
+    suspend fun setAddonSearchEnabledStates(states: Map<String, Boolean>) {
+        val active = profileManager.activeProfile
+        if (active != null && !active.isPrimary && active.usesPrimaryAddons) return
+        store().edit { preferences ->
+            preferences[addonSearchEnabledStatesKey] = gson.toJson(
                 states.mapKeys { (url, _) -> canonicalizeUrl(url) }
             )
         }
@@ -215,6 +259,11 @@ class AddonPreferences @Inject constructor(
 
     private fun getCurrentEnabledStates(preferences: Preferences): Map<String, Boolean> {
         val json = preferences[addonEnabledStatesKey] ?: return emptyMap()
+        return parseEnabledStateMap(json)
+    }
+
+    private fun getCurrentSearchEnabledStates(preferences: Preferences): Map<String, Boolean> {
+        val json = preferences[addonSearchEnabledStatesKey] ?: return emptyMap()
         return parseEnabledStateMap(json)
     }
 

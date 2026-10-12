@@ -1881,6 +1881,8 @@
     <string name="addon_installed_section">Installed</string>
     <string name="addon_empty">No addons installed. Add one to get started.</string>
     <string name="addon_remove">Remove</string>
+    <string name="addon_toggle_enabled">Enabled</string>
+    <string name="addon_toggle_search">Search</string>
     <string name="addon_delete_confirm_title">Delete addon?</string>
     <string name="addon_delete_confirm_message">Are you sure you want to delete it?</string>
     <string name="addon_delete_no">No</string>

@@ -22,7 +22,8 @@ data class Addon(
     val manifestLanguage: String? = null,
     val configVersion: Long? = null,
     val timestamp: Long? = null,
-    val enabled: Boolean = true
+    val enabled: Boolean = true,
+    val searchEnabled: Boolean = true
 ) {
     val isActive: Boolean
         get() = enabled
@@ -30,6 +31,9 @@ data class Addon(
 
 fun List<Addon>.enabledAddons(): List<Addon> =
     filter { it.enabled }
+
+fun List<Addon>.searchEnabledAddons(): List<Addon> =
+    filter { it.enabled && it.searchEnabled }
 
 @Immutable
 data class CatalogDescriptor(

@@ -236,6 +236,12 @@ class AddonManagerViewModel @Inject constructor(
         }
     }
 
+    fun setAddonSearchEnabled(baseUrl: String, enabled: Boolean) {
+        viewModelScope.launch {
+            addonRepository.setAddonSearchEnabled(baseUrl, enabled)
+        }
+    }
+
     fun moveAddonUp(baseUrl: String) {
         reorderAddon(baseUrl, -1)
     }
@@ -355,7 +361,9 @@ class AddonManagerViewModel @Inject constructor(
                         AddonInfo(
                             url = addon.baseUrl,
                             name = addon.displayName.ifBlank { addon.baseUrl },
-                            description = addon.description
+                            description = addon.description,
+                            enabled = addon.enabled,
+                            searchEnabled = addon.searchEnabled
                         )
                     },
                     catalogs = unifiedCatalogs,
