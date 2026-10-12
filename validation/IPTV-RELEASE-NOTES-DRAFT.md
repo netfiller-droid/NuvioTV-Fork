@@ -1131,6 +1131,10 @@ Phone setup (security review)
 
 ## Validation
 
+- Fifteenth sport capture (12 October 09:40; first NHL empty net, the last NFL minute, a
+  NASCAR final) and the "empty net" line: CI debug green at `98d520804` (run 38186968485);
+  980 core and 305 data-layer JVM tests on the host. Not device-tested.
+
 - Fourteenth sport capture (12 October 08:01; NFL half-time, overtime tie, NHL end of
   period; TheSportsDB Final/OT): CI debug green at `2d693cada` (run 38180390637); 973 core
   and 305 data-layer JVM tests on the host. Not device-tested.
