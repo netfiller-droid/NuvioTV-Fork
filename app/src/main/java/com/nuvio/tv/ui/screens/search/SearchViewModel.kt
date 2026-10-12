@@ -1033,17 +1033,17 @@ class SearchViewModel @Inject constructor(
         return if (ready) catalogOrder[firstReal] else null
     }
 
-    private suspend fun searchAddons(): List<Addon> = {
+    private suspend fun searchAddons(): List<Addon> {
         val installed = addonRepository.getInstalledAddons().first().searchEnabledAddons()
         val server = serverCatalog.searchAddons.first()
         installed + server
-    }()
+    }
 
-    private suspend fun discoverAddons(): List<Addon> = {
+    private suspend fun discoverAddons(): List<Addon> {
         val installed = addonRepository.getInstalledAddons().first().enabledAddons()
         val server = serverCatalog.searchAddons.first()
         installed + server
-    }()
+    }
 
     private suspend fun loadDiscoverCatalogs() {
         if (_uiState.value.discoverLocation == DiscoverLocation.OFF) return
