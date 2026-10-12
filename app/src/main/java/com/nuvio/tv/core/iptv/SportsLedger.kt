@@ -90,6 +90,22 @@ object SportsLedger {
     }
 }
 
+object SportsCounts {
+    fun live(fixture: SportsFixture, summary: SummaryCount?): SummaryCount? {
+        val board = (fixture.sportDetail as? SportsDetail.Baseball)?.takeIf { it.outs != null || it.balls != null || it.strikes != null }
+        val count = when {
+            board == null -> summary
+            else -> {
+                val bottom = board.half?.let { it == InningHalf.BOTTOM || it == InningHalf.END }
+                val same = summary != null && summary.inning == board.inning && (bottom == null || summary.bottom == bottom)
+                SummaryCount(board.balls, board.strikes, board.outs, board.first, board.second, board.third, board.inning ?: summary?.inning, bottom ?: summary?.bottom,
+                    summary?.pitcher?.takeIf { same }, summary?.batter?.takeIf { same })
+            }
+        }
+        return count?.takeIf { it.outs != null || it.balls != null || it.strikes != null }
+    }
+}
+
 object SportsGoalies {
     fun inNet(goalies: List<SummaryGoalie>, awayFirst: Boolean): List<SummaryGoalie> =
         (if (awayFirst) listOf(FixtureSide.AWAY, FixtureSide.HOME) else listOf(FixtureSide.HOME, FixtureSide.AWAY))

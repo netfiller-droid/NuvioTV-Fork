@@ -90,6 +90,8 @@ logcat (`adb logcat -s NuvioIptv:V *:E`). Do not share logs that contain address
    at-bat starting, or nothing.
 2. In Game Centre or the multiview tile last plays for a live MLB game, a balk (or another
    runner play) appears once.
+3. Multiview with a live MLB game tile: the count, outs and bases match the Sport hero
+   (they no longer lag a pitch behind).
 
 ## 7p. 9:40 12 October capture: NHL empty net (build `98d520804`)
 1. A live NHL game where the trailing team pulls its goalie late in the 3rd: the Sport hero

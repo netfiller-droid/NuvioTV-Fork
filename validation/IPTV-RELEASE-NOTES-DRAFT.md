@@ -859,6 +859,9 @@ Sport data (capture of 12 October, 11:26; MLB playoffs, a full count and a balk)
 - During a baseball game, the Sport hero no longer shows the raw pitch text (for example
   "Pitch 5 : Ball 3.") under the count.
 - A balk or similar runner play appears once in the baseball last plays, not twice.
+- The multiview baseball tile takes the count, outs and bases from the scoreboard, like the
+  Sport hero, instead of the game summary, which can be a pitch behind; pitcher and batter
+  names show only while both agree on the inning.
 
 ## Second pass over the untested work (12 October 2026, not device-tested)
 

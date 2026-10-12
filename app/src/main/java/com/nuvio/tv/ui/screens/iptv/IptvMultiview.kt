@@ -505,7 +505,7 @@ private fun GameScreen(fixture: SportsFixture, hidden: Boolean, modifier: Modifi
             Text(stringResource(R.string.iptv_sport5p_hidden), style = MaterialTheme.typography.labelSmall, color = NuvioTheme.colors.TextTertiary, maxLines = 1)
             return@Column
         }
-        val count = summary?.count?.takeIf { fixture.sport == "baseball" && fixture.status == FixtureStatus.LIVE && (it.outs != null || it.balls != null || it.strikes != null) }
+        val count = com.nuvio.tv.core.iptv.SportsCounts.live(fixture, summary?.count)?.takeIf { fixture.sport == "baseball" && fixture.status == FixtureStatus.LIVE }
         if (count != null) Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
             CountBases(count, 12.dp)
             Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
