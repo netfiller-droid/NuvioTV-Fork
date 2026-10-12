@@ -1160,6 +1160,10 @@ Phone setup (security review)
 
 ## Validation
 
+- Live player (steady behind-live on HLS, immediate rejoin behind the live window, local
+  timeshift pause held to the buffer): CI debug green at `a7266ce95` (run 38201561490);
+  1010 core and 305 data-layer JVM tests on the host. Not device-tested.
+
 - Sixteenth to eighteenth sport captures (12 October 11:26, 11:43, 12:06; MLB full count,
   balk and pitching changes, basketball plays without a player, TheSportsDB extra time) and
   the multiview baseball count from the scoreboard: CI debug green at `1e539a53a` (run

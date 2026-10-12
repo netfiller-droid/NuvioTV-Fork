@@ -1,4 +1,4 @@
-# Nuvio IPTV — device test checklist (build `1e539a53a`, run 38196253340)
+# Nuvio IPTV — device test checklist (build `a7266ce95`, run 38201561490)
 
 For this build start with section 7s, then 7r, 7q, 7p, 7o, 7n, 7m, 7l, 7k, 7j, 7i, 7h, 7g and 7f (not yet tried on a device). 7e and earlier passed on earlier builds; repeat them only as a regression check. After the 1.1.0-nt.5 merge, also repeat sections 1 and 2.
 
@@ -84,7 +84,7 @@ logcat (`adb logcat -s NuvioIptv:V *:E`). Do not share logs that contain address
    stop (`sports fetch` lines cease).
 12. Useful logs: `sports fetch service=`, `sports links`, `sports fixtures`.
 
-## 7s. Behind-live figure, HLS rejoin and local timeshift pause (build pending)
+## 7s. Behind-live figure, HLS rejoin and local timeshift pause (build `a7266ce95`)
 1. An HLS channel with Safety buffer on: watch 2 minutes at live with Stats open. "Behind
    live" and Return to live do not appear or flicker; Stats shows no "Behind live" row, or
    one that stays under 3 s. (A "Live offset" row in Stats means the stream carries
