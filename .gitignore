@@ -50,6 +50,7 @@ scripts/*
 !scripts/verify_native_apk.py
 !scripts/tests/
 !scripts/tests/*.py
+!scripts/setup-release-secrets.sh
 /supabase
 /SUPPORTER_COSMETICS.md
 tv-samples
