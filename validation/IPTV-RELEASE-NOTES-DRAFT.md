@@ -1162,6 +1162,10 @@ Phone setup (security review)
 
 ## Validation
 
+- Nineteenth sport capture (12 October 21:03; NFL overtime win, NLCS Game 1 final, first live
+  TheSportsDB baseball rows): CI debug green at `8260658fc` (run 38242468867); 1013 core and
+  305 data-layer JVM tests on the host. Not device-tested.
+
 - Live player (steady behind-live on HLS, immediate rejoin behind the live window, local
   timeshift pause held to the buffer): CI debug green at `a7266ce95` (run 38201561490);
   1010 core and 305 data-layer JVM tests on the host. Not device-tested.

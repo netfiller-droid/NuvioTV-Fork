@@ -1,4 +1,4 @@
-# Nuvio IPTV — device test checklist (build `a7266ce95`, run 38201561490)
+# Nuvio IPTV — device test checklist (build `8260658fc`, run 38242468867)
 
 For this build start with section 7t, then 7s, 7r, 7q, 7p, 7o, 7n, 7m, 7l, 7k, 7j, 7i, 7h, 7g and 7f (not yet tried on a device). 7e and earlier passed on earlier builds; repeat them only as a regression check. After the 1.1.0-nt.5 merge, also repeat sections 1 and 2.
 
@@ -84,7 +84,7 @@ logcat (`adb logcat -s NuvioIptv:V *:E`). Do not share logs that contain address
    stop (`sports fetch` lines cease).
 12. Useful logs: `sports fetch service=`, `sports links`, `sports fixtures`.
 
-## 7t. 21:03 12 October capture: TheSportsDB baseball innings (build pending)
+## 7t. 21:03 12 October capture: TheSportsDB baseball innings (build `8260658fc`)
 1. With a TheSportsDB key and a custom baseball league added (KBO, NPB or CPBL) during a
    game: the Sport card, score bug, hero and multiview tile show "Inning N" (not "IN4"), the
    score updates and no clock is shown. A game with no score yet shows the teams and
